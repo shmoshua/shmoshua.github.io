@@ -14,17 +14,17 @@ class App {
         WebFont.load({
             google: {
                 families: ['Hind:700']
+            },
+            fontactive: () =>{
+                this .visual = new Visual();
+
+                window.addEventListener('resize', this.resize.bind(this), false);
+                this.resize();
+
+                requestAnimationFrame(this.animate.bind(this));
+
             }
         });
-        fontactive: () =>{
-            this.visual = new Visual();
-
-            window.addEventListener('resize', this.resize.bind(this), false);
-            this.resize();
-
-            requestAnimationFrame(this.animate.bind(this));
-
-        }
 
     }
 
