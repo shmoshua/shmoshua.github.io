@@ -1,4 +1,4 @@
-import { RANDOM_TEXT } from "./visual";
+import { RANDOM_TEXT } from "./visual.js";
 
 const FRICTION = 0.86;
 const COLOR_SPEED = 0.12;
