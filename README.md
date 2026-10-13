@@ -13,8 +13,25 @@ GitHub Pages rebuilds the site within a minute or two. The homepage list (newest
 the post header and the contents sidebar are generated automatically, so `index.html`
 never needs editing.
 
-## Previewing locally
+## Previewing locally (no commit needed)
 
-The homepage is built by GitHub, so opening `index.html` directly shows template code
-instead of the list. To preview before pushing, install Jekyll and run
-`jekyll serve` in this folder, then open http://localhost:4000.
+One-time setup on macOS (needs [Homebrew](https://brew.sh)):
+
+```bash
+brew install ruby
+echo 'export PATH="$(brew --prefix)/opt/ruby/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+bundle install          # run inside this folder
+```
+
+Then, whenever you want to work on the site:
+
+```bash
+bundle exec jekyll serve --livereload
+```
+
+Open http://localhost:4000. Every time you save a file the site rebuilds and the
+browser refreshes. Stop the server with Ctrl+C.
+
+Don't use VS Code's Live Server for this site: it doesn't run Jekyll, so you'll see
+template code like `{% for post in site.posts %}` instead of the post list.
