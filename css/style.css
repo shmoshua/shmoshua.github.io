@@ -1,0 +1,421 @@
+* {
+    outline: 0;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    width:100%;
+    height: 100%;
+}
+
+body{
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    
+}
+
+canvas{
+    width: 100%;
+    height: 100%;
+    
+}
+
+/* ============================================================
+   DESIGN TOKENS
+   Palette: soft white + near-black ink, phthalo green accent.
+   Type:    Space Grotesk (display) / Source Serif 4 (body) / IBM Plex Mono (code)
+
+   ── HOW TO CHANGE FONTS ─────────────────────────────────────
+   Three variables drive every font on the page:
+     --sans   headings, labels, UI chrome
+     --serif  body text (long prose and math context)
+     --mono   code, Lean snippets, numeric outputs
+
+   To swap a font:
+   1. Go to https://fonts.google.com and pick a family.
+   2. Click "Get font" → "Get embed code" → choose @import.
+      Copy the URL that looks like:
+        https://fonts.googleapis.com/css2?family=Lora:ital,wght@...
+   3. Replace (or add) that URL in the <link> tag near the top
+      of this file (look for "Fonts: display / body / mono").
+   4. Change the corresponding variable below, e.g.:
+        --serif: "Lora", Georgia, serif;
+      (always keep a generic fallback: serif / sans-serif / monospace)
+
+   Some good swaps to try:
+     SANS (display):  "Outfit", "DM Sans", "Bricolage Grotesque"
+     SERIF (body):    "Lora", "Spectral", "Playfair Display", "EB Garamond"
+     MONO (code):     "JetBrains Mono", "Fira Code", "Inconsolata"
+
+   You don't need to use three different families. Using the same
+   family for --sans and --serif (e.g. all "EB Garamond") gives a
+   classical, unified look. For math-heavy writing, a serif body
+   pairs most naturally with MathJax's default math font.
+   ─────────────────────────────────────────────────────────── */
+:root {
+  --paper:    #f5f8f5;   /* very light, slightly green-tinted white */
+  --ink:      #111a14;   /* near-black with a green undertone       */
+  --muted:    #556158;   /* desaturated green-grey for captions      */
+  --rule:     #d9e4da;   /* hairline dividers                        */
+  --accent:   #0d6e5a;   /* phthalo green                           */
+  --accent-2: #8fada0;   /* muted teal for secondary plot line       */
+  --box-bg:   #edf3ee;   /* theorem box background                   */
+  --box-rule: #cfddd0;   /* theorem box border                       */
+  --sel:      #b8e0d4;   /* text selection highlight                 */
+
+  --measure: 45rem;       /* body text column width  */
+  --wide:    52rem;       /* breakout figures        */
+  --serif: "Source Serif 4", Georgia, serif;
+  --sans:  "Space Grotesk", system-ui, sans-serif;
+  --mono:  "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --paper:    #0d1410;
+    --ink:      #ddeee0;
+    --muted:    #7a9e85;
+    --rule:     #1e3024;
+    --accent:   #3ecfaa;
+    --accent-2: #4a7a6a;
+    --box-bg:   #0f1e17;
+    --box-rule: #1c3325;
+    --sel:      #0e3d2e;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.65;
+  font-feature-settings: "onum" 1, "pnum" 1;
+}
+::selection { background: var(--sel); }
+
+/* ---- Layout: centered measure, with breakout helpers ---- */
+.article { max-width: var(--measure); margin: 0 auto; padding: 0 1.4rem; }
+.wide  { max-width: var(--wide); }
+.wide, .full { margin-left: auto; margin-right: auto; }
+@media (min-width: 1100px) {
+  .wide { width: var(--wide); max-width: none;
+          margin-left: calc((var(--measure) - var(--wide)) / 2); }
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header.masthead { padding: 4.5rem 0 1.5rem; }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: .72rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 1.1rem;
+}
+h1.title {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(2rem, 4.5vw, 3.05rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.1rem;
+  text-wrap: balance;
+}
+.authors {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 1.02rem;
+  margin: 0 0 .25rem;
+}
+.affil { color: var(--muted); font-size: .95rem; margin: 0 0 1.4rem; }
+.affil a, .authors a { color: inherit; }
+
+.links { display: flex; flex-wrap: wrap; gap: .6rem; margin: 0 0 1rem; }
+.links a {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: .82rem;
+  text-decoration: none;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: .4rem .95rem;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.links a:hover { border-color: var(--accent); color: var(--accent); }
+.links a .arr { color: var(--muted); }
+
+.rule { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+
+/* ============================================================
+   ABSTRACT
+   ============================================================ */
+.abstract {
+  font-size: 1.04rem;
+  color: var(--ink);
+}
+.abstract .lead-label {
+  font-family: var(--mono);
+  font-size: .7rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-bottom: .5rem;
+}
+
+/* ============================================================
+   TYPOGRAPHY / SECTIONS
+   ============================================================ */
+.article h2 {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+  margin: 3.2rem 0 1rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--rule);
+}
+.article h3 {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 1.15rem;
+  margin: 2.2rem 0 .6rem;
+}
+/* Section numbering driven by content order, not decoration */
+.article { counter-reset: sec; }
+.article h2.numbered { counter-increment: sec; counter-reset: subsec; }
+.article h2.numbered::before {
+  content: counter(sec) "  ";
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.article h3.numbered { counter-increment: subsec; }
+.article h3.numbered::before {
+  content: counter(sec) "." counter(subsec) "  ";
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+p { margin: 0 0 1.1rem; }
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+strong { font-weight: 600; }
+
+/* Margin / side notes (collapse inline on small screens) */
+.sidenote {
+  font-size: .82rem;
+  line-height: 1.5;
+  color: var(--muted);
+  font-family: var(--sans);
+}
+@media (min-width: 1100px) {
+  .sidenote {
+    float: right;
+    clear: right;
+    width: 12rem;
+    margin-right: -13.5rem;
+    margin-top: .15rem;
+    position: relative;
+  }
+}
+@media (max-width: 1099px) {
+  .sidenote {
+    display: block;
+    border-left: 2px solid var(--accent);
+    padding-left: .8rem;
+    margin: 1rem 0;
+  }
+}
+
+/* ── Table of Contents ── */
+.toc {
+  position: fixed;
+  top: 4rem;
+  left: max(1.5rem, calc(50% - var(--measure)/2 - 14rem));
+  width: 12rem;
+  font-family: var(--sans);
+  font-size: .78rem;
+  line-height: 1.5;
+}
+.toc-title {
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: .7rem;
+}
+.toc ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-left: 1px solid var(--rule);
+}
+.toc li a {
+  display: block;
+  padding: .25rem 0 .25rem .9rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color .15s, border-color .15s;
+  border-left: 2px solid transparent;
+  margin-left: -1px;
+}
+.toc li a:hover { color: var(--ink); }
+.toc li a.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+}
+.toc li.subsec a { padding-left: 1.6rem; font-size: .74rem; }
+
+/* hide on narrow screens where there's no room */
+@media (max-width: 1100px) { .toc { display: none; } }
+
+/* ============================================================
+   THEOREM / DEFINITION BOXES — the workhorse of a math post
+   ============================================================ */
+.box {
+  background: var(--box-bg);
+  border: 1px solid var(--box-rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  padding: 1rem 1.3rem;
+  margin: 1rem 0;
+}
+.box .box-title {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: .95rem;
+  margin-bottom: .4rem;
+}
+.box.theorem .box-title { color: var(--accent); }
+.box p:last-child { margin-bottom: 0; }
+.box .statement { font-style: italic; }
+
+details.proof {
+  margin: -0.8rem 0 0.2rem;
+  padding-left: 0;
+  border-left: none;
+}
+details.proof summary {
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  padding: 0.5rem 0;
+  list-style: none;
+}
+details.proof summary::before {
+  content: "▸ Proof.";
+  font-style: normal;
+}
+details.proof[open] summary::before {
+  content: "▾ Proof.";
+  font-style: normal;
+}
+details.proof summary::-webkit-details-marker { display: none; }
+details.proof .proof-end {
+  text-align: right;
+  color: var(--muted);
+  margin-top: 0rem;
+  margin-bottom: 0.4rem;
+}
+/* ============================================================
+   FIGURES + INTERACTIVE DEMO
+   ============================================================ */
+figure { margin: 2rem 0; }
+figcaption {
+  font-family: var(--sans);
+  font-size: .82rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: .7rem;
+}
+figcaption b { color: var(--ink); font-weight: 600; }
+
+.demo {
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 1.1rem 1.1rem .9rem;
+  background: color-mix(in srgb, var(--box-bg) 55%, var(--paper));
+}
+.demo canvas { width: 100%; height: auto; display: block; }
+.controls {
+  display: flex; align-items: center; gap: .9rem;
+  margin-top: .8rem;
+  font-family: var(--sans); font-size: .85rem;
+}
+.controls label { color: var(--muted); white-space: nowrap; }
+.controls input[type=range] { flex: 1; accent-color: var(--accent); }
+.controls output {
+  font-family: var(--mono); font-size: .82rem;
+  min-width: 4.5rem; text-align: right; color: var(--ink);
+}
+.legend { display: flex; gap: 1.2rem; margin-top: .6rem;
+          font-family: var(--sans); font-size: .8rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: .4rem; }
+.legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+
+/* ============================================================
+   CODE (e.g. Lean snippets)
+   ============================================================ */
+pre, code { font-family: var(--mono); font-size: .85em; }
+code { background: var(--box-bg); padding: .1em .35em; border-radius: 4px; }
+pre {
+  background: var(--box-bg);
+  border: 1px solid var(--box-rule);
+  border-radius: 6px;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  line-height: 1.55;
+}
+pre code { background: none; padding: 0; }
+
+/* ============================================================
+   MATH — center display blocks, tabular numbering
+   ============================================================ */
+mjx-container[display="true"] { margin: 1.5rem 0 !important; }
+
+/* ============================================================
+   REFERENCES + FOOTNOTES
+   ============================================================ */
+.references { font-size: .92rem; }
+.references ol { padding-left: 1.4rem; }
+.references li { margin-bottom: .7rem; color: var(--muted); }
+.references li a { color: var(--accent); }
+sup.cite { font-size: .72em; }
+sup.cite a { text-decoration: none; padding: 0 .1em; }
+
+footer {
+  border-top: 1px solid var(--rule);
+  margin-top: 4rem;
+  padding: 2rem 0 4rem;
+  font-family: var(--sans);
+  font-size: .82rem;
+  color: var(--muted);
+}
+
+/* Accessibility niceties */
+a:focus-visible, .links a:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* ---- Post List (For index.html) ---- */
+.post-list { list-style: none; padding: 0; margin: 2rem 0; }
+.post-list li { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--rule); }
+.post-list li:last-child { border-bottom: none; }
+.post-list h2 { margin: 0 0 0.5rem 0; font-size: 1.4rem; padding: 0; border: none; }
+.post-list h2 a { text-decoration: none; color: var(--ink); }
+.post-list h2 a:hover { color: var(--accent); }
+.post-list .date { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem; display: block; }
