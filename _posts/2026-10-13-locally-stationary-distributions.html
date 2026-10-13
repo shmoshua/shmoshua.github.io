@@ -1,4 +1,5 @@
 ---
+list: glauber
 layout: post
 title: "Locally Stationary Distributions: A Framework for Analyzing Slow-Mixing Markov Chains"
 authors: Kuikui Liu, Sidhanth Mohanty, Prasad Raghavendra, Amit Rajaraman, David X. Wu
@@ -121,10 +122,10 @@ $$
     <ol>
       <li>run Glauber dynamics on $\mu_{\frac{\beta}{\sqrt{d}}(A-\frac{d}{n}11^\top)}$ from an arbitrary point $x_0\in \Omega$ for $T=\text{poly}(n)$.</li>
     </ol>
-    With high probability, we have that: 
+    With high probability, we have that for $t\sim [0,T]$:
     $$
-      |\langle \sigma, x_t\rangle | > cn
-    $$where $t\sim [0,T]$.
+      \E_{x\sim \nu_t}|\langle \sigma, x\rangle | > cn
+    $$
   </p>  
 </div>
 

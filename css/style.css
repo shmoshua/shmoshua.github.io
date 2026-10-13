@@ -449,24 +449,27 @@ a:focus-visible, .links a:focus-visible, input:focus-visible {
 }
 .empty { color: var(--muted); }
 
+
 /* ---- Lists on the homepage (see _data/lists.yml) ---- */
 .list-filter { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.6rem 0 0; }
 .list-filter a {
   font-family: var(--sans);
   font-size: .82rem;
   font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;            /* keep "Master Thesis" on one line */
   text-decoration: none;
   color: var(--muted);
   border: 1px solid var(--rule);
   border-radius: 999px;
-  padding: .35rem .95rem;
+  padding: .4rem .95rem;
   transition: color .15s, border-color .15s, background .15s;
 }
 .list-filter a:hover { color: var(--ink); border-color: var(--muted); }
 .list-filter a.active { color: var(--paper); background: var(--ink); border-color: var(--ink); }
 .list-section { margin-top: 2.6rem; }
 .list-section .list-name { font-size: 1.3rem; margin: 0 0 .25rem; }
-.list-name .count {
+.list-section .list-name .count {
   font-family: var(--mono);
   font-size: .72rem;
   font-weight: 400;
@@ -477,18 +480,6 @@ a:focus-visible, .links a:focus-visible, input:focus-visible {
 .list-desc { color: var(--muted); font-size: 1rem; margin: 0 0 .9rem; }
 .list-section .post-list { margin-top: 0; }
 
-/* Footer divider spans the text column only */
-footer::before {
-  content: "";
-  display: block;
-  border-top: 1px solid var(--rule);
-  margin-bottom: 1.5rem;
-}
-
-.article ol, .article ul { padding-left: 1.5rem; margin: 0 0 1.1rem; }
-.article li { margin-bottom: .3rem; }
-
-/* Room to scroll past the end of a post */
-footer.article { padding-bottom: 8rem; }
-/* Local preview: half a screen extra, so the last lines you write can sit mid-screen */
-body.preview footer.article { padding-bottom: 50vh; }
+/* Numbered and bullet lists inside posts */
+article.article ol, article.article ul { padding-left: 1.5rem; margin: 0 0 1.1rem; }
+article.article li { margin-bottom: .3rem; }
