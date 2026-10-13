@@ -12,8 +12,20 @@
 
   <script>
     window.MathJax = {
-      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['$$', '$$'], ['\\[', '\\]']], tags: 'all' },
-      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+      tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      tags: 'all',
+      macros: {
+        R: '\\mathbb{R}',
+        E: '\\mathbb{E}',
+        KL: '\\operatorname{KL}',
+        Ent: '\\operatorname{Ent}',
+        norm: ['\\left\\lVert #1 \\right\\rVert', 1],              // \norm{x}
+        inner: ['\\left\\langle #1, #2 \\right\\rangle', 2],        // \inner{x}{y}
+        dirchform: ['\\mathcal E_P ( #1, #2)',2]
+      }
+    },
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
