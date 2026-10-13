@@ -1,0 +1,11 @@
+# The homepage shows one section per list, in this order.
+# A post joins a list with a line like `list: thesis` in its header.
+# To add a list, copy one of the blocks below and give it a new id.
+
+- id: thesis
+  name: Master Thesis
+  description: Glauber dynamics, mixing times and mirror descent.
+
+- id: ai-safety
+  name: AI Safety
+  description: Papers on alignment, interpretability and evaluations.

@@ -449,6 +449,34 @@ a:focus-visible, .links a:focus-visible, input:focus-visible {
 }
 .empty { color: var(--muted); }
 
+/* ---- Lists on the homepage (see _data/lists.yml) ---- */
+.list-filter { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.6rem 0 0; }
+.list-filter a {
+  font-family: var(--sans);
+  font-size: .82rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: .35rem .95rem;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.list-filter a:hover { color: var(--ink); border-color: var(--muted); }
+.list-filter a.active { color: var(--paper); background: var(--ink); border-color: var(--ink); }
+.list-section { margin-top: 2.6rem; }
+.list-section .list-name { font-size: 1.3rem; margin: 0 0 .25rem; }
+.list-name .count {
+  font-family: var(--mono);
+  font-size: .72rem;
+  font-weight: 400;
+  color: var(--muted);
+  vertical-align: middle;
+  margin-left: .35rem;
+}
+.list-desc { color: var(--muted); font-size: 1rem; margin: 0 0 .9rem; }
+.list-section .post-list { margin-top: 0; }
+
 /* Footer divider spans the text column only */
 footer::before {
   content: "";

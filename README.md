@@ -6,7 +6,9 @@ Live at https://shmoshua.github.io
 
 1. Copy `_drafts/paper-template.html` into `_posts/` and rename it
    `YYYY-MM-DD-short-name.html` (e.g. `_posts/2026-10-13-fitzpatrick-functions.html`).
-2. Edit the header between the `---` lines: `title`, `authors`, `topic`, and optionally `paper` (a link).
+2. Edit the header between the `---` lines: `title`, `list`, `authors`, `topic`, and optionally `paper` (a link).
+   `list` picks the homepage list (`thesis` or `ai-safety`). The lists themselves are
+   defined in `_data/lists.yml`; add an entry there to create a new one.
 3. Write your notes below it, then commit and push.
 
 GitHub Pages rebuilds the site within a minute or two. The homepage list (newest first),

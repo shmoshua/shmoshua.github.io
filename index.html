@@ -25,20 +25,73 @@
 </header>
 
 <main class="article">
-  <!-- Built automatically from the files in _posts/, newest first -->
-  {% if site.posts.size > 0 %}
-  <ul class="post-list">
-    {% for post in site.posts %}
-    <li>
-      <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-      <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %d, %Y" }}</time>
-    </li>
+  <!-- Built automatically from the files in _posts/, newest first.
+       The lists and their order come from _data/lists.yml. -->
+  {% assign lists = site.data.lists %}
+  {% assign list_ids = lists | map: "id" %}
+
+  <nav class="list-filter" aria-label="Show list">
+    <a href="#all" data-list="all" class="active">All</a>
+    {% for l in lists %}<a href="#{{ l.id }}" data-list="{{ l.id }}">{{ l.name }}</a>
     {% endfor %}
-  </ul>
-  {% else %}
-  <p class="empty">No notes yet.</p>
+  </nav>
+
+  {% for l in lists %}
+  {% assign posts = site.posts | where: "list", l.id %}
+  <section class="list-section" id="{{ l.id }}" data-list="{{ l.id }}">
+    <h2 class="list-name">{{ l.name }} <span class="count">{{ posts.size }}</span></h2>
+    {% if l.description %}<p class="list-desc">{{ l.description }}</p>{% endif %}
+    {% if posts.size > 0 %}
+    <ul class="post-list">
+      {% for post in posts %}
+      <li>
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %d, %Y" }}</time>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty">No notes yet.</p>
+    {% endif %}
+  </section>
+  {% endfor %}
+
+  <!-- Posts without a (known) list: line end up here -->
+  {% capture other %}{% for post in site.posts %}{% unless list_ids contains post.list %}
+      <li>
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %d, %Y" }}</time>
+      </li>{% endunless %}{% endfor %}{% endcapture %}
+  {% if other contains "<li>" %}
+  <section class="list-section" id="other" data-list="other">
+    <h2 class="list-name">Other</h2>
+    <ul class="post-list">{{ other }}
+    </ul>
+  </section>
   {% endif %}
 </main>
+
+<script>
+  // "All / Master Thesis / AI Safety" buttons: show one list at a time.
+  // The choice is kept in the address (e.g. /#ai-safety), so you can link to a list.
+  (function () {
+    var buttons = document.querySelectorAll('.list-filter a');
+    var sections = document.querySelectorAll('.list-section');
+    function show(id) {
+      if (!document.querySelector('.list-section[data-list="' + id + '"]')) id = 'all';
+      sections.forEach(function (s) { s.hidden = id !== 'all' && s.dataset.list !== id; });
+      buttons.forEach(function (b) { b.classList.toggle('active', b.dataset.list === id); });
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        e.preventDefault();
+        history.replaceState(null, '', b.dataset.list === 'all' ? location.pathname : '#' + b.dataset.list);
+        show(b.dataset.list);
+      });
+    });
+    show(location.hash.slice(1) || 'all');
+  })();
+</script>
 
 <footer class="article">
   <p>Master Thesis Reading Log · ETH Zurich</p>
