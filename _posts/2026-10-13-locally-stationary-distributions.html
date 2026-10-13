@@ -155,8 +155,56 @@ Then we can assemble our result along the three steps as above as follows:
       $$
       with probability at least $1-\delta$ if $T=\Omega(n^{5+o_d(1)})$.
   </li>
-  <li> <b>Step 3</b>:
+  <li> <b>Step 3</b>: We have a two step argument. We define a proxy that RGD can only increase. 
+    However, local stationary implies that RGD should not be able to move it by much. Therefore, there cannot be much mass where RGD would strictly increase it. 
   </li>
-  
-
 </ol>
+
+<h3 class="numbered"> Diving deeper into Step 3</h3>
+<p>
+Let define our potential function as $\psi:\Omega \to \R_{\ge 0},x\mapsto |\langle v,x\rangle|$.
+Our goal is to show that $\psi$ increases over an RGD step. However, at locally stationary distributions it can't increase by much. 
+</p>
+
+<p>
+First, to use local stationary, our potential function has to be bounded. Hence, we define: 
+$\wt{\psi}(x):=\min\{\psi(x), 0.99\xi \sqrt n\}$ for some constant $\xi$. We have that for any bounded function:
+</p>
+
+
+<div class="box theorem">
+  <div class="box-title">Lemma</div>
+  <p class="statement">
+    Let $\phi:\Omega \to \R$ be a bounded function and $\nu$ be $\varepsilon$-locally stationary. 
+    For any Markov chain $K$,
+    $$
+      |\E_{\nu}[\phi]-\E_{K\nu}[\phi]|\le \|\phi\|_\infty \sqrt{\eps}
+    $$
+  </p>  
+</div>
+
+<details class="proof">
+  <summary></summary>
+  <p>
+    We have that: 
+    $$
+    \begin{aligned}
+      |\E_{\nu}[\phi]-\E_{K\nu}[\phi]|
+      &\le 2\|\phi\|_\infty \cdot d_{\text{TV}}(\nu, K\nu)\le \|\phi\|_\infty \sqrt{\dirchform{K}{f}{\log f}}
+    \end{aligned}
+    $$
+
+
+  </p>
+  <p class="proof-end">∎</p>
+</details>
+
+Therefore, we have that from Step 2, 
+$$
+  |\E_{\nu_t}\wt{\psi}- \E_{K\nu_t}\wt{\psi}|\le 0.99 \xi \sqrt{n}\cdot o(n^{-1})= o(\xi / \sqrt{n})
+$$
+Now, we aim to show that RGD does improve $\wt{\psi}$. This eventually leads to a contradiction if $\E_{\nu_t}\wt{\psi}< 0.99\xi\sqrt{n}-2\delta$. Therefore, we can conclude that: 
+$$
+  \E_{x\sim \nu_t}|\langle v, x\rangle|\ge \E_{\nu_t}\wt{\psi}\ge 0.99\xi \sqrt{n}-o(1)
+$$
+This proves the desired statement.
