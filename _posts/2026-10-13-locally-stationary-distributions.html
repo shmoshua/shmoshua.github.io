@@ -1,35 +1,161 @@
 ---
 layout: post
 title: "Locally Stationary Distributions: A Framework for Analyzing Slow-Mixing Markov Chains"
-authors: Original Authors
+authors: Kuikui Liu, Sidhanth Mohanty, Prasad Raghavendra, Amit Rajaraman, David X. Wu
 topic: Glauber Dynamics
 paper: https://arxiv.org/pdf/2405.20849
 ---
-<!--
-  HOW TO ADD A NEW POST
-  1. Copy this file into _posts/ and name it YYYY-MM-DD-short-name.html
-     e.g. _posts/2026-10-13-fitzpatrick-functions.html
-     (the date in the file name is the date shown on the homepage)
-  2. Fill in the lines between the --- marks above. "paper" is optional.
-  3. Write your notes below. The page header, contents sidebar and the
-     homepage list are all generated for you.
 
-  Tip: use <h2 class="numbered"> / <h3 class="numbered"> for numbered sections.
--->
+In this given setting, let $P$ be a Markov chain with stationary distribution $\pi$ on $\Omega$.
+<div class="box theorem">
+  <div class="box-title">Definition (Locally Stationary Distribution)</div>
+  <p class="statement">
+    A probability measure $\nu$ on $\Omega$ is $\varepsilon$-locally stationary w.r.t. $P$ if 
+    $$
+      \mathcal E_P(f,\log f):=\langle f,(I-P)\log f\rangle _\pi \le \varepsilon
+    $$
+    where $f:= d\nu / d\pi$.
+  </p>  
+</div>
 
-<h2 class="numbered">Introduction</h2>
-<p>Your notes go here. Inline math like $f(x) = x \log x$ works, and so do display equations:</p>
-$$ F_A(x, x^*) = \sup_{(a, a^*) \in \operatorname{gra} A} \langle x, a^* \rangle + \langle a, x^* \rangle - \langle a, a^* \rangle $$
+This locally stationary distribution framework then gives us a way to analyze the behaviors of Glauber dynamics by the following logic. 
+<ol>
+  <li>
+    Glauber dynamics gives a locally stationary distribution in $\operatorname{poly}(n)$ time.
+  </li>
+  <li> At a locally stationary distribution w.r.t Glauber, there is another dynamic for which there is a good transfer.</li>
+  <li> With that given dynamic, the analysis of the objective is more tractable. </li>
+</ol>
+
+We will look at three different examples to see how they apply this logic. Before we dive into the examples, we show each part. 
+
+<h2 class="numbered">The Framework</h2>
+<h3 class="numbered"> Glauber Dynamics gives locally stationary distributions</h3>
+Let $\nu_t:=\exp(-t(I-P))\nu$ and $f_t:= d\nu_t / d\pi$. 
+
+Here, the most important identity is that the Dirichlet form is the derivative of KL divergence, i.e. 
+$$
+   \dirchform{P}{f_t}{\log f_t} = -\frac{d}{dt}\KL(\nu_t\|\pi).
+$$
+
+This is simply given by: 
+$$
+  \begin{aligned}
+  \frac{d}{dt} \KL(\nu_t\|\pi)
+  &= \frac{d}{dt}\langle f_t,\log f_t\rangle _\pi \\
+  &= -\langle (I-P)f_t,\log f_t\rangle _\pi + \langle 1,(I-P) f_t\rangle _\pi \\
+  &= -\langle (I-P)f_t,\log f_t\rangle _\pi + \langle (I-P)1, f_t\rangle _\pi \\
+  &= -\langle f_t,(I-P)\log f_t\rangle _\pi \\
+  &=  - \dirchform{P}{f_t}{\log f_t}
+  \end{aligned}
+$$
+More concretely, for any distribution $\nu$ and $T > 0$, we have that: 
+$$
+  \E_{t \sim[0,T]} \dirchform{P}{f}{\log f}\le \KL(\nu\|\pi) / T
+$$
+This is given by $0 \le \KL(\nu_T\|\pi)=\KL(\nu\|\pi) - T\cdot \E_t\dirchform{P}{f_t}{\log f_t}$. 
+Therefore, if we have a Gibbs distribution $\pi(x)\propto \exp(\frac{1}{2}x^\top J x)$, 
+$$
+  \log \left(\frac{1}{\pi(x)}\right)=\log Z - \frac{1}{2}x^\top J x\le n\log 2 + \max_y |y^\top J y|
+$$
+where $|y^\top J y|\le \|y\|_1 \|Jy\|_\infty = n\|Jy\|_\infty$.
+
+Therefore, if we run $T:=\frac{1}{\delta \varepsilon}\log (\frac{1}{\pi_{\min}})$ steps, then $\nu_t$ is $\varepsilon$-locally stationary with probability $1-\delta$.
+
+
+
+<h3 class="numbered">Transfer via Measure Decomposition</h3>
+Assume we have a measure decomposition of the form $\pi = \E_{z\sim\rho} [\pi_z]$. 
+Notice that this can be represented using a Markov chain given as:
+$$
+  x \longrightarrow z|x \longrightarrow x'|z
+$$
+More precisely, we can define the joint distribution $\mu(x,dz):=\rho(dz)\pi_z(x)$. Then, for any $x$:
+<ol>
+  <li> Sample $z\sim \mu(\cdot |x)$.</li>
+  <li> Sample $x'\sim \pi_z$.</li>
+</ol>
+This is a reversible Markov chain with $\pi$ as the stationary distribution. Let $K$ denote this chain. Then, we get the following transfer lemma. 
 
 <div class="box theorem">
-  <div class="box-title">Theorem 1</div>
-  <p class="statement">State the main result here.</p>
+  <div class="box-title">Lemma</div>
+  <p class="statement">
+    For any function $f:\Omega \to \R_{> 0}$ and $\tau$ s.t. $f_\min > \exp(-\tau)$ or $f_\max < \exp(\tau)$, we have that:
+    $$
+      \dirchform{K}{f}{\log f}\le O\left(\frac{\tau}{\delta}\right)\dirchform{P}{f}{\log f}
+    $$
+    where $\delta:=\inf_z \rho_{\text{MLSI}}(\pi_z)$.
+  </p>  
 </div>
-<details class="proof">
-  <summary></summary>
-  <p>Proof sketch.</p>
-  <p class="proof-end">∎</p>
-</details>
 
-<h2 class="numbered">Takeaways</h2>
-<p>What I learned and how it relates to my thesis.</p>
+Note that the MLSI constant $\rho_{\text{MLSI}}(\pi)$ is given as the largest constant s.t. 
+$$
+  \dirchform{\pi}{f}{\log f}\ge \rho_{\text{MLSI}}(\pi) \cdot \Ent_\pi[f]
+$$
+where $\Ent_\pi[f]:= \E_\pi [f\log f] - \E_\pi f \cdot \log \E_\pi f$. I find this definition quite difficult to grasp. There are a few things: 
+<ol> 
+  <li> If $f=d\nu/ d\pi$, then $\Ent_\pi[f] = \E_\pi [f\log f] = \KL(\nu \|\pi)$</li>
+  <li> $\Ent_\pi[c f] = c\E_\pi[f\log cf]-c\E_\pi f \cdot \log (c \cdot E_\pi f)=c \Ent_\pi[f]$</li>
+  <li> If $f$ is unnormalized, i.e. $\E_\pi f=c$, then $f/c$ is normalized and $\Ent_\pi[f] = c\cdot \KL(\nu\|\pi)$
+ where $d\nu=\frac{1}{c}f d\pi$.  </li>
+  <li> Entropy is non-negative.</li>
+  <li> Entropy is zero if and only if $\nu = \pi$.</li>
+  <li> We want a large MLSI.</li>
+</ol>
+
+<h3 class="numbered"> Boost Theorems</h3>
+So we use the measure decomposition and hopefully the measure decomposition MC $K$ is better at analyzing the objective. 
+We will see more of this in the following examples. 
+
+<h2 class="numbered">Weak Recovery in SBM</h2>
+We define the setting of SBM as follows. $\lambda:=\varepsilon\sqrt{d}$ denote the signal-to-noise ratio. Then, we define $(\sigma, G)\sim \operatorname{SBM}(n,d,\lambda)$ 
+as the process, where $\sigma\in  \Omega$ sampled uniformly randomly, and the graph edges are sampled with: 
+$$
+  \P(u\sim v | \sigma) =\frac{d}{n}\left(1+\varepsilon \sigma_u\sigma_v\right)
+$$
+
+<div class="box theorem">
+  <div class="box-title">Theorem</div>
+  <p class="statement">
+    There exists $\beta, c>0$ s.t. for all $\lambda$ large enough, we have that: 
+    <ol>
+      <li>run Glauber dynamics on $\mu_{\frac{\beta}{\sqrt{d}}(A-\frac{d}{n}11^\top)}$ from an arbitrary point $x_0\in \Omega$ for $T=\text{poly}(n)$.</li>
+    </ol>
+    With high probability, we have that: 
+    $$
+      |\langle \sigma, x_t\rangle | > cn
+    $$where $t\sim [0,T]$.
+  </p>  
+</div>
+
+<h3 class="numbered"> SBM as a spiked matrix and RGD</h3>
+Let $v:= \sigma / \sqrt{n}$ and define the centered adjacent matrix $\bar A:= A - \E[A|\sigma]$. We have that: 
+$\E[A|\sigma]=\frac{d}{n}11^\top +\frac{\lambda \sqrt{d}}{n}\sigma\sigma^\top$. 
+Therefore, 
+
+$$
+  M:=\frac{\beta}{\sqrt{d}}\left(A-\frac{d}{n}11^\top\right) = \frac{\beta}{\sqrt{d}}\left(\bar A  + \lambda \sqrt{d} vv^\top \right) = \underbrace{\frac{\beta}{\sqrt{d}} \bar A}_{=:W} +\underbrace{\beta \lambda}_{=:\eta} vv^\top
+$$
+
+Then, we have the measure decomposition $\mu_M=\E_{z\sim \rho}\mu_{W,z}$ where $z|x=(\eta \langle v, x\rangle + \sqrt{\eta} g)v$. The intuition is as follows: read the current overlap $\langle v,x \rangle$ and add noise of size $\sqrt{\eta}$ and resample the noise model pushed by that much. 
+
+<h3 class="numbered"> SBM and the three steps</h3>
+Notice that $\|My\|_\infty\le \frac{\beta}{\sqrt{d}}(\Delta_\max + d)$. Indeed, we have that:
+    $$
+      |(My)_u|\le \frac{\beta}{\sqrt{d}}\left(|\partial u|+d\right)
+    $$
+    W.h.p. we have that $\Delta_\max = O(\log n)$.
+Then we can assemble our result along the three steps as above as follows:
+<ol>
+  <li> <b>Step 1</b>: With $T$, Glauber outputs a $\tilde O(\frac{n}{\delta T})$-locally-stationary distribution with probability at least $1-\delta$.</li>
+  <li> <b>Step 2</b>: It is given that for any $z$, $\rho_{\text{MLSI}}(\mu_{W,h})\ge n^{-1-o_d(1)}$. Hence, $\delta \ge n^{-1-o_d(1)}$. Further, from above, $\tau = O(n\log n)$. Therefore, 
+      $$
+      \dirchform{\text{RGD}}{f_t}{\log f_t}\le  \tilde O( \frac{n^{3+o_d(1)}}{\delta T})\le o\left(n^{-2}\right)
+      $$
+      with probability at least $1-\delta$ if $T=\Omega(n^{5+o_d(1)})$.
+  </li>
+  <li> <b>Step 3</b>:
+  </li>
+  
+
+</ol>

@@ -19,11 +19,12 @@
       macros: {
         R: '\\mathbb{R}',
         E: '\\mathbb{E}',
+        P: '\\mathbb{P}',
         KL: '\\operatorname{KL}',
         Ent: '\\operatorname{Ent}',
         norm: ['\\left\\lVert #1 \\right\\rVert', 1],              // \norm{x}
         inner: ['\\left\\langle #1, #2 \\right\\rangle', 2],        // \inner{x}{y}
-        dirchform: ['\\mathcal E_P ( #1, #2)',2]
+        dirchform: ['\\mathcal E_{#1} ( #2, #3)',3]
       }
     },
     };
@@ -31,7 +32,7 @@
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
-<body>
+<body{% if jekyll.environment == "development" %} class="preview"{% endif %}></body>
 <!-- Filled in automatically from the h2/h3 headings by js/toc.js -->
 <nav class="toc" aria-label="Contents"></nav>
 
