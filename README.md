@@ -33,7 +33,10 @@ bundle exec jekyll serve --livereload
 ```
 
 Open http://localhost:4000. Every time you save a file the site rebuilds and the
-browser refreshes. Stop the server with Ctrl+C.
+browser refreshes, scrolled to the part of the post you just changed. Stop the server
+with Ctrl+C.
+
+Tip: turn on File → Auto Save in VS Code so the preview follows along as you type.
 
 Don't use VS Code's Live Server for this site: it doesn't run Jekyll, so you'll see
 template code like `{% for post in site.posts %}` instead of the post list.

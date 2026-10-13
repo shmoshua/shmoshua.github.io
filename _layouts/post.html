@@ -52,5 +52,9 @@
 </footer>
 
 <script src="{{ '/js/toc.js' | relative_url }}"></script>
+{% if jekyll.environment == "development" %}
+<!-- Local preview only: jump to the part you just edited after each refresh -->
+<script src="{{ '/js/follow-edits.js' | relative_url }}"></script>
+{% endif %}
 </body>
 </html>
