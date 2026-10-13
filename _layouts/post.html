@@ -3,14 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Paper Title Here</title>
-  
+  <title>{{ page.title }} · {{ site.title }}</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  
-  <!-- Note the ../ to go up one folder and find your CSS -->
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="{{ '/css/style.css' | relative_url }}">
 
   <script>
     window.MathJax = {
@@ -22,27 +20,25 @@
 </head>
 
 <body>
-<!-- Table of Contents (Update links for each post) -->
-<nav class="toc">
-  <div class="toc-title">Contents</div>
-  <ol>
-    <li><a href="#sec-1">1  Section Name</a></li>
-  </ol>
-</nav>
+<!-- Filled in automatically from the h2/h3 headings by js/toc.js -->
+<nav class="toc" aria-label="Contents"></nav>
 
 <header class="masthead article">
-  <p class="eyebrow">Topic Tag</p>
-  <h1 class="title">Paper Title</h1>
-  <p class="authors">Original Authors</p>
-  <p class="affil">My Date Read · <a href="../index.html">← Back to all notes</a></p>
+  {% if page.topic %}<p class="eyebrow">{{ page.topic }}</p>{% endif %}
+  <h1 class="title">{{ page.title }}</h1>
+  {% if page.authors %}<p class="authors">{{ page.authors }}</p>{% endif %}
+  <p class="affil">Read {{ page.date | date: "%b %d, %Y" }} · <a href="{{ '/' | relative_url }}">← Back to all notes</a></p>
+  {% if page.paper %}<div class="links"><a href="{{ page.paper }}">Paper <span class="arr">↗</span></a></div>{% endif %}
 </header>
 
 <article class="article">
-  <h2 class="numbered" id="sec-1">Introduction</h2>
-  <p>Your notes go here.</p>
+{{ content }}
 </article>
 
-<!-- Note the ../ to find your script -->
-<script src="../js/toc.js"></script>
+<footer class="article">
+  <p>{{ site.title }} · ETH Zurich</p>
+</footer>
+
+<script src="{{ '/js/toc.js' | relative_url }}"></script>
 </body>
 </html>

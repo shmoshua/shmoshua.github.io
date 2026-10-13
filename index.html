@@ -1,15 +1,18 @@
+---
+# This empty front matter tells GitHub Pages to fill in the post list below.
+---
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Master Thesis Reading Log</title>
-  
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  
+
   <!-- Link to your shared CSS -->
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -22,18 +25,19 @@
 </header>
 
 <main class="article">
+  <!-- Built automatically from the files in _posts/, newest first -->
+  {% if site.posts.size > 0 %}
   <ul class="post-list">
+    {% for post in site.posts %}
     <li>
-      <span class="date">Oct 13, 2026</span>
-      <h2><a href="posts/2026-10-13-fitzpatrick-functions.html">On Fitzpatrick Functions of Entropy Subdifferentials</a></h2>
-      <p>Finding the closed form and the convergence rate of Fitzpatrick functions of entropy subdifferentials. Notes on the Bauschke et al. paper.</p>
+      <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %d, %Y" }}</time>
     </li>
-    <li>
-      <span class="date">Oct 05, 2026</span>
-      <h2><a href="posts/2026-10-05-example-paper.html">Another Optimization Paper Title</a></h2>
-      <p>A brief 2-sentence summary of what this paper was about and my main takeaway.</p>
-    </li>
+    {% endfor %}
   </ul>
+  {% else %}
+  <p class="empty">No notes yet.</p>
+  {% endif %}
 </main>
 
 <footer class="article">
