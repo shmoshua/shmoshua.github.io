@@ -15,12 +15,14 @@ never needs editing.
 
 ## Previewing locally (no commit needed)
 
-One-time setup on macOS (needs [Homebrew](https://brew.sh)):
+One-time setup on an Apple Silicon Mac (Homebrew in `/opt/homebrew`). If your shell is
+zsh, use `~/.zshrc` instead of `~/.bash_profile`.
 
 ```bash
-brew install ruby
-echo 'export PATH="$(brew --prefix)/opt/ruby/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
+/opt/homebrew/bin/brew install ruby@3.4
+echo 'export PATH="/opt/homebrew/opt/ruby@3.4/bin:$PATH"' >> ~/.bash_profile
+source ~/.bash_profile
+ruby -v                 # should print 3.4
 bundle install          # run inside this folder
 ```
 

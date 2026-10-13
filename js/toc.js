@@ -28,7 +28,7 @@
     // Mirror the CSS section numbering for headings with class="numbered"
     var num = '';
     if (h.classList.contains('numbered')) {
-      if (h.tagName === 'H2') { sec++; sub = 0; num = String(sec); }
+      if (h.tagName === 'H2') { sec++; sub = 0; num = sec + '.'; }
       else { sub++; num = sec + '.' + sub; }
     }
 
@@ -36,7 +36,7 @@
     if (h.tagName === 'H3') li.className = 'subsec';
     var a = document.createElement('a');
     a.href = '#' + h.id;
-    a.textContent = (num ? num + '  ' : '') + h.textContent;
+    a.textContent = (num ? num + ' ' : '') + h.textContent;
     li.appendChild(a);
     list.appendChild(li);
     links.push({ head: h, link: a });
