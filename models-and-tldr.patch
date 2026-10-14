@@ -1,0 +1,426 @@
+From bc212d30f4ddae0180b6dac1c07026765bc8b4cd Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 14 Oct 2026 10:18:47 +0200
+Subject: [PATCH 1/2] Add TL;DR box
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_015sajfvtPmGkb5ceTztqXFY
+---
+ _drafts/paper-template.html |  4 ++++
+ css/style.css               | 28 +++++++++++++++++++++++++++-
+ js/toc.js                   |  5 ++++-
+ 3 files changed, 35 insertions(+), 2 deletions(-)
+
+diff --git a/_drafts/paper-template.html b/_drafts/paper-template.html
+index 5062c5e..dadbe86 100644
+--- a/_drafts/paper-template.html
++++ b/_drafts/paper-template.html
+@@ -20,6 +20,10 @@ paper: https://arxiv.org/abs/0000.00000
+   Tip: use <h2 class="numbered"> / <h3 class="numbered"> for numbered sections.
+ -->
+ 
++<div class="tldr">
++  <p>One or two sentences: what the paper shows and why it matters to me.</p>
++</div>
++
+ <h2 class="numbered">Introduction</h2>
+ <p>Your notes go here. Inline math like $f(x) = x \log x$ works, and so do display equations:</p>
+ $$ F_A(x, x^*) = \sup_{(a, a^*) \in \operatorname{gra} A} \langle x, a^* \rangle + \langle a, x^* \rangle - \langle a, a^* \rangle $$
+diff --git a/css/style.css b/css/style.css
+index a64b6a3..b2eedaf 100644
+--- a/css/style.css
++++ b/css/style.css
+@@ -482,4 +482,30 @@ a:focus-visible, .links a:focus-visible, input:focus-visible {
+ 
+ /* Numbered and bullet lists inside posts */
+ article.article ol, article.article ul { padding-left: 1.5rem; margin: 0 0 1.1rem; }
+-article.article li { margin-bottom: .3rem; }
+\ No newline at end of file
++article.article li { margin-bottom: .3rem; }
++
++/* ---- TL;DR box at the top of a post ----
++   Usage: <div class="tldr"> <p>…</p> </div>
++   Outlined instead of tinted, so it doesn't read as a theorem. */
++.tldr {
++  position: relative;
++  border: 1px solid var(--rule);
++  border-radius: 6px;
++  padding: 1.15rem 1.3rem .95rem;
++  margin: 1.4rem 0 2.2rem;
++  font-size: .95em;
++}
++.tldr::before {
++  content: "TL;DR";
++  position: absolute;
++  top: -.62rem;
++  left: 1rem;
++  padding: 0 .45rem;
++  background: var(--paper);
++  font-family: var(--mono);
++  font-size: .68rem;
++  letter-spacing: .16em;
++  color: var(--accent);
++}
++.tldr > :last-child { margin-bottom: 0; }
++.tldr ul, .tldr ol { padding-left: 1.2rem; }
+diff --git a/js/toc.js b/js/toc.js
+index c38cef0..30a4ec8 100644
+--- a/js/toc.js
++++ b/js/toc.js
+@@ -4,7 +4,10 @@
+   var nav = document.querySelector('nav.toc');
+   if (!nav) return;
+ 
+-  var heads = document.querySelectorAll('article.article h2, article.article h3');
++  // Headings inside a TL;DR box are left out of the contents
++  var heads = Array.prototype.filter.call(
++    document.querySelectorAll('article.article h2, article.article h3'),
++    function (h) { return !h.closest('.tldr'); });
+   if (!heads.length) { nav.remove(); return; }
+ 
+   var title = document.createElement('div');
+-- 
+2.43.0
+
+
+From 9ed69ccde5397c11d3d960255d7fffcedeb48122 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 14 Oct 2026 10:41:25 +0200
+Subject: [PATCH 2/2] Add model pages (SK, SBM) with results, backlinks and a
+ models index
+
+- _models/ collection: one page per model at /models/<name>/, using the post layout
+  (same fonts, MathJax macros, contents sidebar)
+- Each model page lists the notes that link to it, found automatically
+- /models/ lists all models with how many notes mention each; linked from the homepage
+- Results are boxes with an id, so posts can link to one result; the linked box is outlined
+- Fix: <body> was closed right after it opened in the post layout
+- Fix: footer spacing (the .article rule was overriding it); extra room at the end in preview
+- follow-edits.js only restores the scroll position after a refresh, not when following a link
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_015sajfvtPmGkb5ceTztqXFY
+---
+ README.md                   | 18 +++++++++++++++
+ _config.yml                 |  6 +++++
+ _drafts/paper-template.html |  2 ++
+ _layouts/post.html          | 23 ++++++++++++++++++-
+ _models/sbm.html            | 27 ++++++++++++++++++++++
+ _models/sk.html             | 29 +++++++++++++++++++++++
+ css/style.css               | 42 +++++++++++++++++++++++++++++++++
+ index.html                  |  1 +
+ js/follow-edits.js          |  7 ++++++
+ models.html                 | 46 +++++++++++++++++++++++++++++++++++++
+ 10 files changed, 200 insertions(+), 1 deletion(-)
+ create mode 100644 _models/sbm.html
+ create mode 100644 _models/sk.html
+ create mode 100644 models.html
+
+diff --git a/README.md b/README.md
+index f9a8667..0caf609 100644
+--- a/README.md
++++ b/README.md
+@@ -15,6 +15,24 @@ GitHub Pages rebuilds the site within a minute or two. The homepage list (newest
+ the post header and the contents sidebar are generated automatically, so `index.html`
+ never needs editing.
+ 
++## Model pages
++
++`_models/` has one page per model (e.g. `_models/sbm.html` → `/models/sbm/`). Each holds
++the setup and the results you keep needing, as boxes with an `id`:
++
++```html
++<div class="box theorem" id="kesten-stigum">
++  <div class="box-title">Kesten–Stigum threshold</div>
++  <p class="statement">…</p>
++  <p class="source">Who proved it.</p>
++</div>
++```
++
++Link to them from any post: `<a href="/models/sbm/">SBM</a>`, or to one result:
++`<a href="/models/sbm/#kesten-stigum">Kesten–Stigum</a>`. Each model page lists the notes
++that link to it automatically, and `/models/` lists all models. To add a model, copy
++`_models/sbm.html` to a new file name.
++
+ ## Previewing locally (no commit needed)
+ 
+ One-time setup on an Apple Silicon Mac (Homebrew in `/opt/homebrew`). If your shell is
+diff --git a/_config.yml b/_config.yml
+index 28058a0..d6d707e 100644
+--- a/_config.yml
++++ b/_config.yml
+@@ -5,3 +5,9 @@ permalink: /posts/:year-:month-:day-:title:output_ext
+ 
+ exclude:
+   - README.md
++
++# One page per model (SK, SBM, ...) in _models/, published at /models/<file-name>/
++collections:
++  models:
++    output: true
++    permalink: /models/:name/
+diff --git a/_drafts/paper-template.html b/_drafts/paper-template.html
+index dadbe86..502c289 100644
+--- a/_drafts/paper-template.html
++++ b/_drafts/paper-template.html
+@@ -18,6 +18,8 @@ paper: https://arxiv.org/abs/0000.00000
+      homepage list are all generated for you.
+ 
+   Tip: use <h2 class="numbered"> / <h3 class="numbered"> for numbered sections.
++  Link to a model page with <a href="/models/sbm/">SBM</a>, or straight to one
++  of its results with <a href="/models/sbm/#kesten-stigum">Kesten–Stigum</a>.
+ -->
+ 
+ <div class="tldr">
+diff --git a/_layouts/post.html b/_layouts/post.html
+index 43bfb66..0326877 100644
+--- a/_layouts/post.html
++++ b/_layouts/post.html
+@@ -35,7 +35,7 @@
+   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+ </head>
+ 
+-<body{% if jekyll.environment == "development" %} class="preview"{% endif %}></body>
++<body{% if jekyll.environment == "development" %} class="preview"{% endif %}>
+ <!-- Filled in automatically from the h2/h3 headings by js/toc.js -->
+ <nav class="toc" aria-label="Contents"></nav>
+ 
+@@ -43,7 +43,12 @@
+   {% if page.topic %}<p class="eyebrow">{{ page.topic }}</p>{% endif %}
+   <h1 class="title">{{ page.title }}</h1>
+   {% if page.authors %}<p class="authors">{{ page.authors }}</p>{% endif %}
++  {% if page.collection == "models" %}
++  {% if page.summary %}<p class="abstract">{{ page.summary }}</p>{% endif %}
++  <p class="affil">Model · <a href="{{ '/models/' | relative_url }}">All models</a> · <a href="{{ '/' | relative_url }}">Notes</a></p>
++  {% else %}
+   <p class="affil">Read {{ page.date | date: "%b %d, %Y" }} · <a href="{{ '/' | relative_url }}">← Back to all notes</a></p>
++  {% endif %}
+   {% if page.paper %}<div class="links"><a href="{{ page.paper }}">Paper <span class="arr">↗</span></a></div>{% endif %}
+ </header>
+ 
+@@ -51,6 +56,22 @@
+ {{ content }}
+ </article>
+ 
++{% if page.collection == "models" %}
++<!-- Every post that links to this model page, found automatically -->
++<section class="article backlinks">
++  <p class="backlinks-title">Notes that mention this model</p>
++  {% assign n = 0 %}
++  <ul class="post-list">
++  {% for p in site.posts %}{% if p.content contains page.url %}{% assign n = n | plus: 1 %}
++    <li>
++      <a href="{{ p.url | relative_url }}">{{ p.title }}</a>
++      <time datetime="{{ p.date | date_to_xmlschema }}">{{ p.date | date: "%b %d, %Y" }}</time>
++    </li>{% endif %}{% endfor %}
++  </ul>
++  {% if n == 0 %}<p class="empty">None yet. Link here from a post with <code>&lt;a href="{{ page.url }}"&gt;</code>.</p>{% endif %}
++</section>
++{% endif %}
++
+ <footer class="article">
+   <p>{{ site.title }} · ETH Zurich</p>
+ </footer>
+diff --git a/_models/sbm.html b/_models/sbm.html
+new file mode 100644
+index 0000000..99d294a
+--- /dev/null
++++ b/_models/sbm.html
+@@ -0,0 +1,27 @@
++---
++layout: post
++title: "Stochastic Block Model (SBM)"
++summary: "Community detection in a random graph with a planted partition."
++---
++<!--
++  A model page: the setup once, then the results you keep needing.
++  Give each result an id="..." so posts can link straight to it,
++  e.g. <a href="/models/sbm/#kesten-stigum">Kesten–Stigum threshold</a>.
++  Example entries below; check them against your sources.
++-->
++
++<h2>Setup</h2>
++<p>Two balanced communities: assign each vertex $i \in [n]$ a label $\sigma_i \in \{\pm 1\}$ uniformly at random. Connect $i$ and $j$ independently with probability $a/n$ if $\sigma_i = \sigma_j$ and $b/n$ otherwise. Goal: recover $\sigma$ from the graph, up to a global sign.</p>
++<p><em>Weak recovery</em> means outputting $\hat\sigma$ with overlap $\big|\tfrac1n \sum_i \hat\sigma_i \sigma_i\big| \ge \delta$ for some $\delta > 0$, with probability $1 - o(1)$.</p>
++
++<h2>Results</h2>
++
++<div class="box theorem" id="kesten-stigum">
++  <div class="box-title">Kesten–Stigum threshold</div>
++  <p class="statement">Weak recovery is possible if and only if $(a-b)^2 > 2(a+b)$.</p>
++  <p>Equivalently, with $a = d(1+\varepsilon)$, $b = d(1-\varepsilon)$ and $\lambda = \varepsilon\sqrt d$: weak recovery is possible if and only if $\lambda > 1$.</p>
++  <p class="source">Mossel–Neeman–Sly (impossibility below); Massoulié and Mossel–Neeman–Sly (algorithms above).</p>
++</div>
++
++<h2>Open questions / my notes</h2>
++<p>…</p>
+diff --git a/_models/sk.html b/_models/sk.html
+new file mode 100644
+index 0000000..f8fb530
+--- /dev/null
++++ b/_models/sk.html
+@@ -0,0 +1,29 @@
++---
++layout: post
++title: "Sherrington–Kirkpatrick Model (SK)"
++summary: "Mean-field spin glass with i.i.d. Gaussian couplings."
++---
++<!--
++  Example entries below; check them against your sources.
++-->
++
++<h2>Setup</h2>
++<p>For $\sigma \in \{\pm 1\}^n$ and i.i.d. couplings $g_{ij} \sim \mathcal N(0,1)$, the Gibbs measure at inverse temperature $\beta$ is
++$$ \mu_\beta(\sigma) \propto \exp\Big( \frac{\beta}{\sqrt n} \sum_{i<j} g_{ij}\, \sigma_i \sigma_j \Big). $$</p>
++
++<h2>Results</h2>
++
++<div class="box theorem" id="parisi-formula">
++  <div class="box-title">Parisi formula</div>
++  <p class="statement">The limiting free energy $\lim_{n\to\infty} \tfrac1n \E \log Z_n(\beta)$ exists and equals the infimum of the Parisi functional.</p>
++  <p class="source">Guerra (upper bound); Talagrand, 2006.</p>
++</div>
++
++<div class="box theorem" id="glauber-high-temp">
++  <div class="box-title">Fast mixing of Glauber at high temperature</div>
++  <p class="statement">For $\beta < 1/4$, Glauber dynamics has spectral gap $\Omega(1/n)$ with high probability over the couplings.</p>
++  <p class="source">Eldan–Koehler–Zeitouni.</p>
++</div>
++
++<h2>Open questions / my notes</h2>
++<p>…</p>
+diff --git a/css/style.css b/css/style.css
+index b2eedaf..015e814 100644
+--- a/css/style.css
++++ b/css/style.css
+@@ -509,3 +509,45 @@ article.article li { margin-bottom: .3rem; }
+ }
+ .tldr > :last-child { margin-bottom: 0; }
+ .tldr ul, .tldr ol { padding-left: 1.2rem; }
++
++/* ---- Model pages (_models/) ---- */
++/* Where a result came from, under each result box */
++.box .source {
++  font-family: var(--sans);
++  font-size: .78rem;
++  font-style: normal;
++  color: var(--muted);
++  margin: .55rem 0 0;
++}
++/* Arriving via a link like /models/sbm/#kesten-stigum highlights that result */
++.box[id] { scroll-margin-top: 2rem; }
++.box:target { box-shadow: 0 0 0 2px var(--accent); }
++
++/* Links from posts to model pages: dotted underline marks an internal reference */
++article.article a[href^="/models/"] { text-decoration-style: dotted; }
++
++.backlinks { margin-top: 3rem; }
++.backlinks-title {
++  font-family: var(--mono);
++  font-size: .7rem;
++  letter-spacing: .16em;
++  text-transform: uppercase;
++  color: var(--muted);
++  margin: 0 0 .6rem;
++}
++.backlinks .post-list { margin: 0; }
++
++.model-list li > span:first-child { display: flex; flex-direction: column; gap: .15rem; }
++.model-summary { font-size: .95rem; color: var(--muted); }
++.model-count {
++  flex-shrink: 0;
++  font-family: var(--mono);
++  font-size: .78rem;
++  color: var(--muted);
++}
++
++/* Space above and below the footer. ("footer.article" is needed: the .article
++   rule would otherwise reset these.) In local preview, half a screen extra at
++   the bottom so the last lines you write can sit mid-screen. */
++footer.article { margin-top: 4rem; padding-bottom: 8rem; }
++body.preview footer.article { padding-bottom: 50vh; }
+diff --git a/index.html b/index.html
+index d70654e..6870022 100644
+--- a/index.html
++++ b/index.html
+@@ -22,6 +22,7 @@
+   <p class="eyebrow">Reading Log</p>
+   <h1 class="title">Reading List</h1>
+   <p class="abstract">Documenting papers, proofs, and thoughts as I read more papers.</p>
++  <div class="links"><a href="models/">Models <span class="arr">→</span></a></div>
+ </header>
+ 
+ <main class="article">
+diff --git a/js/follow-edits.js b/js/follow-edits.js
+index a3510bb..21369db 100644
+--- a/js/follow-edits.js
++++ b/js/follow-edits.js
+@@ -23,6 +23,13 @@
+   });
+ 
+   function restore() {
++    // Only after a refresh: arriving through a link (e.g. /models/sbm/#result)
++    // should land where the link points.
++    var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
++    if (!nav || nav.type !== 'reload') {
++      if (location.hash) { var t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
++      return;
++    }
+     var saved = null;
+     try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {}
+     if (!saved) return;
+diff --git a/models.html b/models.html
+new file mode 100644
+index 0000000..916ef07
+--- /dev/null
++++ b/models.html
+@@ -0,0 +1,46 @@
++---
++title: Models
++permalink: /models/
++---
++<!doctype html>
++<html lang="en">
++<head>
++  <meta charset="utf-8">
++  <meta name="viewport" content="width=device-width, initial-scale=1">
++  <title>Models · {{ site.title }}</title>
++  <link rel="preconnect" href="https://fonts.googleapis.com">
++  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
++  <link rel="stylesheet" href="{{ '/css/style.css' | relative_url }}">
++</head>
++<body>
++
++<header class="masthead article">
++  <p class="eyebrow">Reference</p>
++  <h1 class="title">Models</h1>
++  <p class="abstract">Results worth remembering, collected per model. Each page links back to the notes that use it.</p>
++  <p class="affil"><a href="{{ '/' | relative_url }}">← Back to all notes</a></p>
++</header>
++
++<main class="article">
++  <!-- Built automatically from the files in _models/ -->
++  {% assign models = site.models | sort: "title" %}
++  <ul class="post-list model-list">
++    {% for m in models %}
++    {% assign n = 0 %}{% for p in site.posts %}{% if p.content contains m.url %}{% assign n = n | plus: 1 %}{% endif %}{% endfor %}
++    <li>
++      <span>
++        <a href="{{ m.url | relative_url }}">{{ m.title }}</a>
++        {% if m.summary %}<span class="model-summary">{{ m.summary }}</span>{% endif %}
++      </span>
++      <span class="model-count">{{ n }} note{% if n != 1 %}s{% endif %}</span>
++    </li>
++    {% endfor %}
++  </ul>
++</main>
++
++<footer class="article">
++  <p>{{ site.title }} · ETH Zurich</p>
++</footer>
++</body>
++</html>
+-- 
+2.43.0
+
