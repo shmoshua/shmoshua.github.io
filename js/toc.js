@@ -4,7 +4,10 @@
   var nav = document.querySelector('nav.toc');
   if (!nav) return;
 
-  var heads = document.querySelectorAll('article.article h2, article.article h3');
+  // Headings inside a TL;DR box are left out of the contents
+  var heads = Array.prototype.filter.call(
+    document.querySelectorAll('article.article h2, article.article h3'),
+    function (h) { return !h.closest('.tldr'); });
   if (!heads.length) { nav.remove(); return; }
 
   var title = document.createElement('div');
