@@ -35,7 +35,7 @@
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
-<body{% if jekyll.environment == "development" %} class="preview"{% endif %}></body>
+<body{% if jekyll.environment == "development" %} class="preview"{% endif %}>
 <!-- Filled in automatically from the h2/h3 headings by js/toc.js -->
 <nav class="toc" aria-label="Contents"></nav>
 
@@ -43,13 +43,34 @@
   {% if page.topic %}<p class="eyebrow">{{ page.topic }}</p>{% endif %}
   <h1 class="title">{{ page.title }}</h1>
   {% if page.authors %}<p class="authors">{{ page.authors }}</p>{% endif %}
+  {% if page.collection == "models" %}
+  {% if page.summary %}<p class="abstract">{{ page.summary }}</p>{% endif %}
+  <p class="affil">Model · <a href="{{ '/models/' | relative_url }}">All models</a> · <a href="{{ '/' | relative_url }}">Notes</a></p>
+  {% else %}
   <p class="affil">Read {{ page.date | date: "%b %d, %Y" }} · <a href="{{ '/' | relative_url }}">← Back to all notes</a></p>
+  {% endif %}
   {% if page.paper %}<div class="links"><a href="{{ page.paper }}">Paper <span class="arr">↗</span></a></div>{% endif %}
 </header>
 
 <article class="article">
 {{ content }}
 </article>
+
+{% if page.collection == "models" %}
+<!-- Every post that links to this model page, found automatically -->
+<section class="article backlinks">
+  <p class="backlinks-title">Notes that mention this model</p>
+  {% assign n = 0 %}
+  <ul class="post-list">
+  {% for p in site.posts %}{% if p.content contains page.url %}{% assign n = n | plus: 1 %}
+    <li>
+      <a href="{{ p.url | relative_url }}">{{ p.title }}</a>
+      <time datetime="{{ p.date | date_to_xmlschema }}">{{ p.date | date: "%b %d, %Y" }}</time>
+    </li>{% endif %}{% endfor %}
+  </ul>
+  {% if n == 0 %}<p class="empty">None yet. Link here from a post with <code>&lt;a href="{{ page.url }}"&gt;</code>.</p>{% endif %}
+</section>
+{% endif %}
 
 <footer class="article">
   <p>{{ site.title }} · ETH Zurich</p>

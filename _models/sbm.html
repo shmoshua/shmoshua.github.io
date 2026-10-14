@@ -1,0 +1,27 @@
+---
+layout: post
+title: "Stochastic Block Model (SBM)"
+summary: "Community detection in a random graph with a planted partition."
+---
+<!--
+  A model page: the setup once, then the results you keep needing.
+  Give each result an id="..." so posts can link straight to it,
+  e.g. <a href="/models/sbm/#kesten-stigum">Kesten–Stigum threshold</a>.
+  Example entries below; check them against your sources.
+-->
+
+<h2>Setup</h2>
+<p>Two balanced communities: assign each vertex $i \in [n]$ a label $\sigma_i \in \{\pm 1\}$ uniformly at random. Connect $i$ and $j$ independently with probability $a/n$ if $\sigma_i = \sigma_j$ and $b/n$ otherwise. Goal: recover $\sigma$ from the graph, up to a global sign.</p>
+<p><em>Weak recovery</em> means outputting $\hat\sigma$ with overlap $\big|\tfrac1n \sum_i \hat\sigma_i \sigma_i\big| \ge \delta$ for some $\delta > 0$, with probability $1 - o(1)$.</p>
+
+<h2>Results</h2>
+
+<div class="box theorem" id="kesten-stigum">
+  <div class="box-title">Kesten–Stigum threshold</div>
+  <p class="statement">Weak recovery is possible if and only if $(a-b)^2 > 2(a+b)$.</p>
+  <p>Equivalently, with $a = d(1+\varepsilon)$, $b = d(1-\varepsilon)$ and $\lambda = \varepsilon\sqrt d$: weak recovery is possible if and only if $\lambda > 1$.</p>
+  <p class="source">Mossel–Neeman–Sly (impossibility below); Massoulié and Mossel–Neeman–Sly (algorithms above).</p>
+</div>
+
+<h2>Open questions / my notes</h2>
+<p>…</p>

@@ -5,3 +5,9 @@ permalink: /posts/:year-:month-:day-:title:output_ext
 
 exclude:
   - README.md
+
+# One page per model (SK, SBM, ...) in _models/, published at /models/<file-name>/
+collections:
+  models:
+    output: true
+    permalink: /models/:name/

@@ -1,0 +1,29 @@
+---
+layout: post
+title: "Sherrington–Kirkpatrick Model (SK)"
+summary: "Mean-field spin glass with i.i.d. Gaussian couplings."
+---
+<!--
+  Example entries below; check them against your sources.
+-->
+
+<h2>Setup</h2>
+<p>For $\sigma \in \{\pm 1\}^n$ and i.i.d. couplings $g_{ij} \sim \mathcal N(0,1)$, the Gibbs measure at inverse temperature $\beta$ is
+$$ \mu_\beta(\sigma) \propto \exp\Big( \frac{\beta}{\sqrt n} \sum_{i<j} g_{ij}\, \sigma_i \sigma_j \Big). $$</p>
+
+<h2>Results</h2>
+
+<div class="box theorem" id="parisi-formula">
+  <div class="box-title">Parisi formula</div>
+  <p class="statement">The limiting free energy $\lim_{n\to\infty} \tfrac1n \E \log Z_n(\beta)$ exists and equals the infimum of the Parisi functional.</p>
+  <p class="source">Guerra (upper bound); Talagrand, 2006.</p>
+</div>
+
+<div class="box theorem" id="glauber-high-temp">
+  <div class="box-title">Fast mixing of Glauber at high temperature</div>
+  <p class="statement">For $\beta < 1/4$, Glauber dynamics has spectral gap $\Omega(1/n)$ with high probability over the couplings.</p>
+  <p class="source">Eldan–Koehler–Zeitouni.</p>
+</div>
+
+<h2>Open questions / my notes</h2>
+<p>…</p>

@@ -507,3 +507,45 @@ article.article li { margin-bottom: .3rem; }
 }
 .tldr > :last-child { margin-bottom: 0; }
 .tldr ul, .tldr ol { padding-left: 1.2rem; }
+
+/* ---- Model pages (_models/) ---- */
+/* Where a result came from, under each result box */
+.box .source {
+  font-family: var(--sans);
+  font-size: .78rem;
+  font-style: normal;
+  color: var(--muted);
+  margin: .55rem 0 0;
+}
+/* Arriving via a link like /models/sbm/#kesten-stigum highlights that result */
+.box[id] { scroll-margin-top: 2rem; }
+.box:target { box-shadow: 0 0 0 2px var(--accent); }
+
+/* Links from posts to model pages: dotted underline marks an internal reference */
+article.article a[href^="/models/"] { text-decoration-style: dotted; }
+
+.backlinks { margin-top: 3rem; }
+.backlinks-title {
+  font-family: var(--mono);
+  font-size: .7rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 .6rem;
+}
+.backlinks .post-list { margin: 0; }
+
+.model-list li > span:first-child { display: flex; flex-direction: column; gap: .15rem; }
+.model-summary { font-size: .95rem; color: var(--muted); }
+.model-count {
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: .78rem;
+  color: var(--muted);
+}
+
+/* Space above and below the footer. ("footer.article" is needed: the .article
+   rule would otherwise reset these.) In local preview, half a screen extra at
+   the bottom so the last lines you write can sit mid-screen. */
+footer.article { margin-top: 4rem; padding-bottom: 8rem; }
+body.preview footer.article { padding-bottom: 50vh; }

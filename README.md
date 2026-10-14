@@ -15,6 +15,24 @@ GitHub Pages rebuilds the site within a minute or two. The homepage list (newest
 the post header and the contents sidebar are generated automatically, so `index.html`
 never needs editing.
 
+## Model pages
+
+`_models/` has one page per model (e.g. `_models/sbm.html` → `/models/sbm/`). Each holds
+the setup and the results you keep needing, as boxes with an `id`:
+
+```html
+<div class="box theorem" id="kesten-stigum">
+  <div class="box-title">Kesten–Stigum threshold</div>
+  <p class="statement">…</p>
+  <p class="source">Who proved it.</p>
+</div>
+```
+
+Link to them from any post: `<a href="/models/sbm/">SBM</a>`, or to one result:
+`<a href="/models/sbm/#kesten-stigum">Kesten–Stigum</a>`. Each model page lists the notes
+that link to it automatically, and `/models/` lists all models. To add a model, copy
+`_models/sbm.html` to a new file name.
+
 ## Previewing locally (no commit needed)
 
 One-time setup on an Apple Silicon Mac (Homebrew in `/opt/homebrew`). If your shell is

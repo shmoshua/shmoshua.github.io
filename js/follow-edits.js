@@ -23,6 +23,13 @@
   });
 
   function restore() {
+    // Only after a refresh: arriving through a link (e.g. /models/sbm/#result)
+    // should land where the link points.
+    var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    if (!nav || nav.type !== 'reload') {
+      if (location.hash) { var t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
+      return;
+    }
     var saved = null;
     try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {}
     if (!saved) return;
