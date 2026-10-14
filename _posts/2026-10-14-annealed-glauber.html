@@ -10,8 +10,25 @@ paper: https://arxiv.org/pdf/2610.09882
 
 <div class="tldr">
   <p>
-    For every fixed $0\le \beta < 1$ and fixed $M,D> 0$, a polytime simulated annealing algorithm using Glauber s.t. $\tv(\nu_t, \mu)\le n^{-M}$ with probability at least $1-n^{-D}$.
+    An improved weak Poincare inequality for $0\le \beta < 1$ with only polynomial dependence on the defect $\eps$, using this it turns the annealing Glauber framework to  polytime sampler with inverse poly TV error.
   </p>
 </div>
+<p>
+    Let $A$ be the SK-model interaction matrix. 
 
-We first introduce the setting. 
+</p>
+
+The biggest results are two things. They first introduce the weak Poincare inequality and then using that to give a simulated annealing algortihm. 
+
+<p> For the setting of this paper, we say $0\le \beta < 1$ is the <b>fixed inverse temperature</b>, $D>0$ the error accuracy and $M > 0$ how close we want to get to the Gibbs distribution. 
+
+<div class="box theorem">
+  <div class="box-title">Theorem (Weak Poincare Inequality)</div>
+  <p class="statement">
+    With probability at least $1-n^{-D}$, for every function $f:\Omega \to \R$ and $n^{-M}\le \eps\le 1/2$, we have that: 
+    $$
+        \Var_{\mu_A}(f)\le \poly(n)\cdot \left(\frac{1}{\eps}\right)^{O(1)}\cdot \dirchform{\mu_A}{f}{f}+\eps \cdot \text{osc}(f)^2
+    $$
+  </p>  
+</div>
+</p>

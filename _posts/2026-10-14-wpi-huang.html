@@ -1,0 +1,44 @@
+---
+layout: post
+title: "Paper Title"
+list: glauber          # which homepage list: glauber or ai-safety (see _data/lists.yml)
+authors: Original Authors
+topic: Topic Tag
+paper: https://arxiv.org/abs/0000.00000
+---
+<!--
+  HOW TO ADD A NEW POST
+  1. Copy this file into _posts/ and name it YYYY-MM-DD-short-name.html
+     e.g. _posts/2026-10-13-fitzpatrick-functions.html
+     (the date in the file name is the date shown on the homepage)
+  2. Fill in the lines between the --- marks above. "paper" is optional.
+     "list" decides which homepage list the post appears in.
+     Keep the title in quotes: titles with a colon break without them.
+  3. Write your notes below. The page header, contents sidebar and the
+     homepage list are all generated for you.
+
+  Tip: use <h2 class="numbered"> / <h3 class="numbered"> for numbered sections.
+  Link to a model page with <a href="/models/sbm/">SBM</a>, or straight to one
+  of its results with <a href="/models/sbm/#kesten-stigum">Kesten–Stigum</a>.
+-->
+
+<div class="tldr">
+  <p>What the paper shows and why it matters, in a sentence or two. Math like $\nu \ll \pi$ works.</p>
+</div>
+
+<h2 class="numbered">Introduction</h2>
+<p>Your notes go here. Inline math like $f(x) = x \log x$ works, and so do display equations:</p>
+$$ F_A(x, x^*) = \sup_{(a, a^*) \in \operatorname{gra} A} \langle x, a^* \rangle + \langle a, x^* \rangle - \langle a, a^* \rangle $$
+
+<div class="box theorem">
+  <div class="box-title">Theorem 1</div>
+  <p class="statement">State the main result here.</p>
+</div>
+<details class="proof">
+  <summary></summary>
+  <p>Proof sketch.</p>
+  <p class="proof-end">∎</p>
+</details>
+
+<h2 class="numbered">Takeaways</h2>
+<p>What I learned and how it relates to my thesis.</p>
