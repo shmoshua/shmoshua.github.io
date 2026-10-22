@@ -1,0 +1,235 @@
+---
+layout: post
+title: "Poincare Inequality and MLSI"
+---
+<!--
+  A model page: the setup once, then the results you keep needing.
+  Give each result an id="..." so posts can link straight to it,
+  e.g. <a href="/models/sbm/#kesten-stigum">Kesten–Stigum threshold</a>.
+  Example entries below; check them against your sources.
+-->
+Let $P$ be a reversible Markov chain with a stationary distribution $\mu$. 
+<h2 class="numbered"> Linear Algebraic Identities</h2>
+We have the following identities:
+<ol>
+    <li>
+        <b> Reversibility implies self-adjointness. </b> Indeed,
+        $$
+            \langle f,Pg\rangle_\mu = \sum_{x,y}\mu(x)f(x)P(x,y)g(y)  =\langle Pf,g\rangle_\mu
+        $$
+        Therefore, $P$ has <b>real eigenvalues</b> by the spectral theorem. 
+    </li>
+    <li>
+        <b> $P$ has eigenvalues in $[-1,1]$</b>. Indeed, by Jensen $(Pf)^2\le Pf^2$. Therefore, 
+        $$
+            \|Pf\|^2_\mu \le \langle 1,Pf^2\rangle_\mu =\langle 1, f^2\rangle_\mu = \langle f,f\rangle_\mu = \|f\|_\mu^2
+        $$Therefore, $\|P\|\le 1$. Further, $I-P$ has eigenvalues in $[0,2]$.
+    </li>
+    <li>
+        <b> Variance as the sum of squares </b>. Let $\{\varphi_i\}_i$ be the eigenbasis of $I-P$ with $\varphi_0=1$. Then, $\E_\mu f = \sum_i \langle f,\varphi_i\rangle_\mu\langle \varphi_i,1\rangle_\mu=\langle f,\varphi_0\rangle_\mu$.
+        Then, by Parseval, 
+        $$
+            \Var_\mu(f)=\E_\mu[(f-\E_\mu f)^2]=\E_\mu\left[\left(\sum_{i\ge 1}\langle f, \varphi_i\rangle_\mu \varphi_i\right)^2\right]=\sum_{i\ge 1}\langle f,\varphi_i\rangle_\mu^2
+        $$
+    </li>
+    <li>
+        <b> Dirichlet form as a sum of squares</b>. 
+        $$
+            \dirchform{P}{f}{f}=\langle f,(I-P)f\rangle_\mu = \sum_{i\ge 1}\lambda_i \langle f,\varphi_i\rangle_\mu^2 
+        $$
+    </li>
+
+</ol>
+
+
+<h2 class="numbered"> Poincare Inequality</h2>
+
+<p>
+<div class="box theorem" id="PI">
+  <div class="box-title">Definition (Poincare inequality)</div>
+  <p class="statement">
+    $P$ satisfies $\rho$-Poincare inequality if for any function $f:\Omega \to \R$: 
+    $$
+        \rho\cdot \Var_\mu(f)\le \dirchform{P}{f}{f}
+    $$
+    Then, $\rho_{\text{PI}}$ is the largest such constant $\rho$. 
+  </p>
+</div>
+We have that $\rho_{\text{PI}}\ge 1/\poly(n)$ typically. 
+</p>
+
+
+<p>
+Let $f_t:=d\nu_t / d\mu$. Then, we have the following results. 
+<ol>
+    <li> <b>The $\chi^2$-distance is the variance of the density. </b>
+        $$
+            \chi^2(\nu_t\|\mu)=\sum_{x}\frac{(\nu_t(x)-\mu(x))^2}{\mu(x)}= \E_\mu[(f_t -1)^2]=\Var_\mu(f_t)
+        $$
+    </li>
+    <li>
+        <b>The derivative of the $\chi^2$-distance is the Dirichlet form. </b>
+        $$
+        \begin{aligned}
+        \frac{d}{dt}\Var_\mu(f_t)&=\frac{d}{dt}\langle f_t -1, f_t-1\rangle_\mu\\
+        &=\frac{d}{dt}\langle f_t, f_t\rangle_\mu = - 2\langle f_t, (I-P)f_t\rangle = -2\dirchform{P}{f_t}{f_t}
+        \end{aligned} 
+        $$
+    </li>
+    <li>
+        From the Poincare inequality, we have that: 
+        $$
+            \frac{d}{dt} \Var_\mu(f_t)\le -2\rho_{\text{PI}}\cdot \Var_\mu(f_t)
+        $$
+        By differentiating $g(t):= e^{2\rho_{\text{PI}} t}\Var_\mu(f_t)$, we have that: 
+        $$
+            e^{2\rho_{\text{PI}} t}\Var_\mu(f_t) - \Var_\mu(f_0)=g(t)-g(0)=\int_0^t g'(t)dt \le 0
+        $$
+        Therefore, we have that: 
+        $$
+        \begin{aligned}
+            \Var_\mu(f_t)&\le e^{-\rho_{\text{PI}}t} \cdot\Var_\mu(f_0)\\
+             \chi^2(\nu_t\|\mu)&\le e^{-\rho_{\text{PI}}t} \cdot\chi^2(\nu\|\mu)
+        \end{aligned}
+        $$
+    </li>
+    <li>
+        <b>$\rho_{\text{PI}}$ is the smallest non-zero eigenvalue of $(I-P)$</b>. Indeed, we have that from above, 
+        $$
+            \lambda_1\cdot \Var_\mu (f)=\lambda_1\cdot \sum_{i\ge 1}\langle f,\varphi_i\rangle ^2\le \sum_{i\ge 1}\lambda_i\langle f,\varphi_i\rangle ^2=\dirchform{P}{f}{f}
+        $$
+        Hence, $\lambda_1(I-P)\le \rho_{\text{PI}}$. However, we also have that: 
+        $$
+            \rho_{\text{PI}} = \rho_{\text{PI}} \Var_\mu(\varphi_1)\le \dirchform{P}{\varphi_1}{\varphi_1}=\lambda_1
+        $$
+    </li>
+</ol>
+</p>
+
+<h2 class="numbered"> Modified Log-Sobolev Inequality</h2>
+
+
+<p>
+<div class="box theorem" id="MLSI">
+  <div class="box-title">Definition (MLSI)</div>
+  <p class="statement">
+    $P$ satisfies $\rho$-MLSI if for any function $f:\Omega \to \R_{>0 }$: 
+    $$
+        \rho\cdot \Ent_\mu(f)\le \dirchform{P}{f}{\log f}
+    $$where $\Ent_\mu [f]:=\E_\mu [f\log f] - \E_\mu f \log \E_\mu f$.
+    Then, $\rho_{\text{MLSI}}$ is the largest such constant $\rho$. 
+  </p>
+</div>
+</p>
+
+
+
+<p>
+Similarly as above, we have the following results. 
+<ol>
+    <li> <b>The KL divergence is the entropy functional of the density. </b>
+        $$
+            \KL(\nu_t\|\mu)=\sum_{x}\nu_t(x)\log f_t(x)= \langle f_t, \log f_t\rangle_\mu= \Ent_\mu [f_t]
+        $$
+    </li>
+    <li>
+        <b>The derivative of the KL divergence is the Dirichlet form. </b>
+        $$
+        \begin{aligned}
+        \frac{d}{dt}\KL(\nu_t\|\mu)&=\frac{d}{dt}\langle f_t, \log f_t\rangle_\mu\\
+        &= - \langle f_t, (I-P)\log f_t\rangle = -\dirchform{P}{f_t}{\log f_t}
+        \end{aligned} 
+        $$
+    </li>
+    <li>
+        From the MLSI, we have that: 
+        $$
+            \frac{d}{dt} \KL(\nu_t\| \mu)\le -\rho_{\text{MLSI}}\cdot \KL(\nu_t\| \mu)
+        $$
+        By differentiating $g(t):= e^{\rho_{\text{MLSI}} t}\KL(\nu_t\| \mu)$, we have that: 
+        $$
+            e^{\rho_{\text{MLSI}} t}\KL(\nu_t\| \mu) - \KL(\nu_0\| \mu)=g(t)-g(0)=\int_0^t g'(t)dt \le 0
+        $$
+        Therefore, we have that: 
+        $$
+        \begin{aligned}
+            \Ent_\mu(f_t)&\le e^{-\rho_{\text{MLSI}}t} \cdot\Ent_\mu(f_0)\\
+             \KL(\nu_t\|\mu)&\le e^{-\rho_{\text{MLSI}}t} \cdot\KL(\nu\|\mu)
+        \end{aligned}
+        $$
+    </li>
+</ol>
+</p>
+
+
+<h2 class="numbered"> Weak Poincare Inequality</h2>
+
+
+<p>
+<div class="box theorem" id="WPI">
+  <div class="box-title">Definition (WPI)</div>
+  <p class="statement">
+    $P$ satisfies $(\rho,\eps)$-WPI if for any function $f:\Omega \to \R$: 
+    $$
+        \rho\cdot \Var_\mu(f)\le \dirchform{P}{f}{ f} + \eps \|f-\E_\mu f\|^2_\infty
+    $$
+  </p>
+</div>
+</p>
+
+
+
+<p>
+Then, using the identities from PI, we have:
+$$
+    \chi^2(\nu_t\|\mu)\le e^{-\rho t}\cdot \chi^2(\nu_0\|\mu)+\eps\left\|f_0 - 1\right\|^2_\infty
+$$
+</p>
+
+<h2 class="numbered"> Poincare Constant and MLSI Constant</h2>
+<ol>
+    <li><b>MLSI implies Poincare</b>
+        $$
+            \rho_{\text{MLSI}}\le 2\rho_{\text{PI}}
+        $$
+
+        <details class="proof">
+        <summary></summary>
+        <p>
+            By linearization: Let $g:\Omega \to \R$. We first assume that $\E g = 0$. Let $\eps > 0$ be small enough constant s.t. $f:= 1+\eps g$ is positive. 
+            Then, we have:
+            $$
+            \begin{aligned}
+                \Ent_\mu[f]
+                &=\E_\mu[( 1+\eps g) \log (1+\eps g)] \\
+                &= \E_\mu\left[\eps g + \frac{\eps^2 g^2}{2}+O(\eps^3)\right]\\
+                &= \frac{\eps^2}{2} \Var_\mu(g) + O(\eps^3)\\
+
+                \dirchform{P}{f}{\log f}
+                &=\eps \langle g, (I-P)\log (1+\eps g)\rangle\\
+                &=\eps \left\langle g, (I-P)\left(\eps g -\frac{\eps^2 g^2}{2}+O(\eps^3)\right)\right\rangle\\
+                &= \eps^2\cdot \dirchform{P}{g}{g} + O(\eps^3)
+            \end{aligned}
+            $$
+            Therefore, by MLSI, 
+            $\rho_{\text{MLSI}}\cdot (\eps^2 / 2)\cdot  \Var_\mu(g)  \le  \eps^2\cdot \dirchform{P}{g}{g} + O(\eps^3)$. 
+            Diving both sides by $\eps^2$ and taking $\eps\to 0$ gives us our statement.
+        </p>
+        <p class="proof-end">∎</p>
+        </details>
+    </li>
+    <li><b>Poincare implies MLSI</b>
+        $$
+            \rho_{\text{PI}}\le \left(1+\frac{\log(1/\mu_{\min})}{2}\right)\rho_{\text{MLSI}}
+        $$
+
+        <details class="proof">
+        <summary></summary>
+        <p>
+            Let $f:\Omega \to \R_{>0}$. As both entropy functional and Dirichlet form are linear, we may assume that $\E_\mu f = 1$. Then, $f\le 1/\mu_\min$.
+            
+        </p>
+        <p class="proof-end">∎</p>
+        </details>
+    </li>
+</ol>

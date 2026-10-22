@@ -1,0 +1,146 @@
+---
+layout: post
+title: "Spiked Wigner Model"
+---
+
+<h2 class="numbered">Setup</h2>
+<p>In the spiked Wigner model, we aim to recover an unknown signal $\bs{v}\sim \text{Unif}(\Omega)$, given a noise measurement: 
+    $$
+        \bs{M}:= \bs{W}+\frac{\lambda}{N} \bs{v v}^\top 
+    $$
+    for some signal-to-noise ratio $\lambda\ge 0$, and a noise matrix $\bs{W}\sim\textsf{GOE}(N)$ with $\bs{W}_{ji}=\bs{W}_{ij}\sim \mathcal N(0, 1/N)$ for $i\ne j$, 
+    and $\bs{W}_{ii}\sim \mathcal N(0, 2/N)$.  
+</p>
+
+<h2 class = "numbered">Known Results</h2>
+<h3 class = "numbered">Statistical and Spectral Threshold</h3>
+<p>
+The spiked Wigner model exhibits a sharp phase transition at
+$\lambda=1$, known as the BBP transition:
+<ul>
+    <li>
+        If $\lambda<1$, the spiked and unspiked models are
+        mutually contiguous, and weak recovery of the signal
+        is information-theoretically impossible.
+    </li>
+    <li>
+        If $\lambda>1$, the leading eigenvector of $\bs{M}$
+        has nontrivial correlation with $\bs{v}$, and weak
+        recovery is achievable in polynomial time.
+    </li>
+</ul>
+</p>
+
+<h3 class = "numbered">Glauber Dynamics</h3>
+<p>
+For an inverse temperature $\beta>0$, consider the Gibbs measure
+on $\Omega$:
+$$
+    \mu_{\beta M}(x)
+    \propto
+    \exp\left(
+        \frac{\beta}{2}x^\top
+        Mx
+    \right).
+$$
+Equivalently,
+$$
+    \mu_{\beta M}(x)
+    \propto
+    \exp\left(
+        \frac{\beta}{2}x^\top Wx + \frac{\beta\lambda}{2N} \langle x,v\rangle^2
+    \right).
+$$
+The Bayesian posterior corresponds to $\beta=\lambda$.
+For $\beta\neq\lambda$, this is a tempered version of the
+posterior.
+</p>
+
+<h3 class="numbered">Polynomial-Time Recovery by Glauber Dynamics</h3>
+<p>
+Rajaraman and Wu (2026) show that, under a high-temperature
+mixing assumption for the SK model,
+Glauber dynamics exhibits a sharp recovery transition at
+$\beta\lambda=1.$
+</p>
+<p>
+More precisely, consider Glauber dynamics initialized at an
+arbitrary $\bs{\sigma}_0\in\Omega$. Run the chain for
+$T\geq\widetilde{\Omega}(N^4)$ steps and let
+$\widehat{\bs{\sigma}}=\bs{\sigma}_t$, where $t$ is chosen
+uniformly from $\{0,\ldots,T\}$.
+
+For $\beta\in(0,1)$ with $\beta\lambda\neq1$, assuming the
+required modified log-Sobolev inequality (MLSI) for the SK model,
+the correlation satisfies
+$$
+    \mathbb P\left(
+        \left|
+        \frac{1}{N}
+        |\langle\widehat{\bs{\sigma}},\bs{v}\rangle|
+        -\mathsf{OPT}_{\beta,\lambda}
+        \right|
+        >N^{-1/2+\varepsilon}
+    \right)=o_N(1)
+$$
+for every fixed $\varepsilon>0$, where
+$\mathsf{OPT}_{\beta,\lambda}$ is the largest nonnegative fixed
+point of an explicit AMP-like recursion. In particular,
+$$
+    \mathsf{OPT}_{\beta,\lambda}
+    \begin{cases}
+        =0, & \beta\lambda<1,\\
+        >0, & \beta\lambda>1.
+    \end{cases}
+$$
+Hence, Glauber dynamics achieves weak recovery when
+$\beta\lambda>1$, despite potentially having exponential
+mixing time.
+
+Moreover, the correlation attained by Glauber dynamics matches,
+up to a vanishing error, the correlation of a sample from its
+stationary Gibbs measure:
+$$
+    \frac{1}{N}
+    |\langle\widehat{\bs{\sigma}},\bs{v}\rangle|
+    =
+    \mathsf{OPT}_{\beta,\lambda}+o_N(1).
+$$
+For an $o_N(1)$ approximation without the sharper
+$N^{-1/2+\varepsilon}$ accuracy, the paper shows that
+$T=\widetilde{\Omega}(N^3)$ suffices.
+</p>
+
+<h2 class="numbered"> Restricted Poincare Inequality</h2>
+<p>
+    Let us define the following objective set: 
+    $$
+        \mathcal A_{c}:=\{ x\in \Omega : |\langle v, x\rangle | \ge cN\}
+    $$
+    We define that a reversible Markov Chain $P$ with stationary distribution $\mu$ satisfies the <b>$(\rho,c)$-restricted Poincare inequality</b>, 
+    if for any $g:\Omega \to \R$ with $\supp(g)\subseteq \overline{\mathcal A_c}$, 
+    $$
+        \rho \cdot \|g\|^2_\mu\le \dirchform{P}{g}{g}
+    $$
+    Assume that this holds. Let $\nu_t$ be the law of time $t$ Glauber dynamics starting from $\nu_0$. Further, $f_t := d\nu_t / d\mu$. 
+    Let $0 < \delta \le c$. If we have $\varphi:\Omega \to \R$, 
+
+    $$
+    \varphi(x):=\begin{cases}0 & |\langle v,x\rangle | \ge cN\\ \frac{c - |\langle v, x\rangle | / N}{\delta} & (c-\delta) N \le |\langle v,x\rangle |\le cN\\ 1& |\langle v,x\rangle | < (c-\delta)N\end{cases}
+    $$
+
+    Then, $g_t:=\varphi \sqrt{f_t}$ has $\supp(g_t)\subseteq \overline{\mathcal A_{c}}$ and: 
+    $$
+       \|g_t\|^2_\mu=\E_\mu[\varphi^2 f_t]\ge \E_\mu [1_{\overline{\mathcal A_{(c-\delta)}}}f_t]=\nu_t(|\langle v,x\rangle | < (c-\delta)N)
+    $$
+    For the RHS, 
+    Using $(u+w)^2\le(1+\varepsilon)u^2+(1+\varepsilon^{-1})w^2$, $\varphi^2\le1$ and reversibility,
+    $$
+    \dirchform{P}{g_t}{g_t}\le (1+\varepsilon)\,\dirchform{P}{\sqrt{f_t}}{\sqrt{f_t}}+\frac{2(1+\varepsilon^{-1})}{\delta^2 N}.
+    $$
+    where a spin flip changes $\langle v,x\rangle$ by $2$, so $|\varphi(x)-\varphi(y)|\le \frac{2}{\delta N}$. So for every $t$,
+    $$
+    \nu_t\big(|\langle v,x\rangle|<(c-\delta)N\big)\le\frac1\rho\Big[\tfrac{1+\varepsilon}{4}\,\dirchform{P}{f_t}{\log f_t}+\tfrac{2(1+\varepsilon^{-1})}{\delta^2N}\Big].
+    $$
+
+</p>

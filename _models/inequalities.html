@@ -1,0 +1,21 @@
+---
+layout: post
+title: "TV distance inequalities"
+---
+
+
+<div class="box theorem" id="kesten-stigum">
+  <div class="box-title">Definition (TV distance)</div>
+  <p class="statement">
+    $$
+        \tv(p,q)=\frac{1}{2}\int |p(x)-q(x)|dx
+    $$
+  </p>
+</div>
+
+<h3 class="numbered"> TV distance and $\chi^2$ distance</h3>
+By Cauchy-Schwarz, 
+
+$$
+    \tv(p,q)\le \frac{1}{2}\sqrt{\int \frac{(p(x)-q(x))^2}{q(x)}dx}\sqrt{\int q(x)dx}=\frac{1}{2}\chi^2(p\|q)
+$$

@@ -1,44 +1,116 @@
 ---
 layout: post
-title: "Paper Title"
-list: glauber          # which homepage list: glauber or ai-safety (see _data/lists.yml)
-authors: Original Authors
-topic: Topic Tag
-paper: https://arxiv.org/abs/0000.00000
+title: "Weak Poincare Inequalities, Simulated Annealing, and
+Sampling from Spherical Spin Glasses"
+list: glauber  
+authors: Brice Huang, Sidhanth Mohanty, Amit Rajaraman, David X. Wu
+topic: Glauber Dynamics, SK Model
+paper: https://arxiv.org/pdf/2411.09075
 ---
-<!--
-  HOW TO ADD A NEW POST
-  1. Copy this file into _posts/ and name it YYYY-MM-DD-short-name.html
-     e.g. _posts/2026-10-13-fitzpatrick-functions.html
-     (the date in the file name is the date shown on the homepage)
-  2. Fill in the lines between the --- marks above. "paper" is optional.
-     "list" decides which homepage list the post appears in.
-     Keep the title in quotes: titles with a colon break without them.
-  3. Write your notes below. The page header, contents sidebar and the
-     homepage list are all generated for you.
-
-  Tip: use <h2 class="numbered"> / <h3 class="numbered"> for numbered sections.
-  Link to a model page with <a href="/models/sbm/">SBM</a>, or straight to one
-  of its results with <a href="/models/sbm/#kesten-stigum">Kesten–Stigum</a>.
--->
 
 <div class="tldr">
   <p>What the paper shows and why it matters, in a sentence or two. Math like $\nu \ll \pi$ works.</p>
 </div>
 
-<h2 class="numbered">Introduction</h2>
-<p>Your notes go here. Inline math like $f(x) = x \log x$ works, and so do display equations:</p>
-$$ F_A(x, x^*) = \sup_{(a, a^*) \in \operatorname{gra} A} \langle x, a^* \rangle + \langle a, x^* \rangle - \langle a, a^* \rangle $$
+The steps can be broken down into the following steps. 
+<ol>
+    <li>
+        Glauber satisfies WPI for every temperature step. 
+    </li>
+    <li>
+        Given WPI, Glauber mixes fast enough to the "warm start" state of the next schedule step.
+    </li>
+    <li>
+        Each temperature step is indeed a warm start. 
+    </li>
+</ol>
 
-<div class="box theorem">
-  <div class="box-title">Theorem 1</div>
-  <p class="statement">State the main result here.</p>
+<h3 class="numbered"> The Annealing algorithm</h3>
+Let $\beta_0$ be the final temperature and $T$ be the time Glauber spends in each temperature. Further, $\delta$ is the temperature step. 
+Then, the annealing schedule is defined as: 
+$$
+    \beta(t):=\delta \left\lfloor \frac{t}{T}\right\rfloor,\qquad 0\le t < T(\beta_0 / \delta+1)
+$$
+Hence, we run Glauber with stationary distribution $\mu_{\beta(t)}$ at time $t$. 
+
+<h2 class="numbered"> Weak Poincare Inequality</h2>
+
+This introduces the WPI and shows the Step 2 from above. 
+<p>
+<div class="box theorem" id="WPI">
+  <div class="box-title">Definition (WPI)</div>
+  <p class="statement">
+    $P$ satisfies $(\rho,\eps)$-WPI if for any function $f:\Omega \to \R$: 
+    $$
+        \rho\cdot \Var_\mu(f)\le \dirchform{P}{f}{ f} + \eps \cdot \text{osc}(f)^2
+    $$
+  </p>
 </div>
-<details class="proof">
-  <summary></summary>
-  <p>Proof sketch.</p>
-  <p class="proof-end">∎</p>
-</details>
+</p>
 
-<h2 class="numbered">Takeaways</h2>
-<p>What I learned and how it relates to my thesis.</p>
+
+<p>
+The first idea is to use the WPI to get: 
+$$
+    \frac{d}{dt}\text{Var}_{\mu}(f_t)\le -2 \dirchform{P}{f_t}{f_t}\le -2\rho\Var_\mu(f_t)+2\eps \cdot \text{osc}(f_t)^2
+$$
+Then, by Grönwall, we have: 
+$$
+    \frac{d}{dt}\left[e^{2\rho t}\Var_\mu (f_t)\right]=2\rho e^{2\rho t}\Var_\mu(f_t)+e^{2\rho t}\frac{d}{dt}\Var_\mu(f_t)\le 2\eps e^{2\rho t}\text{osc}(f_t)^2
+$$
+Integrating, we have that: 
+$$
+\begin{aligned}
+    \Var_\mu(f_T) 
+    &\le e^{-2\rho T} \Var_\mu(f_0)+2\eps \int_0^T  e^{2\rho (t-T)}\text{osc}(f_t)^2dt\\
+    &\le e^{-2\rho T} \Var_\mu(f_0)+\frac{\eps}{\rho}\cdot \text{osc}(f_0)^2
+\end{aligned}
+$$
+Similarly, $\chi^2(\nu_t\|\mu)\le e^{-2\rho t}\chi^2(\nu_0\|\mu)+\frac{\eps}{\rho}\text{osc}(f_0)^2$.
+</p>
+
+<p>
+    We also additionally define <b>warm start</b>, if $\chi^2(\nu_0\|\mu)=O(1)$ and $\text{osc}(f_0)=O(1)$.
+</p>
+
+<h2 class="numbered"> Glauber Mixes</h2>
+
+Let $\mu_k:=\mu_{k\delta}$, $P_k$ the kernel with stationary distribution $\mu_k$ for time $T$. Further, let$\nu_k:=P_k\nu_{k-1}$. Then, for any $k$:
+$$
+\begin{aligned}
+    \tv(\nu_k,\mu_k)
+    &\le \tv(P_k\nu_{k-1}, P_k\mu_{k-1})+ \tv(P_k\mu_{k-1}, \mu_{k}) \\
+    &\le \tv(\nu_{k-1}, \mu_{k-1}) + \tv(P_k\mu_{k-1}, \mu_{k})
+\end{aligned}
+$$
+If we start from uniform distribution as $\nu_0$, we have that $\tv(\nu_{0}, \mu_{0})=0$. Hence, 
+$$
+    \tv(\nu_{\text{out}},\mu_{\beta_0}) \le \sum_{k = 1}^{\beta_0 / \delta} \tv(P_k \mu_{k-1},\mu_k)\le \frac{1}{2} \sum_{k = 1}^{\beta_0 / \delta} \sqrt{\chi^2( P_k\mu_{k-1}\|\mu_k)}
+$$
+
+Now we just have to control the $\chi^2$-distance. From Part 1, we have that: 
+$$
+    \chi^2( P_k \mu_{k-1}\|\mu_{k})\le  e^{-2\rho T}\chi^2(\mu_{k-1}\|\mu_k)+\frac{\eps}{\rho}\text{osc}\left(\frac{d\mu_{k-1}}{d\mu_k}\right)^2
+$$
+Let $f_k:= d\mu_{k-1} / d\mu_k=\frac{\exp(-\delta H)}{\E_{\mu_k}\exp(-\delta H)}$. Let $\Delta:= \delta \|H\|_\infty$. Then, $e^{-2\Delta}\le f_k\le e^{2\Delta}$. We then have that: 
+$$
+    e^{2\Delta}-e^{-2\Delta}\le e^{2\Delta} + (e^{2\Delta}-2)=2(e^{2\Delta}-1)
+$$
+Therefore, $\text{osc}(f_k)^2 \le 4(e^{2\Delta}-1)^2$ and:
+$$
+    \chi^2(\mu_{k-1}\|\mu_{k})=\E_{\mu_k}[(f_k-1)^2]\le (e^{2\Delta}-1)^2
+$$
+Plugging everything back into (8), we have: 
+$$
+    \chi^2(P_k\mu_{k-1}\|\mu_k)\le \left(e^{-2\rho T}+\frac{4\eps}{\rho}\right)(e^{2\Delta}-1)^2
+$$
+Now, we can plug everything back into (7) and get:
+$$
+\begin{aligned}
+\tv(\nu_{\text{out}},\mu_{\beta_0})&\le \frac{1}{2}\frac{\beta_0}{\delta}(e^{2\Delta}-1)\left(e^{-\rho T}+2\sqrt{\frac{\eps}{\rho}}\right)\\
+&\le \beta_0\|H\|_\infty e^{2\Delta}\left(e^{-\rho T}+2\sqrt{\frac{\eps}{\rho}}\right)
+\end{aligned}
+$$
+where in the first inequality we use $\sqrt{a+b}\le \sqrt{a}+\sqrt{b}$ and in the second, $e^x-1\le xe^x$.
+
+<h2 class="numbered">MPI holds for all step</h2>

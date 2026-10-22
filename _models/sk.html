@@ -1,20 +1,45 @@
 ---
 layout: post
 title: "Sherrington–Kirkpatrick Model (SK)"
-summary: "Mean-field spin glass with i.i.d. Gaussian couplings."
 ---
 <!--
   Example entries below; check them against your sources.
 -->
 
-<h3>Setup</h2>
+<h2 class="numbered">Setup</h2>
 <p>For $\sigma \in \{\pm 1\}^n$ and i.i.d. couplings $g_{ij} \sim \mathcal N(0,1)$, the Gibbs measure at inverse temperature $\beta$ is
 $$ 
 \mu_\beta(\sigma) \propto \exp\Big( \frac{\beta}{\sqrt n} \sum_{i< j} g_{ij}\, \sigma_i \sigma_j \Big). 
 $$
 </p>
 
-<h3>Results</h2>
+<h2 class = "numbered">Results</h2>
+<h3 class = "numbered">Inverse Temperature Thresholds</h3>
+The replica symmetric phase can be split up to the following:
+$$
+0\le \beta_{\text{unique}}\le \beta_{\text{SL}}\le \beta_{\text{shatter}} \le \beta_{\text{RS}}
+$$
+where: 
+<ol>
+  <li> <b>Uniqueness threshold</b>: Below $\beta_{\text{unique}}$, Glauber dynamics satisfy the Poincare inequality w.h.p. Hence, we have fast mixing under worst case initialization.
+  Worst case mixing is <b>exponentially slow</b> above this threshold.</li>
+  <li> <b> Stochastic Localization threshold</b>: Below $\beta_{\text{SL}}$, algorithmic stochastic localization successfully samples from $\mu$. Above this threshold, it fails.
+  Additionally, below this threshold, simulated annealing is proven to sample, though it is not known whether it fails above $\beta_{\text{SL}}$.</li>
+  <li> <b> Shattering threshold</b>: Below $\beta_{\text{shatter}}$ (and above $\beta_{\text{unique}}$), metastable states are present in the Gibbs measure and obstruct local Markov chains
+    from mixing rapidly from a worst case initialization. However, it is an open problem whether they still manage to succeed with random initialization.
+    </li>
+  <li> <b> Above $\beta_{\text{shatter}}$</b>: The Gibbs distribution $\mu$ shatters into exponentially many well-separated clusters, each of which contains only an exponentially small fraction of the Gibbs mass. 
+    There is evidence suggesting efficient sampling from $\mu$ is impossible in this region.
+  </li>
+</ol>
+
+Below are some known thresholds for different cases:
+<ol>
+  <li> <b> SK-Model</b>: It is known that $\beta_{\text{SL}}=\beta_{\text{shatter}}=\beta_{\text{RS}}=1$. OpenAI preprints report that $\beta_{\text{unique}}=1$.
+  </li>
+</ol>
+
+<h3 class="numbered">Other results</h3>
 
 <div class="box theorem" id="parisi-formula">
   <div class="box-title">Parisi formula</div>
