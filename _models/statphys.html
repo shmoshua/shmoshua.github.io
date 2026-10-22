@@ -1,0 +1,238 @@
+---
+layout: post
+title: "Statistical Physics"
+---
+Let us consider the following model. Let $\Omega:=\{\pm 1\}^n$ be the hypercude. Then, the <b>Boltzmann distribution</b> is given by:
+$$
+    \mu(\sigma)\propto \exp(-\beta E(\sigma))
+$$ where $E$ is the energy. To motivate the choice of exponential, 
+the Boltzmann distribution is the <b>maximum entropy distribution</b> given the average energy $\overline{E}$, i.e.
+$$
+\begin{array}{rl}
+\max & S(\mu):=-\sum_{\sigma\in \Omega}\mu(\sigma)\log \mu(\sigma)\\
+\text{s.t.} & \sum_{\sigma} \mu(\sigma) = 1\\
+& \sum_{\sigma}\mu(\sigma) E(\sigma) = \overline{E}
+\end{array}
+$$
+By Lagrange multipliers $\lambda$ and $\beta$ respectively, we have that: 
+$$
+    \frac{\partial S(\mu)}{\partial \mu(\sigma)}= - \log \mu(\sigma) - 1 = \lambda + \beta E(\sigma)
+$$By exponentiating both sides, we get that $\mu(\sigma) \propto \exp(-\beta E(\sigma))$.
+
+<h2 class="numbered"> Free Energy</h2>
+
+For the above system, the <b>free energy</b> is defined as:
+$$
+    F:=-\frac{1}{\beta}\log Z,\qquad Z:=\sum_{\sigma}\exp(-\beta E(\sigma))
+$$
+In other words, $Z$ is the partition function. Then, we get the following decomposition:
+
+<div class="box theorem" id="free-energy-decomposition">
+  <div class="box-title">Proposition (Free Energy Decomposition)</div>
+  <p class="statement">
+    $$
+        F = \E_\mu E - \frac{1}{\beta}\cdot S(\mu)
+    $$i.e. the free energy is the average energy minus the entropy.
+  </p>
+</div>
+
+<details class="proof">
+  <summary></summary>
+  <p>
+    This is given by a simple algebraic calculation: 
+    $$
+    \begin{aligned}
+    \E_\mu E - \frac{1}{\beta} S(\mu)
+    & = \frac{1}{\beta}\sum_\sigma\mu(\sigma)\left[\beta E(\sigma) +\log \mu(\sigma)\right]\\
+    & = \frac{1}{\beta}\sum_\sigma\mu(\sigma)\log(\exp(\beta E(\sigma))\cdot \mu(\sigma)) \\
+    & =- \frac{1}{\beta}\sum_\sigma\mu(\sigma)\log Z \\&= F
+    \end{aligned}
+    $$
+  </p>
+</details>
+
+
+
+
+Now, let us represent free energy as a function over distributions, i.e. we have $F(\nu):=\E_\nu E - \frac{1}{\beta} S(\nu)$ and $F= F(\mu)$ in the above sense. 
+Then, we get that the Boltzmann distribution minimizes the free energy. 
+
+
+<div class="box theorem" id="free-energy-decomposition">
+  <div class="box-title">Proposition</div>
+  <p class="statement">
+    Let $\nu$ be any distribution. We have that $$F(\nu) - F(\mu) = \frac{1}{\beta}\KL(\nu\|\mu)$$
+    Consequently, we get that $F(\mu)\le F(\nu)$.
+  </p>
+</div>
+
+
+<details class="proof">
+  <summary></summary>
+  <p>
+    We have that: 
+    $$
+    \begin{aligned}
+    F(\nu) - F(\mu) &= \sum_{\sigma}(\nu(\sigma) - \mu(\sigma))E(\sigma)+\frac{1}{\beta}\sum_\sigma \left[\nu(\sigma)\log \nu(\sigma) - \mu(\sigma)\log \mu(\sigma)\right]\\
+    &= \frac{1}{\beta}\sum_{\sigma}(\nu(\sigma) - \mu(\sigma))\left[\beta E(\sigma)+\log \mu(\sigma)\right]+\frac{1}{\beta}\KL(\nu\|\mu) \\
+    &= \frac{1}{\beta}\sum_{\sigma}(\nu(\sigma) - \mu(\sigma))\log Z+\frac{1}{\beta}\KL(\nu\|\mu) \\
+    &= \frac{1}{\beta}\KL(\nu\|\mu) 
+    \end{aligned}
+    $$
+  </p>
+</details>
+
+The fact that $\mu$ minimizes the free energy can also be shown similarly as above using Lagrange multipliers. 
+
+<h3 class="numbered"> Mean Field Approximation of Free Energy</h3>
+<p>
+    From this section, assume that $E(\sigma):=\sum_{i\sim j} h(\sigma_i,\sigma_j)$, given by the edge corelations. 
+</p>
+<p>The ansatz is follows: as $Z$ is difficult to compute, we <b>approximate the true free energy by finding the minimum free energy over a family of distributions that are more tractable.</b> 
+</p>
+
+<p>
+The first family of distributions we will consider are given by $\nu(\sigma):=\prod_i \nu_i(\sigma_i)$. In this family, we can write the free energy as: 
+$$
+\begin{aligned}
+F(\nu)
+&= \sum_{i\sim j}\sum_{s,t} \nu_i(s)\nu_j(t)h(s,t) +\frac{1}{\beta}\sum_{\sigma} \left(\prod_j \nu_j(\sigma_j)\right)  \left(\sum_i \log \nu_i(\sigma_i)\right)\\
+&= \sum_{i\sim j}\sum_{s,t} \nu_i(s)\nu_j(t)h(s,t) +\frac{1}{\beta}\sum_{\sigma} \sum_i \prod_j \nu_j(\sigma_j)\log \nu_i(\sigma_i)\\
+&= \sum_{i\sim j}\sum_{s,t} \nu_i(s)\nu_j(t)h(s,t) +\frac{1}{\beta}\sum_i\sum_s \nu_i(s)\log \nu_i(s)\\
+\end{aligned}
+$$
+With Lagrange multiplier $\lambda_i$ on the constraint that $\sum_{s}\nu_i(s) = 1$ for every $i\in[n]$, 
+$$
+\frac{\partial F}{\partial \nu_i(s)}=\sum_{j:j\sim i}\sum_t \nu_j(t)h(s,t)+\frac{1}{\beta}\log \nu_i(s) + \frac{1}{\beta} = \lambda_i
+$$
+Hence, after multiplying by $\beta$ and exponentiating: 
+$$
+\nu_i(s)\propto \exp \left( - \beta \sum_{j\in \partial i} \sum_t \nu_j(t)h(s,t) \right)
+$$
+This is a fixed point equation governed by the mean field. We can use fixed point iteration methods to approximate the free energy. 
+</p>
+
+<h3 class="numbered">Belief Propagation and Bethe Free Energy</h3>
+<p>
+The second family of functions we will consider additionally expresses the edge marginal energies, i.e. 
+$$
+    \nu(\sigma):=\prod_i \nu_i(\sigma_i)\prod_{i\sim j}\frac{\nu_{ij}(\sigma_i,\sigma_j)}{\nu_i(\sigma_i)\nu_j(\sigma_j)},\qquad \sum_{t}\nu_{ij}(s,t)=\nu_i(s),\forall i,s
+$$ for some distritbutions $\nu_i,\nu_{ij}$. Then, the following question arise: 1) Does this define a probability distribution? 
+
+We have that <b>any Gibbs distribution can be expressed in the above form if and only if the underlying interaction graph $G$ is a forest.</b> 
+</p>
+
+<details class="proof">
+  <summary></summary>
+  <p>
+        We prove the statement for the slightly larger class of Gibbs distributions with vertex potentials,
+        $$
+            \mu(\sigma)\propto \prod_i \phi_i(\sigma_i)\prod_{i\sim j}\psi_{ij}(\sigma_i,\sigma_j),\qquad \phi_i,\psi_{ij}>0,
+        $$
+        which contains our case ($\phi_i\equiv 1$, $\psi_{ij}=e^{-\beta h}$). Write $\mu_i,\mu_{ij}$ for the marginals of $\mu$; they are strictly positive.
+    </p>
+
+    <p>
+        Suppose $G$ is a forest. We proceed with induction over the number of edges. If $G$ has no edges, then $\mu\propto\prod_i\phi_i$ is a product measure, so $\mu=\prod_i\mu_i$, which is the formula with an empty edge product.
+    </p>
+
+    <p>
+        Otherwise $G$ has a leaf $\ell$ with unique neighbour $k$, since every tree component with at least one edge has at least two leaves.
+    </p>
+
+    <p>
+        <i>Conditional of the leaf.</i> The conditional distribution
+        $$
+            \mu(\sigma_\ell\mid\sigma_{-\ell})=\frac{\phi_\ell(\sigma_\ell)\psi_{k\ell}(\sigma_k,\sigma_\ell)}{\sum_s\phi_\ell(s)\psi_{k\ell}(\sigma_k,s)}
+        $$
+        depends on $\sigma_{-\ell}$ only through $\sigma_k$. By the tower property it therefore equals
+        $$
+            \mu(\sigma_\ell\mid\sigma_k)=\frac{\mu_{k\ell}(\sigma_k,\sigma_\ell)}{\mu_k(\sigma_k)}.
+        $$
+    </p>
+
+    <p>
+        <i>Marginal of the rest.</i> Summing out $\sigma_\ell$,
+        $$
+            \mu(\sigma_{-\ell})\propto\prod_{i\ne\ell}\tilde\phi_i(\sigma_i)\prod_{\substack{i\sim j\\ i,j\ne\ell}}\psi_{ij}(\sigma_i,\sigma_j),
+            \qquad \tilde\phi_k(\sigma_k)=\phi_k(\sigma_k)\sum_s\phi_\ell(s)\psi_{k\ell}(\sigma_k,s),
+        $$
+        with $\tilde\phi_i=\phi_i$ for $i\ne k$. This is a Gibbs distribution of the same type on the forest $G-\ell$, which has one edge fewer. Its marginals are $\mu_i,\mu_{ij}$ for $i,j\neq\ell$, because a marginal of a marginal is a marginal. By the induction hypothesis,
+        $$
+            \mu(\sigma_{-\ell})=\prod_{i\ne\ell}\mu_i(\sigma_i)\prod_{\substack{i\sim j\\ i,j\ne\ell}}\frac{\mu_{ij}(\sigma_i,\sigma_j)}{\mu_i(\sigma_i)\mu_j(\sigma_j)}.
+        $$
+    </p>
+
+    <p>
+        <i>Combine.</i> Writing $\frac{\mu_{k\ell}}{\mu_k}=\mu_\ell\cdot\frac{\mu_{k\ell}}{\mu_k\mu_\ell}$,
+        $$
+            \mu(\sigma)=\mu(\sigma_{-\ell})\,\frac{\mu_{k\ell}(\sigma_k,\sigma_\ell)}{\mu_k(\sigma_k)}
+            =\prod_{i}\mu_i(\sigma_i)\prod_{i\sim j}\frac{\mu_{ij}(\sigma_i,\sigma_j)}{\mu_i(\sigma_i)\mu_j(\sigma_j)}.
+        $$
+        This completes the induction.
+    </p>
+</details>
+
+
+
+
+<p>
+Then, the <b>Bethe free energy</b> of $\nu_i,\nu_{ij}$ is defined as the free energy given by $\nu$ (with the abuse of notation as $\nu$ is not strictly a probability distribution). More concretely, 
+$$
+\begin{aligned}
+F_{\text{Bethe}}(\nu_i,\nu_{ij}):=&\sum_{i\sim j }\sum_{s,t} \nu_{ij}(s,t)h(s,t)\\
+&+\frac{1}{\beta}\sum_{i }\sum_{s}\nu_{i}(s)\log \nu_{i}(s)\\
+&+\frac{1}{\beta}\sum_{i\sim j }\sum_{s,t}\nu_{ij}(s,t)\log\frac{\nu_{ij}(s,t)}{\nu_i(s)\nu_j(t)}
+\end{aligned}
+$$
+It is simple to check that if $\nu$ above defines a probability distribution, then $F_{\text{Bethe}}(\nu_i,\nu_{ij}) = F(\nu)$.  
+</p>
+
+<p>
+Let us now compute the minimum Bethe free energy. More concretely, we have the optimization problem:
+$$
+\begin{array}{rll}
+\min& F_{\text{Bethe}}(\nu_i,\nu_{ij})\\
+\text{s.t.} & \sum_{t} \nu_{ij}(s,t) = \nu_i(s)& \forall (i,j)\in E, s\in \{\pm 1\}\\
+& \sum_s \nu_i(s) = 1&\forall i \in[n]
+\end{array}
+$$
+We solve this using Lagrange multipliers as $\lambda_{i\to j}(s)$ and $\eta_i$, respectively. Then, 
+$$
+\begin{aligned}
+\frac{\partial F_{\text{Bethe}}}{\partial \nu_{ij}(s,t)}&=h(s,t)+\frac{1}{\beta}\log \frac{\nu_{ij}(s,t)}{\nu_i(s)\nu_j(t)} + \text{const.} = -\lambda_{i\to j}(s) - \lambda_{j\to i}(t)\\
+\frac{\partial F_{\text{Bethe}}}{\partial \nu_i(s)} &= \frac{1}{\beta}\log \nu_i(s)-\frac{1}{\beta}\sum_{j\in \partial i}\sum_t \frac{\nu_{ij}(s,t)}{\nu_i(s)} + \text{const.}  = \sum_{j\in \partial i}\lambda_{i \to j}(s)
+\end{aligned}
+$$
+
+From the first FOCs, we have that: 
+$$
+\nu_{ij}(s,t)\propto \nu_i(s)\nu_j(t)\exp(-\beta h(s,t))\exp(-\beta \lambda_{i\to j}(s) - \beta \lambda_{j\to i}(t))
+$$
+Let us define <b>messages</b>: $m_{i\to j}(s):=\nu_i(s)\exp(-\beta \lambda_{i\to j}(s))$. Then, we can rewrite (22) as: 
+$ \nu_{ij}(s,t)\propto m_{i\to j}(s) m_{j\to i}(t)\exp(-\beta h(s,t))$. Comparing the identity $\nu_{i}(s)=m_{i\to j}(s) \exp(\beta\lambda_{i\to j}(s))$ with:
+$$
+\nu_{i}(s)=\sum_{t}\nu_{ij}(s,t)\propto m_{i\to j}(s)\sum_t m_{j\to i}(t)\exp(-\beta h(s,t))
+$$
+We get that $\sum_t m_{j\to i}(t)\exp(-\beta h(s,t))\propto \exp(\beta\lambda_{i\to j}(s))$. 
+</p>
+
+<p>
+From the second FOC's, using $\sum_t \nu_{ij}(s,t) = \nu_i(s)$: 
+$$
+\begin{aligned}
+\nu_i(s)
+&\propto \prod_{j\in \partial i}\exp(\beta \lambda_{i\to j}(s))\\
+&\propto \prod_{j\in \partial i}\sum_t m_{j\to i }(t)\exp(-\beta h(s,t))
+\end{aligned}$$
+and 
+$$
+\begin{aligned}
+m_{i\to j}(s)
+&\propto \prod_{k\in \partial i \backslash j}\exp(\beta \lambda_{i\to k}(s))\\
+&\propto \prod_{j\in \partial i \backslash j}\sum_t m_{k\to i }(t)\exp(-\beta h(s,t))
+\end{aligned}
+$$
+Hence, $m_{i\to j}(s)$ is the probability of $i$ having state $s$ if $i$ and $j$ weren't connected.
+</p>
+
