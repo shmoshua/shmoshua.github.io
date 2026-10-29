@@ -1,0 +1,241 @@
+---
+layout: post
+title: "Weak recovery for SBM from hot Glauber: a conditional theorem"
+---
+<p>Written: Oct 29. 2026</p>
+
+
+<h3 class="numbered">Setting</h3>
+<p>Let $\Omega:=\{\pm 1\}^N$ be the hypercube. We consider the following 2-community SBM: Let $d$ be a fixed average degree and $\eps \in(0,1)$. Let further $x\sim \text{Unif}(\Omega)$.
+Then, $G\sim \text{SBM}(N,d,\eps)$ is a random graph where for all $i< j$:
+$$
+    \P(ij\in E)=\frac{d}{N}(1+\eps x_ix_j)
+$$
+Let $A$ be its adjacency matrix. Then, the <b>signal-to-noise (SNR)</b> ratio is defined as $\lambda:= \eps^2d$. 
+It is known that for 2-community SBM, weak recovery is possible if and only if $\lambda > 1$, also known as the KS threshold.
+</p>
+
+
+<h3 class="numbered"> Exact Bayes Posterior of SBM</h3>
+The posterior of $x$ given $G$ is given by the Ising model:
+$$
+    \mu(\sigma)\propto \exp\left( \frac{\arctanh \eps+\kappa}{2}\sigma^\top A\sigma -\frac{\kappa}{2}\langle 1,\sigma\rangle ^2\right)
+$$
+i.e. the interaction matrix is given by $(\arctanh \eps+\kappa) A - \kappa 11^\top$ where $\kappa := \frac{1}{2}\log \frac{1-(1-\eps)d / N}{1-(1+\eps)d / N}$.
+
+Indeed, the posteror is given by: 
+$$
+p(x | G)\propto p (G | x) = \prod_{i\sim j }\frac{d}{N}(1+\eps x_i x_j)\cdot \prod_{i\not\sim j}\left(1 - \frac{d}{N}(1+\eps x_ix_j)\right)
+$$
+Then, for $s\in \{\pm 1\}$, $\log (1+\eps s) = \frac{1}{2}\log (1-\eps^2) + s\cdot \arctanh \eps$. Similarly, 
+$\log (1-\frac{d}{N}(1+\eps s)) = - \kappa s + \text{const}$. 
+
+Therefore, 
+$$
+\log p(x|G) \propto \sum_{i\sim j}(x_ix_j \arctanh\eps) + \sum_{i\not\sim j} x_i x_j \kappa
+$$
+It follows that:
+$$
+\mu(\sigma)\propto \exp\left(\arctanh \eps \sum_{i\sim j}\sigma_i \sigma_j -\kappa \sum_{i< j} (1-A_{ij}) \sigma_i\sigma_j\right)
+$$
+
+<p>
+Two-community SBM. For $\beta\gt 0$ let
+$$
+\mu_\beta(\sigma)\propto \exp\Big(\beta\sum_{i\lt j}J_{ij}\sigma_i\sigma_j\Big),\qquad t:=\tanh(\beta J_e),\qquad x:=d\,t^2 .
+$$
+</p>
+
+Cavity heuristics: the equilibrium of $\mu_\beta$ is informative iff $d\,\omega t\gt 1$, i.e. $x\gt 1/\lambda$, and the noise part is
+non-glassy iff $x\lt 1$. So the <b>window</b> $x\in(1/\lambda,1)$ is non-empty for every $\lambda\gt 1$. (Bayes is $x=\lambda\gt 1$:
+always glassy noise. The proven high-temperature range of Liu&ndash;Mohanty&ndash;Rajaraman&ndash;Wu is $x\le 0.03$, which forces
+$\lambda\gtrsim 35$.) I use the <b>balanced</b> point where the informative margin $\sqrt{\lambda x}-1$ equals the glassy margin $1-x$:
+$$
+x_\star=\tfrac12\Big((4+\lambda)-\sqrt{(4+\lambda)^2-16}\Big),\qquad
+\text{margins}=0.37,\ 0.24,\ 0.14,\ 0.09\ \text{ for }\lambda=3,\ 2,\ 1.5,\ 1.3 .
+$$
+</p>
+<p>
+Dynamics: continuous-time heat-bath Glauber for $\mu_\beta$, one clock of rate one per site (time is measured in sweeps):
+$$
+Lf(\sigma)=\sum_i r_i(\sigma)\big(f(\sigma^{i})-f(\sigma)\big),\qquad r_i=\tfrac12\big(1-\sigma_i\tanh(\beta h_i)\big),\qquad h_i=\sum_j J_{ij}\sigma_j ,
+$$
+$P_s=e^{sL}$. The overlap is $m(\sigma)=\langle x^*,\sigma\rangle/n$ and $v=m^2$. The start is uniform, $\nu_0$, and the output is $X_U$
+with $U\sim\mathrm{Unif}[0,T]$.
+</p>
+
+<h3>2. Reduction theorem (rigorous)</h3>
+<p>
+<b>Theorem 1.</b> Let $\psi:\Omega\to[0,\psi_{\max}]$, $\alpha\ge 0$, $0\le s_1\lt s_2$, $c\in(0,1]$ and $D\subseteq\Omega$. Suppose that for every $x\in D$
+$$
+\E_x\Big[\frac{1}{s_2-s_1}\int_{s_1}^{s_2} v(X_r)\,dr\Big]+\frac{\alpha}{s_2-s_1}\,\E_x\big[\psi(X_{s_1})-\psi(X_{s_2})\big]\ \ge\ c. \tag{$\star$}
+$$
+Then for every initial law $\nu$ and every $T\gt 0$,
+$$
+\E_\nu\big[v(X_U)\big]\ \ge\ c\,\mathbb P_\nu(\tau_{D^c}\gt T)\;-\;\frac{\alpha\,\psi_{\max}+(s_1+s_2)/2}{T},
+$$
+where $\tau_{D^c}$ is the first exit time from $D$.
+</p>
+<p>
+<em>Proof.</em> Put $w=s_2-s_1$, $K=\frac1w\int_{s_1}^{s_2}P_r\,dr$, and $\omega(r)=1$ on $[0,s_1]$, $\omega(r)=(s_2-r)/w$ on $[s_1,s_2]$. Define
+$$
+f=\alpha K\psi+\int_0^{s_2}\omega(r)\,P_r(1-v)\,dr .
+$$
+Since $\psi\ge 0$ and $v\le 1$, $0\le f\le \alpha\psi_{\max}+\int_0^{s_2}\omega=\alpha\psi_{\max}+(s_1+s_2)/2$. Using $LP_r=\frac{d}{dr}P_r$,
+$LK\psi=(P_{s_2}\psi-P_{s_1}\psi)/w$, and integrating by parts,
+$L\int_0^{s_2}\omega P_r\phi\,dr=-\phi+\frac1w\int_{s_1}^{s_2}P_r\phi\,dr=K\phi-\phi$. With $\phi=1-v$,
+$$
+Lf=\frac{\alpha}{w}\big(P_{s_2}\psi-P_{s_1}\psi\big)+v-Kv ,
+$$
+so $(\star)$ is exactly $Lf\le v-c$ on $D$. Let $\tau=T\wedge\tau_{D^c}$. Dynkin's formula and $f\ge 0$ give
+$c\,\E\tau\le \E\int_0^\tau v(X_r)dr+\E f(X_0)\le \E\int_0^T v(X_r)dr+\alpha\psi_{\max}+(s_1+s_2)/2$, and $\E\tau\ge T\,\mathbb P(\tau_{D^c}\gt T)$.
+Divide by $T$. $\square$
+</p>
+<p>
+<b>Remarks.</b>
+(i) Nothing about reversibility, $\mu_\beta$, its partition function or entropy is used; the price is $\psi_{\max}$, not
+$\mathrm{KL}(\nu_0\Vert\mu_\beta)\approx 0.2n$ (which is what the WPI route through entropy pays).
+(ii) Letting $s_2\downarrow s_1=s$ gives the pointwise form $\E_x[v(X_s)-\alpha L\psi(X_s)]\ge c$; $s=0$ is dual feasibility in the
+flow LP with potential $\alpha\psi$. $s_1=0$ gives the integrated form. The window $[s_1,s_2]$ combines a burn-in (to skip the
+fast initial transient) with time-averaging (which telescopes the noise of $\psi$). Numerically only the windowed form works near
+the threshold (Section 5).
+(iii) The multiplicative / WPI certificate is a special case: if $h\ge 1$ and $-Lh/h+\theta v\ge\kappa$ on $D$, then
+$\psi=\log h$, $\alpha=1/\theta$, $s_1=s_2=0$ satisfies $(\star)$ with $c=\kappa/\theta$, because $L\log h\le Lh/h$.
+</p>
+<p>
+<b>Corollary 2.</b> If $(\star)$ holds, $\delta:=\mathbb P_{\nu_0}(\tau_{D^c}\le T)\le 1/4$ and $T\ge 4\big(\alpha\psi_{\max}+(s_1+s_2)/2\big)/c$, then
+$\E\,m(X_U)^2\ge c/2$ and $\mathbb P\big(|m(X_U)|\ge \sqrt{c/4}\big)\ge c/4$.
+<em>Proof.</em> $c(1-\delta)-c/4\ge c/2$; and for $w=m^2\in[0,1]$, $\E w\le \mathbb P(w\ge \E w/2)+\E w/2$. $\square$
+</p>
+
+<h3>3. The potential</h3>
+<p>
+Let $u$ be the informative eigenvector of the Bethe Hessian at the chain's temperature,
+$H(t)=I+\frac{t^2}{1-t^2}D_G-\frac{t}{1-t^2}A_G$ (or the vertex part of the non-backtracking eigenvector; both work numerically),
+normalized $\Vert u\Vert_2^2=n$. Put $y(\sigma)=\langle u,\sigma\rangle/n$ and
+$$
+\psi(\sigma)=\ell\big(y^2\big),\qquad \ell(q)=\log\frac{z^2+\eta}{q+\eta}\ \ (q\le z^2),\qquad \eta=\frac{c_\eta}{n},
+$$
+with $\ell$ continued smoothly to $0$ beyond $z^2$ for the proofs (the numerics use the kink $\ell_+$). Then
+$\psi_{\max}=\log(1+z^2 n/c_\eta)=\log n+O(1)$, so Corollary 2 needs $T=O(\log n)$ sweeps, i.e. $O(n\log n)$ single-site updates,
+as soon as $(\star)$ holds with $n$-independent $\alpha,c,s_1,s_2,c_\eta,z$.
+</p>
+<p>
+<b>Lemma 3 (second-order expansion).</b> Let $\delta_i=-2u_i\sigma_i/n$ be the change of $y$ when spin $i$ flips, and
+$$
+b(\sigma):=Ly=\frac1n\sum_i u_i\big(\tanh(\beta h_i)-\sigma_i\big),\qquad
+q(\sigma):=\sum_i r_i\delta_i^2=\frac{2}{n^2}\sum_i u_i^2\big(1-\sigma_i\tanh(\beta h_i)\big).
+$$
+For $\psi=\ell(y^2)$ with $\ell$ smooth, $L\psi=\psi'(y)\,b+\tfrac12\psi''(y)\,q+\rho$ with
+$|\rho|\le\frac43\Vert\psi'''\Vert_\infty\Vert u\Vert_\infty/n^2$.
+</p>
+<p>
+<em>Proof.</em> $r_i\delta_i=\frac{u_i}{n}(\tanh\beta h_i-\sigma_i)$ gives the first-order term. Taylor's theorem leaves
+$\frac16\Vert\psi'''\Vert_\infty\sum_i r_i|\delta_i|^3\le\frac16\Vert\psi'''\Vert_\infty\cdot\frac{8}{n^3}\Vert u\Vert_\infty\sum_i u_i^2$. $\square$
+</p>
+<p>
+For the log potential $\Vert\psi'''\Vert_\infty\lesssim\eta^{-3/2}$, so $|\rho|\lesssim \Vert u\Vert_\infty/(c_\eta^{3/2}\sqrt n)\to 0$ when
+$\Vert u\Vert_\infty=o(\sqrt n)$. In the scaled variables $\bar y=\sqrt n\,y$, $\bar b=\sqrt n\,b$,
+$\bar q=\frac{n}{2}q=\frac1n\sum_i u_i^2(1-\sigma_i\tanh\beta h_i)$, for $|y|\lt z$:
+$$
+-L\psi=\frac{2\,\bar y\,\bar b}{\bar y^2+c_\eta}+\frac{2\,\bar q\,(c_\eta-\bar y^2)}{(\bar y^2+c_\eta)^2}+o(1). \tag{$\diamond$}
+$$
+The first term is the drift (good when $\bar y\bar b\gt 0$, i.e. $|y|$ grows); the second is diffusion (good inside the flat region
+$\bar y^2\lt c_\eta$, bad outside).
+</p>
+<p>
+<b>Lemma 4 (uniform diffusion floor).</b> For every $\sigma$,
+$\bar q(\sigma)\ge \frac1n\sum_i u_i^2\, e^{-2\beta(J_e\deg_i+|J_n|n)}$.
+</p>
+<p>
+<em>Proof.</em> $1-\sigma\tanh(\beta h)\ge 1-\tanh(\beta|h|)=\frac{2}{1+e^{2\beta|h|}}\ge e^{-2\beta|h|}$ and
+$|h_i|\le J_e\deg_i+|J_n|(n-1)$. $\square$
+</p>
+<p>
+So $\bar q$ is bounded below <em>uniformly over configurations</em> (worst case) once $u$ puts a constant fraction of its mass
+on vertices of bounded degree ($|J_n|n\to \frac{a-b}{2}$ is $O(1)$). Measured: $\bar q\in[0.23,0.43]$ on every configuration examined.
+</p>
+<p>
+<b>Heuristic size of the drift.</b> If, after averaging out fast noise, $\bar b\approx\gamma\bar y$ with growth rate $\gamma\gt 0$, then
+$(\diamond)$ becomes $\varphi(\bar y^2)$ with $\varphi(w)=\frac{2\gamma w}{w+c_\eta}+\frac{2\bar q(c_\eta-w)}{(w+c_\eta)^2}$.
+For $c_\eta=2\bar q/\gamma$, writing $w=c_\eta r$, $\varphi/\gamma=\frac{2r^2+r+1}{(1+r)^2}$, minimized at $r=1/3$ with value $7/8$.
+So $-L\psi\ge \frac78\gamma$ throughout $|y|\lt z$, and Corollary 2 then needs $T\approx \frac{32}{7}\frac{\log n}{\gamma}$ sweeps, the
+observed escape time scale. Empirically $\gamma\approx 0.4\,|\lambda_{\min}(H(t))|$ roughly in all four settings
+($\gamma\approx 0.084,\ 0.04,\ 0.017,\ 0.004$&ndash;$0.008$ per sweep for $\lambda=3,2,1.5,1.3$). The flat-region condition
+$c_\eta\gtrsim 2\bar q/\gamma$ is necessary for the <em>pointwise</em> form; with windowing the noise is averaged and small $c_\eta$
+already works at $\lambda\ge 2$.
+</p>
+
+<h3>4. The main lemma (open) and the conditional theorem</h3>
+<p>
+Let $B=\{\sigma:\ |y(\sigma)|\ge z,\ m(\sigma)^2\lt c_1\}$ ("aligned with $u$ but not with $x^*$") and $D=\Omega\setminus B$.
+</p>
+<p>
+<b>Main Lemma (conjecture).</b> Fix $d$, $\lambda\gt 1$ and $t$ at the balanced point. With high probability over $G$ there are
+$\alpha,c,c_1,s_1,s_2,c_\eta,z\gt 0$ independent of $n$ such that $(\star)$ holds for all $x\in D$.
+</p>
+<p>
+<b>Alignment Lemma (conjecture).</b> $\mathbb P_{\nu_0}(\tau_B\le C\log n)\le 1/4$.
+</p>
+<p>
+<b>Theorem 5 (conditional).</b> Under the two conjectures, Glauber for $\mu_\beta$ started uniformly and stopped at a uniform time
+in $[0,T]$, $T=C'\log n$ sweeps, satisfies $\E\,m(X_U)^2\ge c/2$; i.e. weak recovery in $O(n\log n)$ single-site updates, for every $\lambda\gt 1$.
+<em>Proof:</em> Theorem 1, Corollary 2 and $\psi_{\max}=\log n+O(1)$. $\square$
+</p>
+<p>
+<b>What the Main Lemma needs, and status.</b>
+</p>
+<ul>
+<li><b>(S1) Spectral input</b>: $u$ correlates with $x^*$, $\Vert u\Vert_\infty=o(\sqrt n)$, and $u$ is delocalized over bounded-degree
+vertices. Expected from non-backtracking theory (Bordenave&ndash;Lelarge&ndash;Massouli&eacute;; Stephan&ndash;Massouli&eacute;) for the
+non-backtracking vector; for $H(t)$ via Ihara&ndash;Bass. Technical.</li>
+<li><b>(S2)</b> Expansion: Lemma 3, proved.</li>
+<li><b>(S3)</b> Diffusion floor: Lemma 4, proved given (S1).</li>
+<li><b>(S4) Window growth</b> (the core): for $|y(x)|\lt z$,
+$\frac{\alpha}{w}\E_x[\psi(X_{s_1})-\psi(X_{s_2})]\ge c$. By $(\diamond)$ this is a statement about the drift of $y$ along the
+window after a burn-in $s_1$. Suggested route: (a) finite speed of propagation for Glauber on sparse graphs (in $O(s_2)$ sweeps a
+vertex's trajectory depends w.h.p. only on an $O(s_2)$-neighbourhood, by disagreement percolation since rates are bounded and degrees
+are Poisson); (b) $u$ is approximately a local functional of the graph (non-backtracking eigenvectors are approximated by tree
+functionals); (c) this reduces the expected change of $y$ to a computation on Galton&ndash;Watson trees with couplings $\pm\operatorname{atanh} t$,
+where $x\lt 1$ should give contraction of the non-informative part and $\sqrt{\lambda x}\gt 1$ growth along $u$; (d) concentration of
+$\psi(y_{s_2})-\psi(y_{s_1})$ over the window (this is where windowing helps: the noise telescopes).</li>
+<li><b>(S5) Alignment</b>: open. Along every trajectory examined, $|m|\approx(0.5\text{&ndash;}0.9)\,|y|$ once $|y|$ is macroscopic.</li>
+<li><b>(S6) Stability beyond the cutoff</b>: on $\{|y|\ge z,\ m^2\ge c_1\}$ the window average of $v$ stays $\ge c$. Open, expected near equilibrium.</li>
+</ul>
+
+<h3>5. Numerical evidence</h3>
+<p>
+Setup: $d=5$, balanced window temperature, two graphs per setting. Configurations $x$ are sampled from five families: cold-start
+trajectories, $m\approx 0$ states pinned at the hot and at the Bayes temperature (then released), states pinned at half the equilibrium
+overlap, and equilibrium states with a 20% graph ball flipped. For each $x$, 24&ndash;32 independent replicas are run and the left side
+of $(\star)$ is estimated on the same replica paths; $c^*$ is the <em>minimum</em> over all sampled $x$. Parameters
+$(s_1,s_2,z,c_\eta,\alpha)$ are chosen on one graph and evaluated on the other ("cross-graph").
+</p>
+<table>
+<tr><th>$\lambda$</th><th>$n$</th><th>families</th><th>window $[s_1,s_2]$</th><th>certified $\E m(X_U)^2$</th><th>cross-graph</th><th>true value</th><th>$T$ (sweeps)</th></tr>
+<tr><td>3</td><td>20k</td><td>3</td><td>[5, 20]</td><td>0.340</td><td>0.31&ndash;0.36</td><td>0.354</td><td>$10^4$</td></tr>
+<tr><td>2</td><td>20k</td><td>5</td><td>[10, 40]</td><td>0.154</td><td>0.13&ndash;0.17</td><td>0.173</td><td>$10^4$</td></tr>
+<tr><td>1.5</td><td>20k</td><td>5</td><td>[10, 120]</td><td>0.047</td><td>0.044&ndash;0.064</td><td>0.067</td><td>$3\cdot 10^4$</td></tr>
+<tr><td>1.5</td><td>80k</td><td>3</td><td>[0, 120]</td><td>0.054</td><td>0.052&ndash;0.054</td><td>0.060</td><td>$3\cdot 10^4$</td></tr>
+<tr><td>1.3</td><td>20k</td><td>3</td><td>[10, 240]</td><td>0.010</td><td>0.004&ndash;0.025</td><td>0.026</td><td>$10^5$</td></tr>
+</table>
+<p>
+Earlier variants on the same data: the pointwise form ($s_1=s_2$) certifies 0.31 ($\lambda=3$) and 0.06&ndash;0.10 ($\lambda=2$) but fails at
+$\lambda=1.5$, $n=20$k, because the per-configuration noise of $L\psi(X_s)$ is as large as the signal $\approx 2\gamma$; the integrated form
+($s_1=0$) fails because it averages over the fast initial transient, during which $|y|$ shrinks. The multiplicative certificate
+($h_s=e^{-sH_\theta}h_0$) gave the same qualitative picture with worse constants.
+</p>
+<p>
+Supporting measurements: $\bar q\ge 0.23$ on all configurations (Lemma 4); $\gamma\approx 0.4|\lambda_{\min}(H(t))|$;
+alignment $|m|/|y|\approx 0.5$&ndash;$0.9$; every adversarial start escapes (no traps found in any family).
+</p>
+
+<h3>6. Caveats and next steps</h3>
+<ul>
+<li>$(\star)$ is checked on sampled configurations (a few hundred to a thousand per setting), not on all of $D$; the minimum of noisy
+replica means is biased downward, so the certified values are conservative in that respect, but the sampling of $x$ is not exhaustive.</li>
+<li>Two graphs per setting; potential parameters are tuned (the cross-graph column is the honest number).</li>
+<li>Next: prove (S4) on trees first (step (c)), which is a finite-dimensional recursion; then the locality steps (a)&ndash;(b).
+In parallel: $n$-scaling of the windowed certificate at $\lambda=1.3$ (at $\lambda=1.5$ it improves from $n=20$k to $80$k), and
+longer windows at $\lambda=1.3$ (the best window there is the longest one recorded).</li>
+</ul>

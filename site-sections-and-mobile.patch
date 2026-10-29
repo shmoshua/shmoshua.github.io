@@ -1,0 +1,883 @@
+From d2cb38903e8b28aa6b0cc6eb696e0fcda239a956 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 29 Oct 2026 15:34:54 +0100
+Subject: [PATCH] Split site into Reading List / Attempts / Notes; smaller text
+ and fitted equations on phones
+
+- Tabs at the top of every page (names in _data/sections.yml)
+- New Attempts section (_attempts/): one page per idea with dated entries,
+  status label, sorted by latest entry; template in _drafts/
+- Models renamed to Notes (_models/ -> _notes/, /models/ -> /notes/);
+  /models/ redirects to /notes/; notes list links from posts and attempts
+- Oct 28 WPI page moved to /attempts/wpi-sbm/ as its first entry
+- Phones: root font scaled down (body ~15px), tighter padding, and wide
+  display equations shrink to fit (js/fit-math.js)
+---
+ README.md                                     |  42 +++++-
+ .../28.Oct-wpi.html => _attempts/wpi-sbm.html |   9 +-
+ _config.yml                                   |  20 ++-
+ _data/sections.yml                            |  15 ++
+ _drafts/attempt-template.html                 |  25 ++++
+ _drafts/paper-template.html                   |   6 +-
+ _includes/nav.html                            |  11 ++
+ _layouts/post.html                            |  40 ++++--
+ {_models => _notes}/WPI-and-MLSI.html         |   2 +-
+ {_models => _notes}/edge-annealing-sbm.html   |   0
+ {_models => _notes}/inequalities.html         |   0
+ {_models => _notes}/sbm.html                  |   2 +-
+ {_models => _notes}/sk.html                   |   0
+ {_models => _notes}/spiked-wigner.html        |   0
+ {_models => _notes}/statphys.html             |   0
+ {_models => _notes}/stocloc.html              |   0
+ attempts.html                                 |  65 +++++++++
+ css/style.css                                 | 134 +++++++++++++++++-
+ index.html                                    |   4 +-
+ js/fit-math.js                                |  41 ++++++
+ js/follow-edits.js                            |   2 +-
+ js/toc.js                                     |   9 +-
+ models.html                                   |  49 +------
+ notes.html                                    |  47 ++++++
+ 24 files changed, 441 insertions(+), 82 deletions(-)
+ rename _models/28.Oct-wpi.html => _attempts/wpi-sbm.html (87%)
+ create mode 100644 _data/sections.yml
+ create mode 100644 _drafts/attempt-template.html
+ create mode 100644 _includes/nav.html
+ rename {_models => _notes}/WPI-and-MLSI.html (99%)
+ rename {_models => _notes}/edge-annealing-sbm.html (100%)
+ rename {_models => _notes}/inequalities.html (100%)
+ rename {_models => _notes}/sbm.html (97%)
+ rename {_models => _notes}/sk.html (100%)
+ rename {_models => _notes}/spiked-wigner.html (100%)
+ rename {_models => _notes}/statphys.html (100%)
+ rename {_models => _notes}/stocloc.html (100%)
+ create mode 100644 attempts.html
+ create mode 100644 js/fit-math.js
+ create mode 100644 notes.html
+
+diff --git a/README.md b/README.md
+index 0caf609..fadd8c1 100644
+--- a/README.md
++++ b/README.md
+@@ -15,10 +15,37 @@ GitHub Pages rebuilds the site within a minute or two. The homepage list (newest
+ the post header and the contents sidebar are generated automatically, so `index.html`
+ never needs editing.
+ 
+-## Model pages
++## Sections
+ 
+-`_models/` has one page per model (e.g. `_models/sbm.html` → `/models/sbm/`). Each holds
+-the setup and the results you keep needing, as boxes with an `id`:
++The site has three sections, shown as tabs at the top of every page. Their names and
++order live in `_data/sections.yml` (rename "Attempts" to "Ansätze" there, for example).
++
++| Tab          | Folder        | Address                 | What goes in it                         |
++|--------------|---------------|-------------------------|-----------------------------------------|
++| Reading List | `_posts/`     | `/` (the homepage)      | One post per paper (see above)          |
++| Attempts     | `_attempts/`  | `/attempts/<file-name>/` | One page per idea, with a dated log    |
++| Notes        | `_notes/`     | `/notes/<file-name>/`   | Concepts, models and summaries          |
++
++## Attempts
++
++One page per idea, e.g. `_attempts/wpi-sbm.html` → `/attempts/wpi-sbm/`. Start one by
++copying `_drafts/attempt-template.html` into `_attempts/`. The header has a `title`, a
++one-line `summary` and a `status` (`open`, `stuck`, `works` or `dropped`).
++
++Each time you work on the idea, add an entry at the bottom of the page:
++
++```html
++<h2 class="entry" data-date="2026-10-29">Trying the dual instead</h2>
++```
++
++The date (written `YYYY-MM-DD`) is shown above the heading and in the contents sidebar.
++The Attempts page sorts ideas by their latest entry and counts the entries, so there are
++no dates to keep up to date by hand.
++
++## Notes
++
++`_notes/` has one page per concept or model (e.g. `_notes/sbm.html` → `/notes/sbm/`).
++Each holds the setup and the results you keep needing, as boxes with an `id`:
+ 
+ ```html
+ <div class="box theorem" id="kesten-stigum">
+@@ -28,10 +55,11 @@ the setup and the results you keep needing, as boxes with an `id`:
+ </div>
+ ```
+ 
+-Link to them from any post: `<a href="/models/sbm/">SBM</a>`, or to one result:
+-`<a href="/models/sbm/#kesten-stigum">Kesten–Stigum</a>`. Each model page lists the notes
+-that link to it automatically, and `/models/` lists all models. To add a model, copy
+-`_models/sbm.html` to a new file name.
++Link to them from any post or attempt: `<a href="/notes/sbm/">SBM</a>`, or to one result:
++`<a href="/notes/sbm/#kesten-stigum">Kesten–Stigum</a>`. Each note lists the posts and
++attempts that link to it automatically. Add an optional `summary:` line to a note's
++header to show a one-line description on the Notes page. To add a note, copy
++`_notes/sbm.html` to a new file name.
+ 
+ ## Previewing locally (no commit needed)
+ 
+diff --git a/_models/28.Oct-wpi.html b/_attempts/wpi-sbm.html
+similarity index 87%
+rename from _models/28.Oct-wpi.html
+rename to _attempts/wpi-sbm.html
+index 419b1e8..b6ccdbc 100644
+--- a/_models/28.Oct-wpi.html
++++ b/_attempts/wpi-sbm.html
+@@ -1,8 +1,9 @@
+ ---
+-layout: post
+-title: "Weak Poincare for SBM"
++title: "Weak Poincaré for SBM"
++status: open
++summary: "Can the SBM posterior satisfy a weak Poincaré inequality with polynomial ρ and a small magnetization defect?"
+ ---
+-<p>Written: Oct 28. 2026</p>
++<h2 class="entry" data-date="2026-10-28">Setting up the inequality</h2>
+ 
+ 
+ <p>
+@@ -51,7 +52,7 @@ $$
+ </p>
+ 
+ 
+-<h2>Restricting Function Space Further</h2>
++<h3>Restricting Function Space Further</h3>
+ We only need the weak Poincare to hold for $\nu_t$ where $t\sim \text{Unif}[0,T]$. This means we can have following constraints:
+ <ol>
+     <li>$\nu$ is even.</li>
+diff --git a/_config.yml b/_config.yml
+index d6d707e..3c438b8 100644
+--- a/_config.yml
++++ b/_config.yml
+@@ -5,9 +5,23 @@ permalink: /posts/:year-:month-:day-:title:output_ext
+ 
+ exclude:
+   - README.md
++  - "*.patch"
+ 
+-# One page per model (SK, SBM, ...) in _models/, published at /models/<file-name>/
++# The site has three sections (names and order in _data/sections.yml):
++#   Reading List  -> _posts/     (one post per paper)
++#   Attempts      -> _attempts/  (one page per idea, with a dated log of how it develops)
++#   Notes         -> _notes/     (concepts, models and summaries to look things up in)
+ collections:
+-  models:
++  attempts:
+     output: true
+-    permalink: /models/:name/
++    permalink: /attempts/:name/
++  notes:
++    output: true
++    permalink: /notes/:name/
++
++# Every page in _attempts/ and _notes/ uses the same layout as the posts
++defaults:
++  - scope: { path: "", type: attempts }
++    values: { layout: post }
++  - scope: { path: "", type: notes }
++    values: { layout: post }
+diff --git a/_data/sections.yml b/_data/sections.yml
+new file mode 100644
+index 0000000..01142df
+--- /dev/null
++++ b/_data/sections.yml
+@@ -0,0 +1,15 @@
++# The tabs at the top of every page, in this order.
++# To rename a section, change its `name` here (e.g. "Attempts" -> "Ansätze");
++# every page picks up the new name. Leave `url` as it is so links keep working.
++
++- id: reading
++  name: Reading List
++  url: /
++
++- id: attempts
++  name: Attempts
++  url: /attempts/
++
++- id: notes
++  name: Notes
++  url: /notes/
+diff --git a/_drafts/attempt-template.html b/_drafts/attempt-template.html
+new file mode 100644
+index 0000000..06c6953
+--- /dev/null
++++ b/_drafts/attempt-template.html
+@@ -0,0 +1,25 @@
++---
++title: "Name of the idea"
++status: open        # open, stuck, works or dropped (shown as a label)
++summary: "The question this idea tries to answer, in one sentence."
++---
++<!--
++  HOW TO START A NEW ATTEMPT
++  1. Copy this file into _attempts/ and give it a short name, e.g. _attempts/wpi-sbm.html
++     It is published at /attempts/wpi-sbm/ and appears on the Attempts page.
++  2. Fill in the lines between the --- marks above. Keep the title in quotes.
++  3. Every time you work on the idea, add a new entry at the bottom:
++
++       <h2 class="entry" data-date="2026-10-29">What I tried today</h2>
++
++     The date must be written YYYY-MM-DD. The Attempts page uses these dates to
++     sort the ideas (most recently worked on first) and to count the entries.
++     Use <h3> for sub-headings inside an entry.
++  4. Update `status` when the idea gets stuck, works out or is dropped.
++
++  Link to a note with <a href="/notes/sbm/">SBM</a>; the note page then lists this
++  attempt under "Linked from".
++-->
++
++<h2 class="entry" data-date="2026-10-29">First try</h2>
++<p>What the idea is, and the first thing you tried. Math like $\E_\mu g^2$ works.</p>
+diff --git a/_drafts/paper-template.html b/_drafts/paper-template.html
+index ae3c9cc..cece58e 100644
+--- a/_drafts/paper-template.html
++++ b/_drafts/paper-template.html
+@@ -1,7 +1,7 @@
+ ---
+ layout: post
+ title: "Paper Title"
+-list: glauber          # which homepage list: glauber or ai-safety (see _data/lists.yml)
++list: glauber          # which reading list: glauber or ai-safety (see _data/lists.yml)
+ authors: Original Authors
+ topic: Topic Tag
+ paper: https://arxiv.org/abs/0000.00000
+@@ -18,8 +18,8 @@ paper: https://arxiv.org/abs/0000.00000
+      homepage list are all generated for you.
+ 
+   Tip: use <h2 class="numbered"> / <h3 class="numbered"> for numbered sections.
+-  Link to a model page with <a href="/models/sbm/">SBM</a>, or straight to one
+-  of its results with <a href="/models/sbm/#kesten-stigum">Kesten–Stigum</a>.
++  Link to a note with <a href="/notes/sbm/">SBM</a>, or straight to one
++  of its results with <a href="/notes/sbm/#kesten-stigum">Kesten–Stigum</a>.
+ -->
+ 
+ <div class="tldr">
+diff --git a/_includes/nav.html b/_includes/nav.html
+new file mode 100644
+index 0000000..5557a0f
+--- /dev/null
++++ b/_includes/nav.html
+@@ -0,0 +1,11 @@
++<!-- The tabs at the top of every page. Names come from _data/sections.yml.
++     Pages include this file with current="reading", "attempts" or "notes". -->
++<nav class="site-nav" aria-label="Sections">
++  <div class="site-nav-inner">
++    <a class="site-name" href="{{ '/' | relative_url }}">{{ site.title }}</a>
++    <div class="site-tabs">
++      {% for s in site.data.sections %}<a href="{{ s.url | relative_url }}"{% if include.current == s.id %} class="active" aria-current="page"{% endif %}>{{ s.name }}</a>
++      {% endfor %}
++    </div>
++  </div>
++</nav>
+diff --git a/_layouts/post.html b/_layouts/post.html
+index f70339a..dc8e8a4 100644
+--- a/_layouts/post.html
++++ b/_layouts/post.html
+@@ -43,18 +43,34 @@
+ </head>
+ 
+ <body{% if jekyll.environment == "development" %} class="preview"{% endif %}>
++{% if page.collection == "notes" %}{% assign section = "notes" %}{% elsif page.collection == "attempts" %}{% assign section = "attempts" %}{% else %}{% assign section = "reading" %}{% endif %}
++{% include nav.html current=section %}
++
+ <!-- Filled in automatically from the h2/h3 headings by js/toc.js -->
+ <nav class="toc" aria-label="Contents"></nav>
+ 
+ <header class="masthead article">
+-  {% if page.topic %}<p class="eyebrow">{{ page.topic }}</p>{% endif %}
++  {% if page.collection == "notes" %}
++  <p class="eyebrow">{{ page.topic | default: "Note" }}</p>
++  <h1 class="title">{{ page.title }}</h1>
++  {% if page.summary %}<p class="abstract">{{ page.summary }}</p>{% endif %}
++  <p class="affil"><a href="{{ '/notes/' | relative_url }}">← All notes</a></p>
++
++  {% elsif page.collection == "attempts" %}
++  {% assign parts = page.content | split: 'data-date="' %}
++  {% assign n = parts.size | minus: 1 %}
++  <p class="eyebrow">Attempt{% if page.status %} <span class="status status-{{ page.status | slugify }}">{{ page.status }}</span>{% endif %}</p>
+   <h1 class="title">{{ page.title }}</h1>
+-  {% if page.authors %}<p class="authors">{{ page.authors }}</p>{% endif %}
+-  {% if page.collection == "models" %}
+   {% if page.summary %}<p class="abstract">{{ page.summary }}</p>{% endif %}
+-  <p class="affil">Model · <a href="{{ '/models/' | relative_url }}">All models</a> · <a href="{{ '/' | relative_url }}">Notes</a></p>
++  <p class="affil">
++    {% if n > 0 %}{% assign first = parts[1] | slice: 0, 10 %}{% assign last = parts | last | slice: 0, 10 %}Started {{ first | date: "%b %d, %Y" }}{% if n > 1 %} · last entry {{ last | date: "%b %d, %Y" }}{% endif %} · {{ n }} entr{% if n == 1 %}y{% else %}ies{% endif %} · {% endif %}<a href="{{ '/attempts/' | relative_url }}">← All attempts</a>
++  </p>
++
+   {% else %}
+-  <p class="affil">Read {{ page.date | date: "%b %d, %Y" }} · <a href="{{ '/' | relative_url }}">← Back to all notes</a></p>
++  {% if page.topic %}<p class="eyebrow">{{ page.topic }}</p>{% endif %}
++  <h1 class="title">{{ page.title }}</h1>
++  {% if page.authors %}<p class="authors">{{ page.authors }}</p>{% endif %}
++  <p class="affil">Read {{ page.date | date: "%b %d, %Y" }} · <a href="{{ '/' | relative_url }}">← Reading list</a></p>
+   {% endif %}
+   {% if page.paper %}<div class="links"><a href="{{ page.paper }}">Paper <span class="arr">↗</span></a></div>{% endif %}
+ </header>
+@@ -63,19 +79,20 @@
+ {{ content }}
+ </article>
+ 
+-{% if page.collection == "models" %}
+-<!-- Every post that links to this model page, found automatically -->
++{% if page.collection == "notes" %}
++<!-- Every reading note and attempt that links to this page, found automatically -->
++{% assign linkers = site.posts | concat: site.attempts %}
+ <section class="article backlinks">
+-  <p class="backlinks-title">Notes that mention this model</p>
++  <p class="backlinks-title">Linked from</p>
+   {% assign n = 0 %}
+   <ul class="post-list">
+-  {% for p in site.posts %}{% if p.content contains page.url %}{% assign n = n | plus: 1 %}
++  {% for p in linkers %}{% if p.content contains page.url %}{% assign n = n | plus: 1 %}
+     <li>
+       <a href="{{ p.url | relative_url }}">{{ p.title }}</a>
+-      <time datetime="{{ p.date | date_to_xmlschema }}">{{ p.date | date: "%b %d, %Y" }}</time>
++      <span class="backlink-kind">{% if p.collection == "attempts" %}Attempt{% else %}Reading · {{ p.date | date: "%b %d, %Y" }}{% endif %}</span>
+     </li>{% endif %}{% endfor %}
+   </ul>
+-  {% if n == 0 %}<p class="empty">None yet. Link here from a post with <code>&lt;a href="{{ page.url }}"&gt;</code>.</p>{% endif %}
++  {% if n == 0 %}<p class="empty">Nothing yet. Link here from a post or attempt with <code>&lt;a href="{{ page.url }}"&gt;</code>.</p>{% endif %}
+ </section>
+ {% endif %}
+ 
+@@ -84,6 +101,7 @@
+ </footer>
+ 
+ <script src="{{ '/js/toc.js' | relative_url }}"></script>
++<script src="{{ '/js/fit-math.js' | relative_url }}"></script>
+ {% if jekyll.environment == "development" %}
+ <!-- Local preview only: jump to the part you just edited after each refresh -->
+ <script src="{{ '/js/follow-edits.js' | relative_url }}"></script>
+diff --git a/_models/WPI-and-MLSI.html b/_notes/WPI-and-MLSI.html
+similarity index 99%
+rename from _models/WPI-and-MLSI.html
+rename to _notes/WPI-and-MLSI.html
+index c4ae35d..bf7ad88 100644
+--- a/_models/WPI-and-MLSI.html
++++ b/_notes/WPI-and-MLSI.html
+@@ -5,7 +5,7 @@ title: "Poincare Inequality and MLSI"
+ <!--
+   A model page: the setup once, then the results you keep needing.
+   Give each result an id="..." so posts can link straight to it,
+-  e.g. <a href="/models/sbm/#kesten-stigum">Kesten–Stigum threshold</a>.
++  e.g. <a href="/notes/sbm/#kesten-stigum">Kesten–Stigum threshold</a>.
+   Example entries below; check them against your sources.
+ -->
+ Let $P$ be a reversible Markov chain with a stationary distribution $\mu$. 
+diff --git a/_models/edge-annealing-sbm.html b/_notes/edge-annealing-sbm.html
+similarity index 100%
+rename from _models/edge-annealing-sbm.html
+rename to _notes/edge-annealing-sbm.html
+diff --git a/_models/inequalities.html b/_notes/inequalities.html
+similarity index 100%
+rename from _models/inequalities.html
+rename to _notes/inequalities.html
+diff --git a/_models/sbm.html b/_notes/sbm.html
+similarity index 97%
+rename from _models/sbm.html
+rename to _notes/sbm.html
+index 1d880f6..c81fefd 100644
+--- a/_models/sbm.html
++++ b/_notes/sbm.html
+@@ -5,7 +5,7 @@ title: "Stochastic Block Model (SBM)"
+ <!--
+   A model page: the setup once, then the results you keep needing.
+   Give each result an id="..." so posts can link straight to it,
+-  e.g. <a href="/models/sbm/#kesten-stigum">Kesten–Stigum threshold</a>.
++  e.g. <a href="/notes/sbm/#kesten-stigum">Kesten–Stigum threshold</a>.
+   Example entries below; check them against your sources.
+ -->
+ 
+diff --git a/_models/sk.html b/_notes/sk.html
+similarity index 100%
+rename from _models/sk.html
+rename to _notes/sk.html
+diff --git a/_models/spiked-wigner.html b/_notes/spiked-wigner.html
+similarity index 100%
+rename from _models/spiked-wigner.html
+rename to _notes/spiked-wigner.html
+diff --git a/_models/statphys.html b/_notes/statphys.html
+similarity index 100%
+rename from _models/statphys.html
+rename to _notes/statphys.html
+diff --git a/_models/stocloc.html b/_notes/stocloc.html
+similarity index 100%
+rename from _models/stocloc.html
+rename to _notes/stocloc.html
+diff --git a/attempts.html b/attempts.html
+new file mode 100644
+index 0000000..cb5fbfb
+--- /dev/null
++++ b/attempts.html
+@@ -0,0 +1,65 @@
++---
++title: Attempts
++permalink: /attempts/
++---
++<!doctype html>
++<html lang="en">
++<head>
++  <meta charset="utf-8">
++  <meta name="viewport" content="width=device-width, initial-scale=1">
++  <title>Attempts · {{ site.title }}</title>
++  <link rel="preconnect" href="https://fonts.googleapis.com">
++  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
++  <link rel="stylesheet" href="{{ '/css/style.css' | relative_url }}">
++</head>
++<body>
++{% include nav.html current="attempts" %}
++
++<header class="masthead article">
++  <p class="eyebrow">Ideas in progress</p>
++  <h1 class="title">Attempts</h1>
++  <p class="abstract">One page per idea, with a dated log of how it develops: what I tried, what broke, and what I changed.</p>
++</header>
++
++<main class="article">
++  <!-- Built automatically from the files in _attempts/, most recently worked on first.
++       Dates and entry counts come from the <h2 class="entry" data-date="..."> headings. -->
++  {% capture rows %}{% for a in site.attempts %}{% assign parts = a.content | split: 'data-date="' %}{% assign last = parts | last | slice: 0, 10 %}{% if parts.size < 2 %}{% assign last = "0000-00-00" %}{% endif %}{{ last }}|{{ forloop.index0 }};;{% endfor %}{% endcapture %}
++  {% assign rows = rows | split: ";;" | sort | reverse %}
++
++  {% if site.attempts.size > 0 %}
++  <ul class="post-list idea-list">
++    {% for row in rows %}
++    {% unless row contains "|" %}{% continue %}{% endunless %}
++    {% assign i = row | split: "|" | last | plus: 0 %}
++    {% assign a = site.attempts[i] %}
++    {% assign parts = a.content | split: 'data-date="' %}
++    {% assign n = parts.size | minus: 1 %}
++    {% assign first = parts[1] | slice: 0, 10 %}
++    {% assign last = parts | last | slice: 0, 10 %}
++    <li>
++      <span>
++        <span class="idea-head">
++          <a href="{{ a.url | relative_url }}">{{ a.title }}</a>
++          {% if a.status %}<span class="status status-{{ a.status | slugify }}">{{ a.status }}</span>{% endif %}
++        </span>
++        {% if a.summary %}<span class="model-summary">{{ a.summary }}</span>{% endif %}
++      </span>
++      <span class="idea-meta">
++        {% if n > 0 %}<time datetime="{{ last }}">{{ last | date: "%b %d, %Y" }}</time>
++        <span>{{ n }} entr{% if n == 1 %}y{% else %}ies{% endif %}{% if n > 1 %} · since {{ first | date: "%b %d" }}{% endif %}</span>{% endif %}
++      </span>
++    </li>
++    {% endfor %}
++  </ul>
++  {% else %}
++  <p class="empty">No attempts yet. Copy <code>_drafts/attempt-template.html</code> into <code>_attempts/</code> to start one.</p>
++  {% endif %}
++</main>
++
++<footer class="article">
++  <p>{{ site.title }} · ETH Zurich</p>
++</footer>
++</body>
++</html>
+diff --git a/css/style.css b/css/style.css
+index c01c42b..1eb1d74 100644
+--- a/css/style.css
++++ b/css/style.css
+@@ -64,6 +64,7 @@ canvas{
+   --box-bg:   #edf3ee;   /* theorem box background                   */
+   --box-rule: #cfddd0;   /* theorem box border                       */
+   --sel:      #b8e0d4;   /* text selection highlight                 */
++  --warn:     #a86a12;   /* "stuck" label on attempts                */
+ 
+   --measure: 45rem;       /* body text column width  */
+   --wide:    52rem;       /* breakout figures        */
+@@ -83,6 +84,7 @@ canvas{
+     --box-bg:   #0f1e17;
+     --box-rule: #1c3325;
+     --sel:      #0e3d2e;
++    --warn:     #e0a84a;
+   }
+ }
+ 
+@@ -93,7 +95,7 @@ body {
+   background: var(--paper);
+   color: var(--ink);
+   font-family: var(--serif);
+-  font-size: 18px;
++  font-size: 1.125rem;   /* 18px on a computer; smaller on phones, see the end of this file */
+   line-height: 1.65;
+   font-feature-settings: "onum" 1, "pnum" 1;
+ }
+@@ -111,7 +113,7 @@ body {
+ /* ============================================================
+    HEADER
+    ============================================================ */
+-header.masthead { padding-top: 4rem; padding-bottom: .5rem; }
++header.masthead { padding-top: 2.6rem; padding-bottom: .5rem; }
+ .eyebrow {
+   font-family: var(--mono);
+   font-size: .72rem;
+@@ -238,7 +240,7 @@ strong { font-weight: 600; }
+ /* ── Table of Contents ── */
+ .toc {
+   position: fixed;
+-  top: 4rem;
++  top: 5.5rem;
+   left: max(1.5rem, calc(50% - var(--measure)/2 - 14rem));
+   width: 12rem;
+   font-family: var(--sans);
+@@ -508,7 +510,7 @@ article.article li { margin-bottom: .3rem; }
+ .tldr > :last-child { margin-bottom: 0; }
+ .tldr ul, .tldr ol { padding-left: 1.2rem; }
+ 
+-/* ---- Model pages (_models/) ---- */
++/* ---- Note pages (_notes/) ---- */
+ /* Where a result came from, under each result box */
+ .box .source {
+   font-family: var(--sans);
+@@ -521,8 +523,8 @@ article.article li { margin-bottom: .3rem; }
+ .box[id] { scroll-margin-top: 2rem; }
+ .box:target { box-shadow: 0 0 0 2px var(--accent); }
+ 
+-/* Links from posts to model pages: dotted underline marks an internal reference */
+-article.article a[href^="/models/"] { text-decoration-style: dotted; }
++/* Links to note pages: dotted underline marks an internal reference */
++article.article a[href^="/notes/"] { text-decoration-style: dotted; }
+ 
+ .backlinks { margin-top: 3rem; }
+ .backlinks-title {
+@@ -549,3 +551,123 @@ article.article a[href^="/models/"] { text-decoration-style: dotted; }
+    the bottom so the last lines you write can sit mid-screen. */
+ footer.article { margin-top: 4rem; padding-bottom: 8rem; }
+ body.preview footer.article { padding-bottom: 50vh; }
++
++/* ============================================================
++   SECTION TABS at the top of every page (_includes/nav.html)
++   ============================================================ */
++.site-nav { border-bottom: 1px solid var(--rule); }
++.site-nav-inner {
++  max-width: var(--measure);
++  margin: 0 auto;
++  padding: .85rem 1.4rem;
++  display: flex;
++  align-items: baseline;
++  justify-content: space-between;
++  gap: .4rem 1.5rem;
++  flex-wrap: wrap;
++  font-family: var(--sans);
++}
++.site-name {
++  font-weight: 600;
++  font-size: .9rem;
++  color: var(--ink);
++  text-decoration: none;
++}
++.site-tabs { display: flex; gap: 1.3rem; }
++.site-tabs a {
++  font-size: .9rem;
++  font-weight: 500;
++  color: var(--muted);
++  text-decoration: none;
++  padding: .2rem 0;
++  border-bottom: 2px solid transparent;
++  transition: color .15s, border-color .15s;
++}
++.site-tabs a:hover { color: var(--ink); }
++.site-tabs a.active { color: var(--accent); border-bottom-color: var(--accent); }
++
++/* ============================================================
++   ATTEMPTS (_attempts/): one page per idea, a dated entry per session
++   ============================================================ */
++/* <h2 class="entry" data-date="2026-10-28">…</h2> shows its date above the heading */
++.article h2.entry {
++  margin-top: 3rem;
++  padding-top: 1.4rem;
++  border-top: 1px solid var(--rule);
++}
++article.article > h2.entry:first-child { margin-top: 1.6rem; }
++.article h2.entry[data-date]::before {
++  content: attr(data-date);
++  display: block;
++  font-family: var(--mono);
++  font-size: .72rem;
++  font-weight: 400;
++  letter-spacing: .08em;
++  color: var(--accent);
++  margin-bottom: .35rem;
++}
++.article h2.entry[id] { scroll-margin-top: 1.5rem; }
++
++/* Status label: open / stuck / works / dropped */
++.status {
++  display: inline-block;
++  font-family: var(--mono);
++  font-size: .66rem;
++  font-weight: 400;
++  letter-spacing: .1em;
++  text-transform: uppercase;
++  line-height: 1.2;
++  padding: .18rem .5rem;
++  border: 1px solid currentColor;
++  border-radius: 999px;
++  color: var(--accent);
++  vertical-align: .15em;
++}
++.eyebrow .status { margin-left: .5rem; vertical-align: .05em; }
++.status-stuck   { color: var(--warn); }
++.status-works   { color: var(--paper); background: var(--accent); border-color: var(--accent); }
++.status-dropped { color: var(--muted); text-decoration: line-through; }
++
++.idea-list li > span:first-child { display: flex; flex-direction: column; gap: .2rem; }
++.idea-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: .3rem .6rem; }
++.idea-meta {
++  flex-shrink: 0;
++  display: flex;
++  flex-direction: column;
++  align-items: flex-end;
++  font-family: var(--mono);
++  font-size: .74rem;
++  color: var(--muted);
++  text-align: right;
++}
++
++.backlink-kind {
++  flex-shrink: 0;
++  font-family: var(--mono);
++  font-size: .74rem;
++  color: var(--muted);
++}
++
++/* ============================================================
++   PHONES: everything sized in rem shrinks with the root size,
++   so the page looks like a scaled-down version of the desktop one
++   and more of each equation fits on screen.
++   ============================================================ */
++@media (max-width: 760px) {
++  html { font-size: 14.5px; }            /* body text ≈ 16px */
++}
++@media (max-width: 480px) {
++  html { font-size: 13.5px; }            /* body text ≈ 15px */
++  .article, .site-nav-inner { padding-left: 1rem; padding-right: 1rem; }
++  header.masthead { padding-top: 1.8rem; }
++  h1.title { font-size: 1.6rem; }
++  .abstract { font-size: 1.05rem; }
++  .box { padding: .75rem .85rem; }
++  article.article ol, article.article ul { padding-left: 1.15rem; }
++  .tldr { padding: 1rem .95rem .8rem; }
++  .site-tabs { gap: 1rem; }
++  .idea-meta { align-items: flex-start; text-align: left; flex-direction: row; gap: .8rem; }
++  .post-list li { gap: .25rem; }
++  mjx-container[display="true"] { margin: 1.1rem 0 !important; }
++}
++
+diff --git a/index.html b/index.html
+index 6870022..70b8fe0 100644
+--- a/index.html
++++ b/index.html
+@@ -14,15 +14,15 @@
+   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+ 
+   <!-- Link to your shared CSS -->
+-  <link rel="stylesheet" href="css/style.css">
++  <link rel="stylesheet" href="{{ '/css/style.css' | relative_url }}">
+ </head>
+ <body>
++{% include nav.html current="reading" %}
+ 
+ <header class="masthead article">
+   <p class="eyebrow">Reading Log</p>
+   <h1 class="title">Reading List</h1>
+   <p class="abstract">Documenting papers, proofs, and thoughts as I read more papers.</p>
+-  <div class="links"><a href="models/">Models <span class="arr">→</span></a></div>
+ </header>
+ 
+ <main class="article">
+diff --git a/js/fit-math.js b/js/fit-math.js
+new file mode 100644
+index 0000000..9382ce3
+--- /dev/null
++++ b/js/fit-math.js
+@@ -0,0 +1,41 @@
++// Shrinks display equations that are wider than the text column (mostly on phones),
++// so they fit on screen instead of needing a sideways scroll. Equations are never
++// shrunk below MIN of their normal size; anything still too wide keeps scrolling.
++(function () {
++  var MIN = 0.62;
++
++  function fitAll() {
++    var boxes = document.querySelectorAll('mjx-container[display="true"]');
++    Array.prototype.forEach.call(boxes, function (c) {
++      // MathJax may set its own font-size on the container; remember it once
++      if (c.dataset.baseSize === undefined) c.dataset.baseSize = c.style.fontSize || '';
++      c.style.fontSize = c.dataset.baseSize;
++      var avail = c.clientWidth, need = c.scrollWidth;
++      if (!avail || need <= avail + 1) return;
++      var base = parseFloat(c.dataset.baseSize) || 100;   // percent
++      var ratio = Math.max(MIN, avail / need);
++      c.style.fontSize = (base * ratio).toFixed(1) + '%';
++    });
++  }
++
++  // MathJax loads asynchronously: wait for it to finish typesetting the page
++  function whenReady() {
++    var mj = window.MathJax;
++    if (mj && mj.startup && mj.startup.promise) {
++      mj.startup.promise.then(function () {
++        fitAll();
++        // Web fonts can arrive after typesetting and change widths
++        if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
++      });
++    } else {
++      setTimeout(whenReady, 100);
++    }
++  }
++  whenReady();
++
++  var t;
++  window.addEventListener('resize', function () {
++    clearTimeout(t);
++    t = setTimeout(fitAll, 150);
++  });
++})();
+diff --git a/js/follow-edits.js b/js/follow-edits.js
+index 21369db..3dacee6 100644
+--- a/js/follow-edits.js
++++ b/js/follow-edits.js
+@@ -23,7 +23,7 @@
+   });
+ 
+   function restore() {
+-    // Only after a refresh: arriving through a link (e.g. /models/sbm/#result)
++    // Only after a refresh: arriving through a link (e.g. /notes/sbm/#result)
+     // should land where the link points.
+     var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+     if (!nav || nav.type !== 'reload') {
+diff --git a/js/toc.js b/js/toc.js
+index 30a4ec8..3bb5748 100644
+--- a/js/toc.js
++++ b/js/toc.js
+@@ -39,7 +39,14 @@
+     if (h.tagName === 'H3') li.className = 'subsec';
+     var a = document.createElement('a');
+     a.href = '#' + h.id;
+-    a.textContent = (num ? num + ' ' : '') + h.textContent;
++    // Dated entries on attempt pages show their date first, e.g. "Oct 28 · First try"
++    var date = '';
++    var d = h.dataset.date && h.dataset.date.match(/^(\d{4})-(\d{2})-(\d{2})/);
++    if (d) {
++      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
++      date = months[+d[2] - 1] + ' ' + (+d[3]) + ' · ';
++    }
++    a.textContent = date + (num ? num + ' ' : '') + h.textContent;
+     li.appendChild(a);
+     list.appendChild(li);
+     links.push({ head: h, link: a });
+diff --git a/models.html b/models.html
+index 916ef07..ec7b76f 100644
+--- a/models.html
++++ b/models.html
+@@ -1,46 +1,11 @@
+ ---
+-title: Models
+ permalink: /models/
++sitemap: false
+ ---
+ <!doctype html>
+-<html lang="en">
+-<head>
+-  <meta charset="utf-8">
+-  <meta name="viewport" content="width=device-width, initial-scale=1">
+-  <title>Models · {{ site.title }}</title>
+-  <link rel="preconnect" href="https://fonts.googleapis.com">
+-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+-  <link rel="stylesheet" href="{{ '/css/style.css' | relative_url }}">
+-</head>
+-<body>
+-
+-<header class="masthead article">
+-  <p class="eyebrow">Reference</p>
+-  <h1 class="title">Models</h1>
+-  <p class="abstract">Results worth remembering, collected per model. Each page links back to the notes that use it.</p>
+-  <p class="affil"><a href="{{ '/' | relative_url }}">← Back to all notes</a></p>
+-</header>
+-
+-<main class="article">
+-  <!-- Built automatically from the files in _models/ -->
+-  {% assign models = site.models | sort: "title" %}
+-  <ul class="post-list model-list">
+-    {% for m in models %}
+-    {% assign n = 0 %}{% for p in site.posts %}{% if p.content contains m.url %}{% assign n = n | plus: 1 %}{% endif %}{% endfor %}
+-    <li>
+-      <span>
+-        <a href="{{ m.url | relative_url }}">{{ m.title }}</a>
+-        {% if m.summary %}<span class="model-summary">{{ m.summary }}</span>{% endif %}
+-      </span>
+-      <span class="model-count">{{ n }} note{% if n != 1 %}s{% endif %}</span>
+-    </li>
+-    {% endfor %}
+-  </ul>
+-</main>
+-
+-<footer class="article">
+-  <p>{{ site.title }} · ETH Zurich</p>
+-</footer>
+-</body>
+-</html>
++<!-- "Models" is now called "Notes"; this keeps old links to /models/ working. -->
++<meta charset="utf-8">
++<title>Moved to Notes</title>
++<meta http-equiv="refresh" content="0; url={{ '/notes/' | relative_url }}">
++<link rel="canonical" href="{{ '/notes/' | relative_url }}">
++<p>Models are now under <a href="{{ '/notes/' | relative_url }}">Notes</a>.</p>
+diff --git a/notes.html b/notes.html
+new file mode 100644
+index 0000000..432b777
+--- /dev/null
++++ b/notes.html
+@@ -0,0 +1,47 @@
++---
++title: Notes
++permalink: /notes/
++---
++<!doctype html>
++<html lang="en">
++<head>
++  <meta charset="utf-8">
++  <meta name="viewport" content="width=device-width, initial-scale=1">
++  <title>Notes · {{ site.title }}</title>
++  <link rel="preconnect" href="https://fonts.googleapis.com">
++  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
++  <link rel="stylesheet" href="{{ '/css/style.css' | relative_url }}">
++</head>
++<body>
++{% include nav.html current="notes" %}
++
++<header class="masthead article">
++  <p class="eyebrow">Reference</p>
++  <h1 class="title">Notes</h1>
++  <p class="abstract">Concepts, models and summaries worth keeping in one place. Each page lists the reading notes and attempts that link to it.</p>
++</header>
++
++<main class="article">
++  <!-- Built automatically from the files in _notes/ -->
++  {% assign notes = site.notes | sort: "title" %}
++  {% assign linkers = site.posts | concat: site.attempts %}
++  <ul class="post-list model-list">
++    {% for m in notes %}
++    {% assign n = 0 %}{% for p in linkers %}{% if p.content contains m.url %}{% assign n = n | plus: 1 %}{% endif %}{% endfor %}
++    <li>
++      <span>
++        <a href="{{ m.url | relative_url }}">{{ m.title }}</a>
++        {% if m.summary %}<span class="model-summary">{{ m.summary }}</span>{% endif %}
++      </span>
++      <span class="model-count">{{ n }} link{% if n != 1 %}s{% endif %}</span>
++    </li>
++    {% endfor %}
++  </ul>
++</main>
++
++<footer class="article">
++  <p>{{ site.title }} · ETH Zurich</p>
++</footer>
++</body>
++</html>
+-- 
+2.43.0
+
