@@ -10,8 +10,55 @@ title: "Stochastic Block Model (SBM)"
 -->
 
 <h2>Setup</h2>
-<p>Two balanced communities: assign each vertex $i \in [n]$ a label $\sigma_i \in \{\pm 1\}$ uniformly at random. Connect $i$ and $j$ independently with probability $a/n$ if $\sigma_i = \sigma_j$ and $b/n$ otherwise. Goal: recover $\sigma$ from the graph, up to a global sign.</p>
-<p><em>Weak recovery</em> means outputting $\hat\sigma$ with overlap $\big|\tfrac1n \sum_i \hat\sigma_i \sigma_i\big| \ge \delta$ for some $\delta > 0$, with probability $1 - o(1)$.</p>
+<p>
+  Let $k\ge 2$ be a fixed natural number. We study the <b>$k$-community SBM</b>. We have a random variable $(\sigma, G)\sim \text{SBM}_k(n,a,b)$ where $\sigma \sim\text{Unif}([k]^n)$ and for every $i < j$ independently, 
+  $$
+  \P(ij\in E_G)= P_{\sigma_i\sigma_j},\qquad P=\frac{1}{n}\left[(a-b) I+b 11^\top \right]
+  $$
+  This model is called <i>assortative</i> or <i>ferromagnetic</i>, given $a > b$, which we will focus on in this note. 
+</p>
+
+<p>
+  There are two goals: 
+  <ol>
+    <li><b>Detection</b>: Let $G\sim G(n,d/n)$ where $d:=\frac{a + (k-1) b}{k}$ be the average degree. Let us denote this model as the <b>null model</b>. 
+      Can we easily distinguish between SBM and the null model?</li>
+    <li><b>Recovery</b>: Reconstruct or approximate the labels $\sigma$.</li>
+  </ol>
+</p>
+
+<h2 class="numbered">Kesten-Stigum Threshold</h2>
+Mossel-Neeman-Sly have found out that the Kesten-Stigum threshold is given by: 
+$$
+   a- b > k \sqrt{d}
+$$
+We will study the derivation of this:
+
+<h3 class="numbered"> Investigating the Loops</h3>
+<p>
+Let $P,Q$ denote the measure of $G$ given by SBM and the null model respectively. 
+Then, one way to distinguish $P$ and $Q$ is to look at the loops, as they are indistinguishable on trees. </p>
+
+<p>
+We first have that: 
+$$
+\begin{aligned}  
+\E_P[\#\text{ loops of size }\ell] 
+& \approx \frac{1}{2\ell}\sum_{\sigma_1,..,\sigma_\ell \in [k]}\frac{1}{k^\ell}\left(\prod_{i\in[\ell]} P_{\sigma_i\sigma_{i+1}}\right) n^{\ell}\\
+&= \frac{1}{2\ell}\sum_{\sigma_1,..,\sigma_\ell \in [k]}\prod_{i\in[\ell]} \frac{n}{k}P_{\sigma_i\sigma_{i+1}}\\
+&= \frac{1}{2\ell}\tr(\Phi^{\ell})
+\end{aligned}
+$$
+where $\Phi:=\frac{n}{k}P$. We have the following two eigenvalues: 
+<ol>
+  <li> $\Phi 1 = \frac{1}{k}[(a-b) + kb ] 1= d1$ </li>
+  <li> For any $v$ with $\langle 1, v\rangle = 0$, $\Phi v = \frac{1}{k}[(a-b)v]= \frac{a-b}{k}v$</li>
+</ol>
+Therefore, 
+$$
+\E_P[\#\text{ loops of size }\ell]  = \frac{1}{2\ell}\left[d^\ell + (k-1) \left(\frac{a-b}{k}\right)^\ell\right]
+$$
+</p>
 
 <h2>Results</h2>
 

@@ -1,0 +1,44 @@
+---
+layout: post
+title: "Stochastic Localization"
+---
+
+Let $\Omega:=\{\pm 1\}^n$ be the hypercube. Consider a Gibbs distribution in the Ising model, i.e. 
+$$
+    \mu_{A,h}(\sigma)\propto \exp\left(\frac{1}{2}\sigma^\top A\sigma + \langle h, \sigma\rangle\right)
+$$
+
+The main idea in stochastic localization is to <b>represent our Gibbs distribution $\mu$ as a random mixture of more concentrated/simpler distributions</b>. 
+Let $\pi=\E_{z\sim\rho}[\pi_z]$ be a measure decomposition. Then, by the law of total variance, for any $f:\Omega \to \R$, 
+$$
+\Var_\pi(f) = \E_{z\sim\rho} [\Var_{\pi_z} (f)] +\Var_{z\sim\rho}(\E_{\pi_z}[f])
+$$Localization slowly moves all the variance in the first term to the second. 
+<h2 class="numbered">Tilted Measures</h2>
+<p>
+<div class="box theorem" id="tilted measure">
+  <div class="box-title">Definition (Tilted Measure)</div>
+  <p class="statement">
+    Let $\mu_{A,h}$ be the Gibbs distribution from above. For $\xi\in\R^n$, the <b>tilted measure</b> $\mathcal T_\xi \mu_{A,b}$ is given by:
+    $$
+        (\mathcal T_\xi \mu_{A,h})(\sigma) \propto \mu_{A,h}(\sigma) \cdot \exp(\langle \xi, \sigma\rangle)
+    $$
+    i.e. we have that $\mathcal T_\xi \mu_{A,h} = \mu_{A,h+\xi}$.
+  </p>
+</div>
+Let $Z_\xi$ denote the partition function of $\mathcal T_\xi \mu_{A,h}$. Then, we can represent the free energy as a function in $\xi$, i.e. $F(\xi)=-\log Z_\xi$.
+We have the following identities:
+$$
+    \nabla_\xi F = -\E_{\mu_{A,h+\xi}}[\sigma]\in [-1,1]^n,\qquad \nabla^2_\xi F = \Cov_{\mu_{A,h+\xi}}(\sigma)
+$$
+Indeed, we have that $F(\xi) = -\log \sum_{\sigma} \exp(\frac{1}{2}\sigma^\top A\sigma + \langle h+\xi, \sigma\rangle)$. Hence,
+$$
+    \nabla_\xi F =  - \frac{1}{Z_\xi}\sum_{\sigma}\sigma \exp(\frac{1}{2}\sigma^\top A\sigma + \langle h+\xi, \sigma\rangle) = - \E_{\mu_{A,h+\xi}}[\sigma]
+$$
+
+<h2 class="numbered">Stochastic Localization</h2>
+Let $\mu$ be a probability measure on $\Omega$. A <b>stochastic localization</b> of $\mu$ is a process $(\mu_t)_{t\ge 0}$ on $\Omega$ s.t. 
+<ol>
+    <li> $\mu_0 = \mu$</li>
+    <li> (Martingale) For every $\sigma\in \Omega$, the process $t\mapsto \mu_t(\sigma) is a $(\mathcal F_t)$-martingale.</li>
+    <li> (Localization) Almost surely $\mu_t\to \delta_{\sigma^*}$ for some random $\sigma^*$</li>
+</ol>

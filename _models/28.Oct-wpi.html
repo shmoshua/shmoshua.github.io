@@ -1,0 +1,75 @@
+---
+layout: post
+title: "Weak Poincare for SBM"
+---
+<p>Written: Oct 28. 2026</p>
+
+
+<p>
+Let $\mu$ be the posterior. For weak recovery, we denote the magnetization as $m(\sigma):= \langle x^*,\sigma\rangle / n$ where $x^*$ is the truth. 
+
+So, we want a weak Poincare inequality of the following form: 
+$$
+ \E_\mu g^2 \le \rho \dirchform{P}{g}{g} + \eps \E_\mu [m^2 g^2]
+$$
+for all even $g$. Goal is to find whether we can have $\rho =n^{O(1)}$ and small $\eps$. If this holds, then for any even law $\nu$ with $f:= d\nu / d\mu$, by taking $g:= \sqrt{f}$ we have: 
+$$
+1 = \E_\nu[1] =\E_\mu[g^2] \le \frac{\rho}{4} \dirchform{P}{f}{\log f}+\eps \E_\nu[m^2]
+$$
+Therefore, 
+$$
+\E_{\nu}[m^2]\ge \frac{1-\frac{\rho}{4} \dirchform{P}{f}{\log f}}{\eps}
+$$
+</p>
+
+<p>
+   <i>This might be too strong. Is there is a single trap, this might fail?</i>
+</p>
+
+<h3>Find the dual?</h3>
+<p>
+    Let us define:
+    $$
+    \kappa(u):=\inf_{\begin{subarray}{c} \E_\mu g^2 = 1 \\ \E_\mu m^2 g^2 \le u\end{subarray}} \dirchform{P}{g}{g}
+    $$
+    If $\kappa(u)\ge \kappa_0> 0$, then for any $g$ with $\E_\mu g^2 =1$, we have $\kappa_0\le \dirchform{P}{g}{g}$ or $u\le \E_\mu m^2 g^2 $.
+    Hence, 
+    $$
+    \E_\mu g^2 \le \frac{1}{\kappa_0}\dirchform{P}{g}{g} + \frac{1}{u} \E_\mu m^2 g^2
+    $$
+    This can be generalized to any $g$ by taking $g / \|g\|_\mu$.
+</p>
+
+<p>
+Now the dual is given by, finding a positive $h$ s.t. 
+$$
+\frac{(I-P)h}{h}+\theta m^2  \ge \kappa
+$$, then we have that: 
+$$
+\E_\mu g^2 \le \frac{1}{\kappa}\dirchform{P}{g}{g} +\frac{\theta }{\kappa} \E_\mu m^2 g^2
+$$
+</p>
+
+
+<h2>Restricting Function Space Further</h2>
+We only need the weak Poincare to hold for $\nu_t$ where $t\sim \text{Unif}[0,T]$. This means we can have following constraints:
+<ol>
+    <li>$\nu$ is even.</li>
+    <li> We have that:
+        $$
+            0\le f_T = f_0 -\int_0^T (I-P) f_\tau d\tau = f_0 -T(I-P) f_t 
+        $$
+    </li>
+</ol>
+
+Hence, we can solve the optimization problem: 
+$$
+\begin{array}{rl}
+\inf& \E_\mu [m^2 f]\\
+\text{s.t.}& f\ge 0\\
+& \E_\pi f = 1 \\
+& \Ent_\mu[f]\le \text{KL}(\nu_0\|\mu)\\
+& \dirchform{P}{f}{\log f} \le \text{KL}(\nu_0\|\mu) / T\\
+&  (I-P) f \le f_0/T
+\end{array}
+$$

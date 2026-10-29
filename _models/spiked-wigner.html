@@ -6,10 +6,10 @@ title: "Spiked Wigner Model"
 <h2 class="numbered">Setup</h2>
 <p>In the spiked Wigner model, we aim to recover an unknown signal $\bs{v}\sim \text{Unif}(\Omega)$, given a noise measurement: 
     $$
-        \bs{M}:= \bs{W}+\frac{\lambda}{N} \bs{v v}^\top 
+       M:= W+\frac{\lambda}{N} vv^\top 
     $$
-    for some signal-to-noise ratio $\lambda\ge 0$, and a noise matrix $\bs{W}\sim\textsf{GOE}(N)$ with $\bs{W}_{ji}=\bs{W}_{ij}\sim \mathcal N(0, 1/N)$ for $i\ne j$, 
-    and $\bs{W}_{ii}\sim \mathcal N(0, 2/N)$.  
+    for some signal-to-noise ratio $\lambda\ge 0$, and a noise matrix $W\sim\textsf{GOE}(N)$ with $W_{ji}=W_{ij}\sim \mathcal N(0, 1/N)$ for $i\ne j$, 
+    and zero diagonal.
 </p>
 
 <h2 class = "numbered">Known Results</h2>
@@ -24,7 +24,7 @@ $\lambda=1$, known as the BBP transition:
         is information-theoretically impossible.
     </li>
     <li>
-        If $\lambda>1$, the leading eigenvector of $\bs{M}$
+        If $\lambda>1$, the leading eigenvector of $M$
         has nontrivial correlation with $\bs{v}$, and weak
         recovery is achievable in polynomial time.
     </li>
@@ -144,3 +144,13 @@ $T=\widetilde{\Omega}(N^3)$ suffices.
     $$
 
 </p>
+
+<h2 class="numbered">Questions and Answers</h2>
+We may assume wlog that $v=1$. Using Hubbard-Stratonovich transform, we have a measure decomposition: 
+$$
+\mu_{\beta M}=\E_{z}\mu_{\beta W, z1},\qquad z|x:=\beta \lambda/N\cdot \langle v,x\rangle +\sqrt{\beta \lambda / N}g
+$$
+Let $m(x):= \langle v,x\rangle$ be the <b>magnetization</b>. Then, we get the form:
+$$
+m(x')\approx \E\tanh(\beta \sqrt{q}g+\beta \lambda m)
+$$

@@ -236,3 +236,70 @@ $$
 Hence, $m_{i\to j}(s)$ is the probability of $i$ having state $s$ if $i$ and $j$ weren't connected.
 </p>
 
+<h3 class="numbered">The Bethe-Hessian</h3>
+Now assume that the energy is given by: $h(x,y):= - J xy$. Let: 
+$$
+\Phi:= \beta \cdot F_{\text{Bethe}},\qquad K:= \beta J
+$$
+We define also the following local expectation variables: 
+$$
+m_i:= \E_{\nu_i}\sigma_i,\qquad \chi_{ij}:= \E_{\nu_{ij}}\sigma_i\sigma_j
+$$ 
+Then, we can rewrite our Bethe free energy into: 
+$$
+\begin{aligned}
+\Phi & = -K \sum_{i\sim j } \chi_{ij} + \sum_i\sum_s \nu_i(s)\log \nu_i(s) + \sum_{i\sim j}\sum_{s,t}\nu_{ij}(s,t)\log \frac{\nu_{ij}(s,t)}{\nu_i(s)\nu_j(t)}
+\\& = -K \sum_{i\sim j } \chi_{ij} + \sum_i\sum_s \nu_i(s)\log \nu_i(s) + \sum_{i\sim j}\sum_{s,t}\nu_{ij}(s,t)\log \nu_{ij}(s,t) -  \sum_{i\sim j}\sum_{s,t}\nu_{ij}(s,t)\log \nu_i(s) -  \sum_{i\sim j}\sum_{s,t}\nu_{ij}(s,t)\log \nu_j(t)
+\\& = -K \sum_{i\sim j } \chi_{ij} + \sum_i(1-d_i)\sum_s \nu_i(s)\log \nu_i(s) + \sum_{i\sim j}\sum_{s,t}\nu_{ij}(s,t)\log \nu_{ij}(s,t)
+\end{aligned}
+$$
+Now, we have that: 
+$$
+m_i = s\nu_i(s)  - s\nu_i(-s) = s\nu_i(s)  - s(1 - \nu_i(s)) 
+$$
+Hence, $sm_i = 2\nu_i(s) - 1$ and $\nu_i(s) = (1+sm_i) / 2$. Similarly, for any $s,t$,
+$$
+\begin{aligned}
+    st\chi_{ij}(s,t) &= \nu_{ij}(s,t) - \nu_{ij}(s,-t) -  \nu_{ij}(-s,t) + \nu_{ij}(-s,-t)\\
+    &=  - 2\nu_{ij}(s,-t) -  2\nu_{ij}(-s,t)  + 1\\
+    &=  - 2(\nu_{i}(s) - \nu_{ij}(s,t)) -  2(\nu_j(t) - \nu_{ij}(s,t))  + 1\\
+    &=  4 \nu_{ij}(s,t) - 2\nu_{i}(s) -  2\nu_j(t)  + 1\\
+    &=  4 \nu_{ij}(s,t) - (sm_i + 1) -  (tm_j + 1)  + 1\\
+    &=  4 \nu_{ij}(s,t) - sm_i -  tm_j   -1\\
+\end{aligned}
+$$
+Therefore, $\nu_{ij}(s,t) = \frac{1 + sm_i + tm_j + st\chi_{ij}}{4}$. Bringing it together: 
+$$
+\Phi(m,\chi) = -K\sum_{i\sim j} \chi_{ij} + \sum_{i\sim j }f(m_i,m_j,\chi_{ij}) + \sum_i (1-d_i) g(m_i)
+$$
+where $f(a,b,c):= \sum_{s,t}\frac{1+as+bt + cst}{4}\log \frac{1+as+bt + cst}{4}$ and $g(a):=\sum_{s}\frac{1+as}{2}\log \frac{1+as}{2}$.
+
+Now, let us try to find a stationary point. Notice that under $m\to -m$, we have: 
+
+$$
+\Phi(-m,\chi) = \Phi(m,\chi)
+$$
+Differentiating this at $m=0$, we get that: 
+$$
+\left.\frac{\partial \Phi}{\partial m_i}\right|_{m_i = 0} =  0,\qquad \forall i\in[n]
+$$
+Therefore, we will consider the stationary point when $m=0$. In this case, 
+$$
+\left.\frac{\partial \Phi}{\partial \chi_{ij}}\right|_{m=0} = -K + \frac{1}{2} \log \frac{1+\chi_{ij}}{1-\chi_{ij}}  = 0
+$$
+Hence, we get that $\arctanh(\chi_{ij}) = \beta J$ and $\chi_{ij} = \tanh(\beta J)$. 
+
+Let $\rho:=  \tanh(\beta J)$. Now, we compute the Bethe Hessian. We have that: 
+$$
+\left.\frac{\partial^2 f}{\partial m_i\partial m_j}\right|_{m = 0, \chi_{ij}= \rho}  = -\frac{\rho}{1-\rho^2},\qquad \left.\frac{\partial^2 f}{\partial m_i^2}\right|_{m = 0, \chi_{ij}=\rho} = \frac{1}{1-\rho^2}
+$$
+Further, $g''(0) = 1$. Hence, 
+It's given that: 
+$$
+\left[\left.\frac{\partial^2 \Phi}{\partial m_i\partial m_j}\right|_{m = 0, \chi_{ij}= \rho} \right]_{ij}= I + \frac{\rho^2}{ 1- \rho^2}D - \frac{\rho}{1-\rho^2} A
+$$
+
+Now, for the edge variables, we know that $\partial^2 f / \partial m_i\partial \chi_{ij} |_{m=0,\chi = \rho} = 0$. Hence, we get that:
+$$
+\nabla^2\Phi(0,\rho) = \begin{bmatrix} I + \frac{\rho^2}{ 1- \rho^2}D - \frac{\rho}{1-\rho^2} A & 0 \\0& \frac{1}{1-\rho^2} I \end{bmatrix}
+$$

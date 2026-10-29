@@ -1,0 +1,47 @@
+---
+layout: post
+title: "Edge Annealing SBM"
+---
+
+Let $\Omega:=\{\pm 1\}^N$ be the hypercube. We consider the following 2-community SBM: Let $d$ be a fixed average degree and $\eps \in(0,1)$. Let further $x\sim \text{Unif}(\Omega)$.
+Then, $G\sim \text{SBM}(N,d,\eps)$ is a random graph where for all $i< j$:
+$$
+    \P(ij\in E)=\frac{d}{N}(1+\eps x_ix_j)
+$$
+Let $A$ be its adjacency matrix. Then, the <b>signal-to-noise (SNR)</b> ratio is defined as $\lambda:= \eps^2d$. 
+It is known that for 2-community SBM, weak recovery is possible if and only if $\lambda > 1$.
+
+<h3 class="numbered"> Exact Bayes Posterior of SBM</h3>
+The posterior of $x$ given $G$ is given by the Ising model:
+$$
+    \mu(\sigma)\propto \exp\left( \frac{\arctanh \eps+\kappa}{2}\sigma^\top A\sigma -\frac{\kappa}{2}\langle 1,\sigma\rangle ^2\right)
+$$
+i.e. the interaction matrix is given by $(\arctanh \eps+\kappa) A - \kappa 11^\top$ where $\kappa := \frac{1}{2}\log \frac{1-(1-\eps)d / N}{1-(1+\eps)d / N}$.
+
+Indeed, the posteror is given by: 
+$$
+p(x | G)\propto p (G | x) = \prod_{i\sim j }\frac{d}{N}(1+\eps x_i x_j)\cdot \prod_{i\not\sim j}\left(1 - \frac{d}{N}(1+\eps x_ix_j)\right)
+$$
+Then, for $s\in \{\pm 1\}$, $\log (1+\eps s) = \frac{1}{2}\log (1-\eps^2) + s\cdot \arctanh \eps$. Similarly, 
+$\log (1-\frac{d}{N}(1+\eps s)) = - \kappa s + \text{const}$. 
+
+Therefore, 
+$$
+\log p(x|G) \propto \sum_{i\sim j}(x_ix_j \arctanh\eps) + \sum_{i\not\sim j} x_i x_j \kappa
+$$
+It follows that:
+$$
+\mu(\sigma)\propto \exp\left(\arctanh \eps \sum_{i\sim j}\sigma_i \sigma_j -\kappa \sum_{i< j} (1-A_{ij}) \sigma_i\sigma_j\right)
+$$
+
+<h2 class="numbered"> Simulated Annealing Algorithm</h2>
+Given $G$, for each pair $(i,j)$ with $i< j$, we sample i.i.d $u_{ij}\sim \text{Unif}[0,1]$. For $\theta\in[0,1]$, we set: 
+$$
+    G_\theta :=\{ ij\in E: u_{ij}\le \theta\},\qquad \kappa_\theta :=\frac{1}{2}\log \frac{1-\theta(1-\eps)d / N}{1-\theta(1+\eps)d / N} 
+$$
+Then, $G=G_1$ and $\kappa= \kappa_1$. Further, let's define:
+$$
+    \mu_{\theta}(\sigma)\propto \exp\left( \frac{\arctanh \eps+\kappa_\theta}{2}\sigma^\top A_{\theta}\sigma -\frac{\kappa_\theta}{2}\langle 1,\sigma\rangle ^2\right)
+$$
+Then, we get that $G_\theta\sim\text{SBM}(N,\theta d, \eps)$ with posterior given by $\mu_{\theta}$. Let $\theta_j:= j / L$ for $j\in\{0,...,L\}$. 
+For each $j$, we run $T$ steps of Glauber dynamics on $P_j:=P_{\mu_{\theta_j}}$. 
