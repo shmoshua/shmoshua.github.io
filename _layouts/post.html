@@ -43,18 +43,34 @@
 </head>
 
 <body{% if jekyll.environment == "development" %} class="preview"{% endif %}>
+{% if page.collection == "notes" %}{% assign section = "notes" %}{% elsif page.collection == "attempts" %}{% assign section = "attempts" %}{% else %}{% assign section = "reading" %}{% endif %}
+{% include nav.html current=section %}
+
 <!-- Filled in automatically from the h2/h3 headings by js/toc.js -->
 <nav class="toc" aria-label="Contents"></nav>
 
 <header class="masthead article">
+  {% if page.collection == "notes" %}
+  <p class="eyebrow">{{ page.topic | default: "Note" }}</p>
+  <h1 class="title">{{ page.title }}</h1>
+  {% if page.summary %}<p class="abstract">{{ page.summary }}</p>{% endif %}
+  <p class="affil"><a href="{{ '/notes/' | relative_url }}">← All notes</a></p>
+
+  {% elsif page.collection == "attempts" %}
+  {% assign parts = page.content | split: 'data-date="' %}
+  {% assign n = parts.size | minus: 1 %}
+  <p class="eyebrow">Attempt{% if page.status %} <span class="status status-{{ page.status | slugify }}">{{ page.status }}</span>{% endif %}</p>
+  <h1 class="title">{{ page.title }}</h1>
+  {% if page.summary %}<p class="abstract">{{ page.summary }}</p>{% endif %}
+  <p class="affil">
+    {% if n > 0 %}{% assign first = parts[1] | slice: 0, 10 %}{% assign last = parts | last | slice: 0, 10 %}Started {{ first | date: "%b %d, %Y" }}{% if n > 1 %} · last entry {{ last | date: "%b %d, %Y" }}{% endif %} · {{ n }} entr{% if n == 1 %}y{% else %}ies{% endif %} · {% endif %}<a href="{{ '/attempts/' | relative_url }}">← All attempts</a>
+  </p>
+
+  {% else %}
   {% if page.topic %}<p class="eyebrow">{{ page.topic }}</p>{% endif %}
   <h1 class="title">{{ page.title }}</h1>
   {% if page.authors %}<p class="authors">{{ page.authors }}</p>{% endif %}
-  {% if page.collection == "models" %}
-  {% if page.summary %}<p class="abstract">{{ page.summary }}</p>{% endif %}
-  <p class="affil">Model · <a href="{{ '/models/' | relative_url }}">All models</a> · <a href="{{ '/' | relative_url }}">Notes</a></p>
-  {% else %}
-  <p class="affil">Read {{ page.date | date: "%b %d, %Y" }} · <a href="{{ '/' | relative_url }}">← Back to all notes</a></p>
+  <p class="affil">Read {{ page.date | date: "%b %d, %Y" }} · <a href="{{ '/' | relative_url }}">← Reading list</a></p>
   {% endif %}
   {% if page.paper %}<div class="links"><a href="{{ page.paper }}">Paper <span class="arr">↗</span></a></div>{% endif %}
 </header>
@@ -63,19 +79,20 @@
 {{ content }}
 </article>
 
-{% if page.collection == "models" %}
-<!-- Every post that links to this model page, found automatically -->
+{% if page.collection == "notes" %}
+<!-- Every reading note and attempt that links to this page, found automatically -->
+{% assign linkers = site.posts | concat: site.attempts %}
 <section class="article backlinks">
-  <p class="backlinks-title">Notes that mention this model</p>
+  <p class="backlinks-title">Linked from</p>
   {% assign n = 0 %}
   <ul class="post-list">
-  {% for p in site.posts %}{% if p.content contains page.url %}{% assign n = n | plus: 1 %}
+  {% for p in linkers %}{% if p.content contains page.url %}{% assign n = n | plus: 1 %}
     <li>
       <a href="{{ p.url | relative_url }}">{{ p.title }}</a>
-      <time datetime="{{ p.date | date_to_xmlschema }}">{{ p.date | date: "%b %d, %Y" }}</time>
+      <span class="backlink-kind">{% if p.collection == "attempts" %}Attempt{% else %}Reading · {{ p.date | date: "%b %d, %Y" }}{% endif %}</span>
     </li>{% endif %}{% endfor %}
   </ul>
-  {% if n == 0 %}<p class="empty">None yet. Link here from a post with <code>&lt;a href="{{ page.url }}"&gt;</code>.</p>{% endif %}
+  {% if n == 0 %}<p class="empty">Nothing yet. Link here from a post or attempt with <code>&lt;a href="{{ page.url }}"&gt;</code>.</p>{% endif %}
 </section>
 {% endif %}
 
@@ -84,6 +101,7 @@
 </footer>
 
 <script src="{{ '/js/toc.js' | relative_url }}"></script>
+<script src="{{ '/js/fit-math.js' | relative_url }}"></script>
 {% if jekyll.environment == "development" %}
 <!-- Local preview only: jump to the part you just edited after each refresh -->
 <script src="{{ '/js/follow-edits.js' | relative_url }}"></script>

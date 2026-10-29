@@ -15,10 +15,37 @@ GitHub Pages rebuilds the site within a minute or two. The homepage list (newest
 the post header and the contents sidebar are generated automatically, so `index.html`
 never needs editing.
 
-## Model pages
+## Sections
 
-`_models/` has one page per model (e.g. `_models/sbm.html` → `/models/sbm/`). Each holds
-the setup and the results you keep needing, as boxes with an `id`:
+The site has three sections, shown as tabs at the top of every page. Their names and
+order live in `_data/sections.yml` (rename "Attempts" to "Ansätze" there, for example).
+
+| Tab          | Folder        | Address                 | What goes in it                         |
+|--------------|---------------|-------------------------|-----------------------------------------|
+| Reading List | `_posts/`     | `/` (the homepage)      | One post per paper (see above)          |
+| Attempts     | `_attempts/`  | `/attempts/<file-name>/` | One page per idea, with a dated log    |
+| Notes        | `_notes/`     | `/notes/<file-name>/`   | Concepts, models and summaries          |
+
+## Attempts
+
+One page per idea, e.g. `_attempts/wpi-sbm.html` → `/attempts/wpi-sbm/`. Start one by
+copying `_drafts/attempt-template.html` into `_attempts/`. The header has a `title`, a
+one-line `summary` and a `status` (`open`, `stuck`, `works` or `dropped`).
+
+Each time you work on the idea, add an entry at the bottom of the page:
+
+```html
+<h2 class="entry" data-date="2026-10-29">Trying the dual instead</h2>
+```
+
+The date (written `YYYY-MM-DD`) is shown above the heading and in the contents sidebar.
+The Attempts page sorts ideas by their latest entry and counts the entries, so there are
+no dates to keep up to date by hand.
+
+## Notes
+
+`_notes/` has one page per concept or model (e.g. `_notes/sbm.html` → `/notes/sbm/`).
+Each holds the setup and the results you keep needing, as boxes with an `id`:
 
 ```html
 <div class="box theorem" id="kesten-stigum">
@@ -28,10 +55,11 @@ the setup and the results you keep needing, as boxes with an `id`:
 </div>
 ```
 
-Link to them from any post: `<a href="/models/sbm/">SBM</a>`, or to one result:
-`<a href="/models/sbm/#kesten-stigum">Kesten–Stigum</a>`. Each model page lists the notes
-that link to it automatically, and `/models/` lists all models. To add a model, copy
-`_models/sbm.html` to a new file name.
+Link to them from any post or attempt: `<a href="/notes/sbm/">SBM</a>`, or to one result:
+`<a href="/notes/sbm/#kesten-stigum">Kesten–Stigum</a>`. Each note lists the posts and
+attempts that link to it automatically. Add an optional `summary:` line to a note's
+header to show a one-line description on the Notes page. To add a note, copy
+`_notes/sbm.html` to a new file name.
 
 ## Previewing locally (no commit needed)
 

@@ -1,0 +1,11 @@
+<!-- The tabs at the top of every page. Names come from _data/sections.yml.
+     Pages include this file with current="reading", "attempts" or "notes". -->
+<nav class="site-nav" aria-label="Sections">
+  <div class="site-nav-inner">
+    <a class="site-name" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+    <div class="site-tabs">
+      {% for s in site.data.sections %}<a href="{{ s.url | relative_url }}"{% if include.current == s.id %} class="active" aria-current="page"{% endif %}>{{ s.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+</nav>

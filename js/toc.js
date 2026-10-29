@@ -39,7 +39,14 @@
     if (h.tagName === 'H3') li.className = 'subsec';
     var a = document.createElement('a');
     a.href = '#' + h.id;
-    a.textContent = (num ? num + ' ' : '') + h.textContent;
+    // Dated entries on attempt pages show their date first, e.g. "Oct 28 · First try"
+    var date = '';
+    var d = h.dataset.date && h.dataset.date.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (d) {
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      date = months[+d[2] - 1] + ' ' + (+d[3]) + ' · ';
+    }
+    a.textContent = date + (num ? num + ' ' : '') + h.textContent;
     li.appendChild(a);
     list.appendChild(li);
     links.push({ head: h, link: a });

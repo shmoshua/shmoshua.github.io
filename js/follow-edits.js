@@ -23,7 +23,7 @@
   });
 
   function restore() {
-    // Only after a refresh: arriving through a link (e.g. /models/sbm/#result)
+    // Only after a refresh: arriving through a link (e.g. /notes/sbm/#result)
     // should land where the link points.
     var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
     if (!nav || nav.type !== 'reload') {

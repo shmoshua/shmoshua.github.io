@@ -64,6 +64,7 @@ canvas{
   --box-bg:   #edf3ee;   /* theorem box background                   */
   --box-rule: #cfddd0;   /* theorem box border                       */
   --sel:      #b8e0d4;   /* text selection highlight                 */
+  --warn:     #a86a12;   /* "stuck" label on attempts                */
 
   --measure: 45rem;       /* body text column width  */
   --wide:    52rem;       /* breakout figures        */
@@ -83,6 +84,7 @@ canvas{
     --box-bg:   #0f1e17;
     --box-rule: #1c3325;
     --sel:      #0e3d2e;
+    --warn:     #e0a84a;
   }
 }
 
@@ -93,7 +95,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: 1.125rem;   /* 18px on a computer; smaller on phones, see the end of this file */
   line-height: 1.65;
   font-feature-settings: "onum" 1, "pnum" 1;
 }
@@ -111,7 +113,7 @@ body {
 /* ============================================================
    HEADER
    ============================================================ */
-header.masthead { padding-top: 4rem; padding-bottom: .5rem; }
+header.masthead { padding-top: 2.6rem; padding-bottom: .5rem; }
 .eyebrow {
   font-family: var(--mono);
   font-size: .72rem;
@@ -238,7 +240,7 @@ strong { font-weight: 600; }
 /* ── Table of Contents ── */
 .toc {
   position: fixed;
-  top: 4rem;
+  top: 5.5rem;
   left: max(1.5rem, calc(50% - var(--measure)/2 - 14rem));
   width: 12rem;
   font-family: var(--sans);
@@ -508,7 +510,7 @@ article.article li { margin-bottom: .3rem; }
 .tldr > :last-child { margin-bottom: 0; }
 .tldr ul, .tldr ol { padding-left: 1.2rem; }
 
-/* ---- Model pages (_models/) ---- */
+/* ---- Note pages (_notes/) ---- */
 /* Where a result came from, under each result box */
 .box .source {
   font-family: var(--sans);
@@ -521,8 +523,8 @@ article.article li { margin-bottom: .3rem; }
 .box[id] { scroll-margin-top: 2rem; }
 .box:target { box-shadow: 0 0 0 2px var(--accent); }
 
-/* Links from posts to model pages: dotted underline marks an internal reference */
-article.article a[href^="/models/"] { text-decoration-style: dotted; }
+/* Links to note pages: dotted underline marks an internal reference */
+article.article a[href^="/notes/"] { text-decoration-style: dotted; }
 
 .backlinks { margin-top: 3rem; }
 .backlinks-title {
@@ -549,3 +551,123 @@ article.article a[href^="/models/"] { text-decoration-style: dotted; }
    the bottom so the last lines you write can sit mid-screen. */
 footer.article { margin-top: 4rem; padding-bottom: 8rem; }
 body.preview footer.article { padding-bottom: 50vh; }
+
+/* ============================================================
+   SECTION TABS at the top of every page (_includes/nav.html)
+   ============================================================ */
+.site-nav { border-bottom: 1px solid var(--rule); }
+.site-nav-inner {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: .85rem 1.4rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .4rem 1.5rem;
+  flex-wrap: wrap;
+  font-family: var(--sans);
+}
+.site-name {
+  font-weight: 600;
+  font-size: .9rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+.site-tabs { display: flex; gap: 1.3rem; }
+.site-tabs a {
+  font-size: .9rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  padding: .2rem 0;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+.site-tabs a:hover { color: var(--ink); }
+.site-tabs a.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ============================================================
+   ATTEMPTS (_attempts/): one page per idea, a dated entry per session
+   ============================================================ */
+/* <h2 class="entry" data-date="2026-10-28">…</h2> shows its date above the heading */
+.article h2.entry {
+  margin-top: 3rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--rule);
+}
+article.article > h2.entry:first-child { margin-top: 1.6rem; }
+.article h2.entry[data-date]::before {
+  content: attr(data-date);
+  display: block;
+  font-family: var(--mono);
+  font-size: .72rem;
+  font-weight: 400;
+  letter-spacing: .08em;
+  color: var(--accent);
+  margin-bottom: .35rem;
+}
+.article h2.entry[id] { scroll-margin-top: 1.5rem; }
+
+/* Status label: open / stuck / works / dropped */
+.status {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: .66rem;
+  font-weight: 400;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  padding: .18rem .5rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: var(--accent);
+  vertical-align: .15em;
+}
+.eyebrow .status { margin-left: .5rem; vertical-align: .05em; }
+.status-stuck   { color: var(--warn); }
+.status-works   { color: var(--paper); background: var(--accent); border-color: var(--accent); }
+.status-dropped { color: var(--muted); text-decoration: line-through; }
+
+.idea-list li > span:first-child { display: flex; flex-direction: column; gap: .2rem; }
+.idea-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: .3rem .6rem; }
+.idea-meta {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: var(--mono);
+  font-size: .74rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+.backlink-kind {
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: .74rem;
+  color: var(--muted);
+}
+
+/* ============================================================
+   PHONES: everything sized in rem shrinks with the root size,
+   so the page looks like a scaled-down version of the desktop one
+   and more of each equation fits on screen.
+   ============================================================ */
+@media (max-width: 760px) {
+  html { font-size: 14.5px; }            /* body text ≈ 16px */
+}
+@media (max-width: 480px) {
+  html { font-size: 13.5px; }            /* body text ≈ 15px */
+  .article, .site-nav-inner { padding-left: 1rem; padding-right: 1rem; }
+  header.masthead { padding-top: 1.8rem; }
+  h1.title { font-size: 1.6rem; }
+  .abstract { font-size: 1.05rem; }
+  .box { padding: .75rem .85rem; }
+  article.article ol, article.article ul { padding-left: 1.15rem; }
+  .tldr { padding: 1rem .95rem .8rem; }
+  .site-tabs { gap: 1rem; }
+  .idea-meta { align-items: flex-start; text-align: left; flex-direction: row; gap: .8rem; }
+  .post-list li { gap: .25rem; }
+  mjx-container[display="true"] { margin: 1.1rem 0 !important; }
+}
+

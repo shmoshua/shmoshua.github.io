@@ -5,9 +5,23 @@ permalink: /posts/:year-:month-:day-:title:output_ext
 
 exclude:
   - README.md
+  - "*.patch"
 
-# One page per model (SK, SBM, ...) in _models/, published at /models/<file-name>/
+# The site has three sections (names and order in _data/sections.yml):
+#   Reading List  -> _posts/     (one post per paper)
+#   Attempts      -> _attempts/  (one page per idea, with a dated log of how it develops)
+#   Notes         -> _notes/     (concepts, models and summaries to look things up in)
 collections:
-  models:
+  attempts:
     output: true
-    permalink: /models/:name/
+    permalink: /attempts/:name/
+  notes:
+    output: true
+    permalink: /notes/:name/
+
+# Every page in _attempts/ and _notes/ uses the same layout as the posts
+defaults:
+  - scope: { path: "", type: attempts }
+    values: { layout: post }
+  - scope: { path: "", type: notes }
+    values: { layout: post }

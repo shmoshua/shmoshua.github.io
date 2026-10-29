@@ -1,0 +1,15 @@
+# The tabs at the top of every page, in this order.
+# To rename a section, change its `name` here (e.g. "Attempts" -> "Ansätze");
+# every page picks up the new name. Leave `url` as it is so links keep working.
+
+- id: reading
+  name: Reading List
+  url: /
+
+- id: attempts
+  name: Attempts
+  url: /attempts/
+
+- id: notes
+  name: Notes
+  url: /notes/

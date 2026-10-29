@@ -1,0 +1,47 @@
+---
+title: Notes
+permalink: /notes/
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notes · {{ site.title }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/css/style.css' | relative_url }}">
+</head>
+<body>
+{% include nav.html current="notes" %}
+
+<header class="masthead article">
+  <p class="eyebrow">Reference</p>
+  <h1 class="title">Notes</h1>
+  <p class="abstract">Concepts, models and summaries worth keeping in one place. Each page lists the reading notes and attempts that link to it.</p>
+</header>
+
+<main class="article">
+  <!-- Built automatically from the files in _notes/ -->
+  {% assign notes = site.notes | sort: "title" %}
+  {% assign linkers = site.posts | concat: site.attempts %}
+  <ul class="post-list model-list">
+    {% for m in notes %}
+    {% assign n = 0 %}{% for p in linkers %}{% if p.content contains m.url %}{% assign n = n | plus: 1 %}{% endif %}{% endfor %}
+    <li>
+      <span>
+        <a href="{{ m.url | relative_url }}">{{ m.title }}</a>
+        {% if m.summary %}<span class="model-summary">{{ m.summary }}</span>{% endif %}
+      </span>
+      <span class="model-count">{{ n }} link{% if n != 1 %}s{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</main>
+
+<footer class="article">
+  <p>{{ site.title }} · ETH Zurich</p>
+</footer>
+</body>
+</html>
