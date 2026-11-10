@@ -1,0 +1,833 @@
+---
+title: "Generalized Weak Poincaré for SBM Weak Recovery"
+status: open
+summary: "Weak recovery from Glauber via a windowed flow-LP certificate at a temperature hotter than Bayes. The reduction is proved; one dynamical lemma is open."
+---
+<h2 class="entry" data-date="2026-10-28">Weak Poincare inequality</h2>
+
+<p>
+Let $\mu$ be the posterior. For weak recovery, we denote the magnetization as $m(\sigma):= \langle x^*,\sigma\rangle / n$ where $x^*$ is the truth.
+
+So, we want a weak Poincare inequality of the following form:
+$$
+ \E_\mu g^2 \le \rho \dirchform{P}{g}{g} + \eps \E_\mu [m^2 g^2]
+$$
+for all even $g$. Goal is to find whether we can have $\rho =n^{O(1)}$ and small $\eps$. If this holds, then for any even law $\nu$ with $f:= d\nu / d\mu$, by taking $g:= \sqrt{f}$ we have:
+$$
+1 = \E_\nu[1] =\E_\mu[g^2] \le \frac{\rho}{4} \dirchform{P}{f}{\log f}+\eps \E_\nu[m^2]
+$$
+Therefore,
+$$
+\E_{\nu}[m^2]\ge \frac{1-\frac{\rho}{4} \dirchform{P}{f}{\log f}}{\eps}
+$$
+</p>
+
+<p>
+   <i>This might be too strong. If there is a single trap, this might fail?</i>
+</p>
+
+<h3>Find the dual?</h3>
+<p>
+    Let us define:
+    $$
+    \kappa(u):=\inf_{\begin{subarray}{c} \E_\mu g^2 = 1 \\ \E_\mu m^2 g^2 \le u\end{subarray}} \dirchform{P}{g}{g}
+    $$
+    If $\kappa(u)\ge \kappa_0> 0$, then for any $g$ with $\E_\mu g^2 =1$, we have $\kappa_0\le \dirchform{P}{g}{g}$ or $u\le \E_\mu m^2 g^2 $.
+    Hence,
+    $$
+    \E_\mu g^2 \le \frac{1}{\kappa_0}\dirchform{P}{g}{g} + \frac{1}{u} \E_\mu m^2 g^2
+    $$
+    This can be generalized to any $g$ by taking $g / \|g\|_\mu$.
+</p>
+
+<p>
+Now the dual is given by, finding a positive $h$ s.t.
+$$
+\frac{(I-P)h}{h}+\theta m^2  \ge \kappa
+$$, then we have that:
+$$
+\E_\mu g^2 \le \frac{1}{\kappa}\dirchform{P}{g}{g} +\frac{\theta }{\kappa} \E_\mu m^2 g^2
+$$
+</p>
+
+<h2 class="entry">WPI with some test functions</h2>
+<p>
+Two test functions show what the WPI demands.
+</p>
+<ol>
+<li>$g\equiv 1$ gives $\eps\ge 1/\E_\mu m^2$. So "small $\eps$" can only mean $\eps=O(1)$.</li>
+<li>$g=\mathbf 1_S$ gives, for every set $S$ with conductance $\Phi(S)$,
+$$
+1\le \rho\,\Phi(S)+\eps\,\E_\mu[m^2\mid S].
+$$
+Every low-conductance set must carry overlap, <em>whatever its mass</em>. Up to polynomial losses, the WPI is equivalent to recovery from every starting state.</li>
+</ol>
+<p>
+Evenness changes nothing: $(I-P)+\theta m^2$ commutes with the global flip, so its ground state, which is the optimal $h$, is already even.
+A canonical explicit dual is the landscape function $h=\big((I-P)+\theta m^2\big)^{-1}\mathbf 1$, with $\kappa=1/\|h\|_\infty$. It is the expected
+lifetime of the chain killed at rate $\theta m^2$. On exact small instances ($n\approx 12$) it is within $10\%$ of the optimum.
+</p>
+<p>
+<i>Failure: there is no closed form for $h$ beyond Curie&ndash;Weiss. There $h=\mu_m^{-1/2}$ works because $m$ evolves autonomously. For the SBM
+the drift of $m$ is dominated by other components, so a potential in $m$ alone is not a valid certificate.</i>
+</p>
+
+<h2 class="entry" data-date="2026-10-28">Are there traps?</h2>
+<p>
+Two-replica (Franz&ndash;Parisi) cavity at replica-symmetric level, plus the $x=1$ reconstruction test:
+</p>
+<ul>
+<li>the constrained free entropy $s(m)$ increases monotonically up to the equilibrium overlap;</li>
+<li>every overlap slice is a single state (replicon $\lt 1$, no reconstruction).</li>
+</ul>
+<p>
+Simulations at $n$ up to $80$k: no start ever gets stuck. This includes $m\approx 0$ states pinned and annealed at the Bayes temperature and
+colder, intermediate-overlap pins, and wrong-sign domains.
+</p>
+<p>
+Deep traps are invisible from the uniform start. By $L^p$ contraction of the flux into $B$, the chain enters $B$ only if
+$\Phi(B)\gtrsim e^{-(s(0)-\log 2)n}$, which is $\approx e^{-0.44n}$ at $\lambda=1.5$.
+</p>
+<p>
+<i>What remains: rare, frozen states (1RSB with Parisi parameter $\lt 1$) are not ruled out. The WPI needs them excluded; the uniform start does not, if they are deep.</i>
+</p>
+
+
+<h2 class="entry" data-date="2026-10-28">Restricting function space further</h2>
+<p>
+We only need the weak Poincare to hold for $\nu_t$ where $t\sim \text{Unif}[0,T]$. This means we can have following constraints:
+</p>
+<ol>
+    <li>$\nu$ is even.</li>
+    <li> We have that:
+        $$
+            0\le f_T = f_0 -\int_0^T (I-P) f_\tau d\tau = f_0 -T(I-P) \bar f,\qquad \bar f=\frac1T\int_0^T f_\tau d\tau .
+        $$
+    </li>
+</ol>
+Hence, we can solve the optimization problem:
+$$
+\begin{array}{rl}
+\inf& \E_\mu [m^2 f]\\
+\text{s.t.}& f\ge 0\\
+& \E_\mu f = 1 \\
+& \Ent_\mu[f]\le \text{KL}(\nu_0\|\mu)\\
+& \dirchform{P}{f}{\log f} \le \text{KL}(\nu_0\|\mu) / T\\
+&  (I-P) f \le f_0/T
+\end{array}
+$$
+<p>
+(The entropy constraint holds by convexity and monotonicity of KL. The Dirichlet constraint holds because $(a,b)\mapsto(a-b)(\log a-\log b)$ is
+jointly convex and $\frac{d}{dt}\mathrm{KL}(\nu_t\|\mu)=-\dirchform{P}{f_t}{\log f_t}$.)
+</p>
+
+<h3>Only the last constraint matters: the flow LP</h3>
+<p>
+In measure form, with generator $L$:
+$$
+\inf\ \nu(m^2)\quad\text{s.t.}\quad \nu\ge0,\ \ \nu(\mathbf 1)=1,\ \ \nu_0+T\,\nu L\ge 0 .
+$$
+<b>Lemma 5 (weak duality).</b> If $f\ge0$ and $Lf\le m^2-c$ everywhere, then every feasible $\nu$ has $\nu(m^2)\ge c-\nu_0(f)/T$. In particular
+$\E\,m(X_U)^2\ge c-\E_{\nu_0}f/T$.
+<em>Proof.</em> $(\nu_0+T\nu L)(f)\ge0$, since both factors are nonnegative. So $T\nu(Lf)\ge-\nu_0(f)$, and $\nu(m^2)-c\ge\nu(Lf)\ge-\nu_0(f)/T$. $\square$
+Probabilistically this is Dynkin's formula, $\E f(X_T)-\E f(X_0)=\E\int_0^TLf$, together with $f\ge0$.
+</p>
+<p>
+<b>Lemma 6 (WPI $\Rightarrow$ flow-LP dual).</b> If $-Lh/h+\theta m^2\ge\kappa$, then $f=\frac1\theta(\log h-\min\log h)$ satisfies $Lf\le m^2-\kappa/\theta$.
+<em>Proof.</em> $\log(h(y)/h(x))\le h(y)/h(x)-1$ gives $L\log h\le Lh/h\le\theta m^2-\kappa$. $\square$
+</p>
+<p>
+<b>Lemma 7 (flow-LP dual $\Rightarrow$ WPI, polynomial loss).</b> If $0\le f\le F$ and $Lf\le m^2-c$, set $\theta=\min\{F^{-1},c/(enF^2)\}$ and
+$h=e^{\theta f}$. Then $-Lh/h+\theta m^2\ge\theta c/2$, i.e. $\rho=O(nF^2)$ and $\eps=2/c$.
+<em>Proof.</em> $|\theta\Delta_if|\le1$ and $e^a-1-a\le\frac e2a^2$ for $|a|\le1$ give $Lh/h\le\theta Lf+\frac e2\theta^2\sum_ir_i(\Delta_if)^2\le\theta(m^2-c)+\frac e2\theta^2nF^2\le\theta(m^2-c)+\theta c/2$. $\square$
+</p>
+<p>
+So with all starting states the two are equivalent up to polynomial factors. The difference is the start cost: $\E_{\nu_0}f$ for the flow LP,
+$\text{KL}(\nu_0\|\mu)/(4\theta)$ ($\approx0.2n$ here) for the WPI.
+</p>
+<p>
+<i>Failure: by Rost's filling scheme, the feasible $\nu$ are exactly the occupation measures of randomized stopping times with mean $T$. An adversary
+stops recovering paths early and keeps rare trapped ones, so a trap entered with probability $p$ and residence $R$ breaks the LP once $pR\gtrsim T$.
+Toy chain ($p=1\%$, $R=10^7$): truth $0.99$, LP $0$, and the entropy and Dirichlet constraints do not help. Exact $n=10$ SBM posterior (no traps):
+LP $0.72$ vs truth $0.73$.</i>
+</p>
+
+<h2 class="entry" data-date="2026-10-29">Exceptional sets</h2>
+<p>
+<b>Lemma 8 (stopped dual).</b> If $0\le f\le F$ and $Lf\le m^2-c$ on $D$, then $\E\,m(X_U)^2\ge c\,\mathbb P(\tau_{D^c}\gt T)-F/T$.
+<em>Proof.</em> Dynkin's formula up to $\tau=T\wedge\tau_{D^c}$ (where $X_r\in D$ for $r\lt\tau$) gives $c\,\E\tau\le\E\int_0^\tau m^2+\E f(X_0)$, and
+$\E\tau\ge T\,\mathbb P(\tau_{D^c}\gt T)$. $\square$
+</p>
+<p>
+<b>Lemma 9 (occupation defect).</b> If $Lf\le m^2-c+e$ everywhere with $e\ge0$, then
+$\E\,m(X_U)^2\ge c-F/T-\frac1T\int_0^T\E\,e(X_t)\,dt$. <em>Proof.</em> The same Dynkin argument. $\square$
+</p>
+<p>
+<i>Failure: both need a trajectory statement (the cold start rarely enters, or rarely occupies, the bad set). At the Bayes temperature the hard states
+are not separable from cold-start states by a simple static statistic: in the box $\{|m|\le\delta,\ \hat q\ge q_0\}$ the margin was $0.751$ (cold) against $0.755$ (pinned).</i>
+</p>
+
+<h2 class="entry" data-date="2026-10-29">Changing the temperature</h2>
+<p>
+Run Glauber for $\mu_\beta\propto e^{\beta\sum J_{ij}\sigma_i\sigma_j}$ with the Bayes couplings $J_e=\operatorname{atanh}\omega$ on edges and
+$J_n\approx-\frac{a-b}{2n}$ on non-edges. Here $\omega=\frac{a-b}{a+b}$, $\lambda=d\omega^2$, $t=\tanh(\beta J_e)$, $x=dt^2$.
+</p>
+<p>
+<b>Heuristic (cavity).</b> The equilibrium is informative iff $d\omega t\gt1$ ($x\gt1/\lambda$) and the noise is non-glassy iff $x\lt1$. At the Bayes
+temperature $x=\lambda\gt1$, and the $m=0$ slice is locally ordered (self-overlap $0.21$ at $\lambda=1.5$, $0.36$ at $\lambda=2$): those are the
+pinned states that no explicit $h$ certified. In the window $x\in(1/\lambda,1)$ the $m=0$ slice is the paramagnet. At the balanced point
+$\sqrt{\lambda x}-1=1-x$, i.e.
+$$
+x_\star=\tfrac12\Big((4+\lambda)-\sqrt{(4+\lambda)^2-16}\Big),\qquad \text{margins } 0.37,\,0.24,\,0.14,\,0.09\ \text{ for }\lambda=3,2,1.5,1.3 .
+$$
+Liu&ndash;Mohanty&ndash;Rajaraman&ndash;Wu prove mixing only for $x\le0.03$, which forces $\lambda\gtrsim1/0.03$.
+</p>
+<p>
+<b>Proposition 10 (spectral form of the window; sketch).</b> Put $r=1/t$. Then $H(t)=I+\frac{t^2}{1-t^2}D-\frac{t}{1-t^2}A\ \propto\ (r^2-1)I+D-rA$,
+the Bethe Hessian at $r$. By Ihara&ndash;Bass,
+$\det(I-uB)=(1-u^2)^{|E|-n}\det\big(I-uA+u^2(D-I)\big)$ for the non-backtracking matrix $B$. With $u=1/r$, zeros of $\det H(r)$ for $r\gt1$ occur
+exactly at real eigenvalues of $B$. As $r\to\infty$, $H(r)\succ0$, so the number of negative eigenvalues equals the number of real $B$-eigenvalues
+above $r$. For the SBM with $\lambda\gt1$ these are, w.h.p., $\approx d$ (trivial) and $\approx d\omega$ (informative), with the bulk in radius
+$\approx\sqrt d$ (Bordenave&ndash;Lelarge&ndash;Massouli&eacute;). Hence
+$$
+\text{window}\iff\sqrt d\lt\tfrac1t\lt d\omega\iff H(t)\text{ has exactly two negative directions (uniform, informative).}
+$$
+The uniform one is neutralized by $J_n$: its net linear coefficient is $\approx dt-\beta d\omega$, which is $0.07$&ndash;$0.38$ in our settings, all $\lt1$.
+</p>
+<p>
+<b>Claim 11 (no uniform gap on the bulk).</b> There is no $n$-independent $\delta\gt0$ with $H(t)\succeq\delta I$ on the complement of those two directions.
+<em>Proof.</em> On an isolated $k$-star, let $a$ be $r$ at the center and $1$ at the leaves. Then
+$a^\top((r^2-1)I+D-rA)a=(r^2-1)(r^2+k)+kr^2+k-2kr^2=(r^2-1)r^2$ and $\|a\|^2=k+r^2$, so the Rayleigh quotient of $H(t)$ is $r^2/(k+r^2)$.
+For every fixed $k$ such stars have positive density, so three disjoint ones give a vector orthogonal to any two directions with quotient $\to0$ as
+$k\to\infty$. $\square$ (Small components cannot be recovered anyway; a correct statement must restrict to a trimmed core.)
+</p>
+
+<h2 class="entry" data-date="2026-10-29">Windowed certificate</h2>
+<p>
+Coordinate $y=\langle\xi,\sigma\rangle/n$, where $\xi$ is the informative non-backtracking (or Bethe-Hessian) vector with $\|\xi\|^2=n$. Potential
+$\psi=\ell(y^2)$, with $\ell(q)=\log\frac{z^2+\eta}{q+\eta}$ for $q\le z^2$ continued smoothly to $0$, and $\eta=c_\eta/n$, so
+$\psi_{\max}=\log(1+z^2n/c_\eta)=\log n+O(1)$.
+</p>
+
+<h3>The theorem</h3>
+<p>
+<b>Theorem 12.</b> Let $\psi\in[0,\psi_{\max}]$, $\alpha\ge0$, $0\le s_1\lt s_2$, $\ell=s_2-s_1$, $c\in(0,1]$, $D\subseteq\Omega$, and suppose for all $x\in D$
+$$
+\E_x\Big[\frac1\ell\int_{s_1}^{s_2}m(X_r)^2dr\Big]+\frac\alpha\ell\,\E_x\big[\psi(X_{s_1})-\psi(X_{s_2})\big]\ \ge\ c .\tag{$\star$}
+$$
+Then for every initial law $\nu$ and $T\gt0$: $\E_\nu m(X_U)^2\ge c\,\mathbb P_\nu(\tau_{D^c}\gt T)-\big(\alpha\psi_{\max}+\tfrac{s_1+s_2}{2}\big)/T$.
+</p>
+<p>
+<em>Proof.</em> Let $K=\frac1\ell\int_{s_1}^{s_2}P_rdr$, $\omega(r)=1$ on $[0,s_1]$ and $\omega(r)=(s_2-r)/\ell$ on $[s_1,s_2]$, and
+$$
+f=\alpha K\psi+\int_0^{s_2}\omega(r)P_r(1-m^2)\,dr .
+$$
+Then $0\le f\le\alpha\psi_{\max}+\int_0^{s_2}\omega=\alpha\psi_{\max}+\frac{s_1+s_2}{2}$. Using $LP_r=\frac{d}{dr}P_r$:
+$LK\psi=\frac1\ell(P_{s_2}\psi-P_{s_1}\psi)$, and integrating by parts,
+$L\int_0^{s_2}\omega P_r\phi\,dr=[\omega P_r\phi]_0^{s_2}-\int\omega'P_r\phi\,dr=-\phi+K\phi$. With $\phi=1-m^2$,
+$$
+Lf=\frac\alpha\ell\big(P_{s_2}\psi-P_{s_1}\psi\big)+m^2-Km^2 ,
+$$
+so $(\star)$ is exactly $Lf\le m^2-c$ on $D$. Lemma 8 finishes. $\square$
+</p>
+<p>
+<b>Corollary 13.</b> If $\mathbb P(\tau_{D^c}\le T)\le\frac14$ and $T\ge4(\alpha\psi_{\max}+\frac{s_1+s_2}{2})/c$, then $\E\,m(X_U)^2\ge c/2$ and
+$\mathbb P(|m(X_U)|\ge\sqrt{c/4})\ge c/4$.
+<em>Proof.</em> $c(1-\delta)-c/4\ge c/2$. For $w=m^2\in[0,1]$, $\E w\le\mathbb P(w\ge\E w/2)+\E w/2$. $\square$
+With $\psi_{\max}\approx\log n$ this is $O(\log n)$ sweeps, i.e. $O(n\log n)$ updates.
+</p>
+<p>
+<i>The window does not give a stronger bound than the flow LP; it is a way to build a good dual point from a simple $\psi$. As $s_2\downarrow s_1=s$,
+$(\star)$ becomes $\E_x[m(X_s)^2-\alpha L\psi(X_s)]\ge c$ (the lookahead form), and $s=0$ is plain dual feasibility of $\alpha\psi$.</i>
+</p>
+
+<h3>Properties of the potential</h3>
+<p>
+<b>Lemma 14 (second-order expansion).</b> Let $\delta_i=-2\xi_i\sigma_i/n$, $r_i=\frac12(1-\sigma_i\tanh\beta h_i)$,
+$$
+b:=Ly=\frac1n\sum_i\xi_i(\tanh\beta h_i-\sigma_i),\qquad q:=\sum_ir_i\delta_i^2=\frac{2}{n^2}\sum_i\xi_i^2(1-\sigma_i\tanh\beta h_i).
+$$
+Then $L\psi=\psi'(y)b+\frac12\psi''(y)q+\varrho$ with $|\varrho|\le\frac43\|\psi'''\|_\infty\|\xi\|_\infty/n^2$.
+<em>Proof.</em> $r_i\delta_i=\frac{\xi_i}{n}(\tanh\beta h_i-\sigma_i)$ gives the first-order term. Taylor leaves
+$\frac16\|\psi'''\|_\infty\sum_ir_i|\delta_i|^3\le\frac16\|\psi'''\|_\infty\frac{8}{n^3}\|\xi\|_\infty\sum_i\xi_i^2$. $\square$
+</p>
+<p>
+For the log potential $\|\psi'''\|_\infty\lesssim\eta^{-3/2}$, so $\varrho=O(\|\xi\|_\infty c_\eta^{-3/2}n^{-1/2})$. In scaled variables
+$Z=\sqrt n\,y$, $B=\sqrt n\,b$, $\bar q=\frac n2q$, for $|y|\lt z$:
+$$
+-L\psi=\frac{2ZB}{Z^2+c_\eta}+\frac{2\bar q\,(c_\eta-Z^2)}{(Z^2+c_\eta)^2}+o(1).\tag{$\diamond$}
+$$
+The first term is drift, good when $|y|$ grows. The second is diffusion: good inside the flat region, bad outside it.
+</p>
+<p>
+<b>Lemma 15 (uniform diffusion floor).</b> For every $\sigma$, $\bar q(\sigma)\ge\frac1n\sum_i\xi_i^2e^{-2\beta(J_e\deg_i+|J_n|n)}$.
+<em>Proof.</em> $1-\sigma\tanh\beta h\ge1-\tanh\beta|h|=\frac{2}{1+e^{2\beta|h|}}\ge e^{-2\beta|h|}$ and $|h_i|\le J_e\deg_i+|J_n|(n-1)$. $\square$
+Measured: $\bar q\in[0.23,0.43]$ on every configuration examined.
+</p>
+<p>
+<b>Lemma 16 (size of the drift under linear growth).</b> If $B=\gamma Z$ and $\bar q_-\le\bar q\le\bar q_+$, take $c_\eta=2\bar q_+/\gamma$ and $\rho_q=\bar q_-/\bar q_+$.
+Then $(\diamond)\ge\frac78\rho_q\gamma$.
+<em>Proof.</em> Put $\varrho=Z^2/c_\eta$ (this is not the remainder from Lemma 14). For $\varrho\le1$ the diffusion term is $\ge\gamma\rho_q\frac{1-\varrho}{(1+\varrho)^2}$, so
+$(\diamond)/\gamma\ge\frac{2\varrho}{1+\varrho}+\rho_q\frac{1-\varrho}{(1+\varrho)^2}\ge\rho_q\frac{2\varrho^2+\varrho+1}{(1+\varrho)^2}$. For $\varrho\ge1$, use
+$\bar q\le\bar q_+$ in the negative term: $(\diamond)/\gamma\ge\frac{2\varrho^2+\varrho+1}{(1+\varrho)^2}\ge1$. Finally
+$\frac{d}{d\varrho}\frac{2\varrho^2+\varrho+1}{(1+\varrho)^2}=\frac{3\varrho-1}{(1+\varrho)^3}$, so the minimum is $\frac78$ at $\varrho=\frac13$. $\square$
+Then Corollary 13 needs $T\approx\frac{32}{7}\frac{\log n}{\gamma}$, the observed escape scale. Empirically $\gamma\approx0.4\,|\lambda_{\min}(H(t))|$.
+</p>
+
+<h3>How we got to the window (each step with $D=\Omega$)</h3>
+<ol>
+<li>$f=\alpha\psi$. <i>Fails: at many configurations the drift of $y$ momentarily points the wrong way.</i></li>
+<li>$f=\alpha P_s\psi+\int_0^sP_r(1-m^2)dr$, for which $Lf=P_s(\alpha L\psi-m^2)+m^2$. <i>Works for $\lambda\ge2$; inconclusive for $\lambda\le1.5$, because the replica noise is as large as the signal $\approx2\gamma$.</i></li>
+<li>$s_1=0$ (integrated). <i>Fails: averages over the initial transient, during which $|y|$ shrinks.</i></li>
+<li>Burn-in plus window. Works at $\lambda=3,2,1.5,1.3$.</li>
+</ol>
+<p>
+Minimum of $(\star)$ over all sampled configurations in five families (cold start, $m\approx0$ pinned at the hot and the Bayes temperature, pinned at
+half the overlap, wrong-sign domains), with parameters tuned on one graph and evaluated on the other:
+</p>
+<table>
+<tr><th>$\lambda$</th><th>$n$</th><th>window</th><th>certified $\E m(X_U)^2$</th><th>cross-graph</th><th>true</th></tr>
+<tr><td>3</td><td>20k</td><td>[5,20]</td><td>0.340</td><td>0.31&ndash;0.36</td><td>0.354</td></tr>
+<tr><td>2</td><td>20k</td><td>[10,40]</td><td>0.154</td><td>0.13&ndash;0.17</td><td>0.173</td></tr>
+<tr><td>1.5</td><td>20k</td><td>[10,120]</td><td>0.047</td><td>0.044&ndash;0.064</td><td>0.067</td></tr>
+<tr><td>1.5</td><td>80k</td><td>[0,120]</td><td>0.054</td><td>0.052&ndash;0.054</td><td>0.060</td></tr>
+<tr><td>1.3</td><td>20k</td><td>[10,240]</td><td>0.010</td><td>0.004&ndash;0.025</td><td>0.026</td></tr>
+</table>
+
+<h2 class="entry" data-date="2026-10-29">What is left</h2>
+<p>
+<b>Main Lemma A (conjecture, $D=\Omega$).</b> W.h.p. over $G$ there are $\alpha,c,s_1,s_2,c_\eta,z\gt0$ independent of $n$ such that $(\star)$ holds at every
+configuration. Then, by Theorem 12, recovery holds from any start in $O(n\log n)$ updates, and by Lemma 7 there is a WPI with $\rho=O(n\log^2n)$ and $\eps=2/c$.
+</p>
+<p>
+<i>Why it is hard: a local proof would need contraction under worst-case boundary conditions, roughly $dt\lt1$. Informative growth needs $d\omega t\gt1$,
+and $\omega\lt1$ forces $dt\gt1$. So a global ingredient is needed (Claim 11 rules out the naive spectral one). Configurations with $|y|\ge z$ and
+$m\approx0$, where $\psi$ is flat, were never sampled.</i>
+</p>
+<p>
+<b>Main Lemma T (conjecture, cold start).</b> Along the uniform-start trajectory, $(\star)$ holds up to a defect $e$ with
+$\frac1T\int_0^T\E\,e(X_t)dt\le c/4$. Then Lemma 9 gives $\E\,m(X_U)^2\ge c/2$.
+</p>
+<p>
+<i>Why it is hard: it needs control at the $n^{-1/2}$ scale over $\log n$ sweeps, including the global magnetization term $J_n\sum_j\sigma_j$. Glauber on
+a tree is a dynamic-cavity problem over trajectories, not a scalar recursion.</i>
+</p>
+<p>
+<b>Coordinate.</b> Use $y$ with the non-backtracking vector, not $m$. Ratio of negative to positive mass of $-L\psi$ along the cold start:
+</p>
+<table>
+<tr><th>$\lambda$</th><th>$y$</th><th>$m$</th></tr>
+<tr><td>$\ge2$</td><td>$0$&ndash;$0.01$</td><td>$0.08$&ndash;$0.13$</td></tr>
+<tr><td>$1.5$</td><td>$0.08$&ndash;$0.27$</td><td>$0.33$&ndash;$0.44$</td></tr>
+<tr><td>$1.3$</td><td>$0.40$&ndash;$0.44$</td><td>$0.65$&ndash;$0.79$</td></tr>
+</table>
+<p>
+The residual noise decorrelates within about $3$ sweeps (autocorrelation $\approx0.4$ at lag $1$, $\approx0$ by lag $10$), so near KS the difficulty
+is a small signal, not slow noise.
+</p>
+<p>
+<i>Caveat: averages of $(\star)$ under the true cold-start law are Dynkin identities, positive whenever the chain recovers, so data cannot rank the
+routes. The non-circular evidence is the Route-A form: the minimum over all sampled configurations, which held throughout.</i>
+</p>
+
+<h2 class="entry" data-date="2026-10-29">Update: a correlation route for the cold start</h2>
+
+<h3>The tree computation, and why short times are not enough</h3>
+<p>
+On the Poisson$(d)$ tree with edge coupling $\operatorname{atanh}\omega_\beta$ and labels broadcast with edge correlation $\omega$, let
+$\chi(s)=\partial_h\E_h[x^*_o\sigma_o(s)]\big|_{h=0}$ be the root's response to the seeded product start
+$\mathbb P_h(\sigma_v(0)=\pm1)=\frac{1\pm h x^*_v}{2}$. Differentiating the initial law gives
+$$
+\chi(s)=\E\sum_v\omega^{\operatorname{dist}(o,v)}\,\E_0[\sigma_o(s)\sigma_v(0)],\qquad \chi(0)=1 .
+$$
+The exact formulas are $\chi'(0)=\omega S-1$ and $\chi''(0)=1-2\omega S+S\,T_\omega$, where
+$S=\E[D\,a_D]$, $T_\omega=\E[a_{1+L'}(1+L'\omega^2)]$, $D,L'\sim\mathrm{Poisson}(d)$, and
+$a_k=\E\big[\varsigma_1\tanh(\beta J_e\textstyle\sum_{j\le k}\varsigma_j)\big]$ for independent uniform signs $\varsigma_j$. With Taylor remainders
+uniform in the depth, they give a strict gain $\chi(2s)\gt\chi(s)$ at $s=10^{-6}$ near the line $\omega S=1$. I checked the derivations and the
+numbers.
+</p>
+<p><em>
+This does not reach our regime. The gain is just "$\chi'(0)\approx0$, $\chi''(0)\gt0$". On the balanced curve the line $\omega S=1$ sits at
+$\lambda\approx3.41$. For $\lambda=3,2,1.5,1.3$ the initial slope is $-0.04,-0.18,-0.27,-0.31$. On the SBM graphs the measured $\chi$ dips by
+25&ndash;30% at $\lambda=1.5$ and $1.3$. Its minimum is at about 3&ndash;5 sweeps for $\lambda=1.5$; at $\lambda=1.3$ it stays flat until about 20
+sweeps. Both are far outside the Taylor radius $s\le 1/5$. The sign of $\chi'(0)$ is also not the informative condition: at $\omega_\beta=0.4$, a
+zero slope needs $d\omega\omega_\beta\approx1.53$, not $1$. What matters is the long-time growth of $\chi$.
+</em></p>
+
+<h3>Lemma 17 (correlation reduction)</h3>
+<p>
+Start from the uniform law $\nu_0$ on the finite graph, including the non-edge term. For every $s\ge0$ and every statistic $P$ of the path up to
+time $s$ with $\E P^2\gt0$,
+$$
+\E\,m(X_s)^2\ \ge\ \frac{\E[m(X_s)P]^2}{\E[P^2]} .
+$$
+With $P=m(X_0)$, so that $\E\,m(X_0)^2=1/n$,
+$$
+\E\,m(X_s)^2\ \ge\ \frac{\chi_n(s)^2}{n},\qquad
+\chi_n(s)=\tfrac1n\E_{\nu_0}\big[\langle x^*,X_s\rangle\langle x^*,X_0\rangle\big]
+=\partial_h\E_h\big[\langle x^*,X_s\rangle/n\big]\big|_{h=0},
+$$
+where $\E_h$ starts from the product tilt $\prod_i e^{hx^*_i\sigma_i}/(2\cosh h)$.
+</p>
+<p>
+<em>Proof.</em> Cauchy&ndash;Schwarz. The identity for $\chi_n$ is the derivative of the tilted product law at $h=0$. &#8718;
+</p>
+<p>
+So weak recovery on $[s_\ast,T]$ follows from $\chi_n(s)\ge c\sqrt n$ there, which gives $\E\,m(X_U)^2\ge c^2(1-s_\ast/T)$.
+</p>
+<ul>
+<li><b>Not circular.</b> $\chi_n$ is a two-time correlation under one fixed initial law, and for fixed $s$ it is local (its tree version is
+$\chi$). The signed Route T average, by contrast, was a Dynkin identity of the evolving law.</li>
+<li><b>No iteration.</b> Every $s$ refers to the same product start, so no block gain has to be iterated under a correlated law.</li>
+</ul>
+<p>
+Measured on one graph per $\lambda$ ($n=20$k, 300&ndash;400 cold starts), the bound on $\E\,m(X_s)^2$ for three predictors $P$:
+</p>
+<table>
+<tr><th>$\lambda$</th><th>$s$</th><th>true</th><th>$P=m(X_0)$</th><th>$P=y(X_5)$</th><th>$P=y(X_{40})$</th></tr>
+<tr><td>3</td><td>80</td><td>0.36</td><td>0.045</td><td>&ndash;</td><td>&ndash;</td></tr>
+<tr><td>2</td><td>80</td><td>0.083</td><td>0.009</td><td>&ndash;</td><td>&ndash;</td></tr>
+<tr><td>1.5</td><td>400</td><td>0.070</td><td>0.003</td><td>0.023</td><td>0.039</td></tr>
+<tr><td>1.3</td><td>400</td><td>0.024</td><td>0.0005</td><td>0.006</td><td>0.013</td></tr>
+</table>
+<p><em>
+The initial overlap is a weak predictor near threshold. Its correlation with the escape direction is about 0.2 at $\lambda=1.5$ and 0.07&ndash;0.1 at
+$\lambda=1.3$, because noise injected during the slow early phase dominates. An early spectral statistic recovers a third to a half of
+$\E\,m(X_s)^2$. The object to control is therefore $\E_{\nu_0}[m(X_s)\,y(X_{s_0})]$, which is still local and still taken under the fixed initial
+law.
+</em></p>
+
+<h3>What is left</h3>
+<ul>
+<li><b>(T0) Reduction.</b> Lemma 17. <em>Done.</em></li>
+<li><b>(T1) Tree growth.</b> $\chi(s)\ge c\,e^{\gamma s}$ for $s\ge s_1$ with $\gamma\gt0$ throughout the window, or the same for the two-time
+correlation with $y(s_0)$. <em>Moderate.</em> It concerns one infinite-volume dynamics with no $n$, and the terms
+$\E_0[\sigma_o(s)\sigma_v(0)]$ are nonnegative by attractiveness. It needs a non-perturbative tool, such as a positive test vector for the linear
+hierarchy of odd-set responses, or a monotone comparison. Heuristic support: the $\omega$-weighted susceptibility of the free tree measure,
+$\sum_r(d\omega\omega_\beta)^r$, is infinite exactly when the informative condition holds, and that measure is extremal exactly when
+$\Lambda_\beta\lt1$. First step: simulate $\chi$ on a large Poisson tree and match its exponent to the escape rate measured on the SBM.</li>
+<li><b>(T2) Transfer to logarithmic times.</b> $\chi_n(s)\ge c\sqrt n$ at $s\sim\log n/(2\gamma)$. <em>Hard: this is the real obstacle.</em>
+It needs dependence over distances of order $\log n/\log(d\omega\omega_\beta)$, which is more than the tree-like radius $\tfrac12\log_d n$, so cycles
+matter, the same difficulty as in every proof at Kesten&ndash;Stigum. Realistic version: use locality up to $s_0=\epsilon\log n$, which gives
+a non-degenerate projection of size $n^{-1/2+\epsilon'}$ on the informative mode. Then amplify to order one with a spectral or linearized
+argument for $y$. That second phase is the windowed drift inequality restricted to typical configurations in the linear regime. It is
+weaker than requiring it for all $x$, but it still needs the configuration to be locally relaxed around its projection.</li>
+<li><b>(T3) Persistence.</b> $\chi_n(s)\ge c\sqrt n$ on all of $[s_\ast,T]$, i.e. the escape sign does not flip before $T$; the measured
+$\chi_n$ plateaus once $\E\,m^2$ saturates. <em>Moderate.</em> This is a near-equilibrium metastability statement around the informative state of
+$\mu_\beta$, where the signal is macroscopic. The bad configurations with $|y|\ge z$ and $m\approx0$ matter only if the trajectory reaches them,
+and along every recorded trajectory $|m|/|y|\approx0.5$&ndash;$0.9$.</li>
+</ul>
+<p><em>
+Caveats: one graph per setting, a few hundred runs, standard errors of about 0.05 on the correlations; at $\lambda=1.3$, $\E\,m^2$ has not
+saturated by $s=500$.
+</em></p>
+
+<h2 class="entry" data-date="2026-10-30">The response route: overview</h2>
+<p>
+Everything above (WPI, flow LP, stopped duals, Theorem 12) certifies a statement for <em>every</em> starting state $x\in D$. Every failure so far had
+the same source: traps, adversarial stopping, and cold states that no static statistic separates from pinned ones. Theorem 12 itself survives
+numerically down to $\lambda=1.1$, but with $c\approx7\cdot10^{-4}$. That forces $T\approx10^6$ sweeps, and the certificate is fragile across graphs.
+</p>
+<p>
+The simulations show what actually happens from the uniform start:
+</p>
+<ul>
+<li>the overlap starts at the start's own fluctuation, of order $n^{-1/2}$;</li>
+<li>it grows exponentially at a rate $\gamma$ that can be computed from the graph;</li>
+<li>it saturates near $m_{\rm eq}$.</li>
+</ul>
+<p>
+The response route proves this mechanism directly. It uses only three things: the law of one start, linear statistics, and one fixed time. Read
+backwards, the chain is:
+</p>
+<ol>
+<li><b>Theorem 14.</b> A macroscopic <em>response</em> at one time gives weak recovery at that time.</li>
+<li><b>Theorem 15.</b> A residual bound (RB) plus an entry condition give a macroscopic response at the escape time $s_*\approx\log n/(2\gamma)$.</li>
+<li><b>Theorem 16.</b> On a tree paramagnet, the linear part of the generator is $-D_qH(t)$, the Bethe Hessian of Proposition 10. So the window of
+Proposition 10 is exactly where the linear dynamics has one unstable direction.</li>
+<li><b>Lemma 17, Theorem 18, Lemma 19.</b> With memory, the linear model still has exactly one unstable direction. A comparison of the cold response
+with that model gives (RB).</li>
+</ol>
+<p>
+What is open is the comparison (Hypothesis C) and some static inputs. All other steps are proved.
+</p>
+
+<h2 class="entry" data-date="2026-10-30">Weak recovery from the response</h2>
+<p>
+<b>Setup.</b> $L$ is the heat-bath generator for $\mu_\beta$, $P_s=e^{sL}$, time $s$ is in sweeps, and $X_0$ is uniform on $\{\pm1\}^n$. For a fixed
+vector $v\in\mathbb R^n$ (chosen in the next entry), define:
+</p>
+<ul>
+<li>the <b>score</b> $Z_0:=\langle v,X_0\rangle$;</li>
+<li>the <b>response vector</b> $r_s(i):=\E\big[Z_0\,\sigma_i(X_s)\big]$.</li>
+</ul>
+<p>
+Since $\E[X_0X_0^\top]=I$, we have $r_0=v$ and $\E Z_0^2=\|v\|_2^2$. Also $\E[m(X_s)Z_0]=\langle x^*,r_s\rangle/n$.
+</p>
+<p>
+<b>Theorem 14 (fixed-time recovery).</b> If for some time $s_*$ and some $c\gt0$
+$$
+\frac{\langle x^*,r_{s_*}\rangle}{n}\ \ge\ c\,\|v\|_2 ,\tag{G}
+$$
+then $\E\,m(X_{s_*})^2\ge c^2$ and $\mathbb P\big(|m(X_{s_*})|\ge c/\sqrt2\big)\ge c^2/2$.
+</p>
+<p>
+<em>Proof.</em> By Cauchy&ndash;Schwarz, $\E[m(X_{s_*})Z_0]^2\le\E\,m(X_{s_*})^2\,\E Z_0^2$, and the left side is
+$\big(\langle x^*,r_{s_*}\rangle/n\big)^2\ge c^2\|v\|_2^2$. For the tail bound, apply $\E w\le\mathbb P(w\ge\E w/2)+\E w/2$ to $w=m^2\in[0,1]$, as in
+Corollary 13. $\square$
+</p>
+<p>
+<b>Why test against a score.</b> By symmetry $\E\,m(X_s)=0$, so the second moment is a genuinely nonlinear functional of the trajectory. Testing
+against $Z_0$ turns it into a <em>first</em> moment of linear observables. That first moment obeys an evolution equation, closed up to a residual
+(next entries). The only loss is the factor $\operatorname{corr}(Z_0,m_s)^2$, and all we need is that this factor does not depend on $n$.
+</p>
+<p>
+<b>Why a fixed time.</b> Lemma 8 and Theorem 12 control time averages, hence the random output time $U$. Cauchy&ndash;Schwarz holds at every fixed
+$s$, so no averaging is needed. A random time can still be used later as a cheap substitute for persistence.
+</p>
+<p>
+<i>Caveats.</i>
+</p>
+<ul>
+<li><i>The pointwise analogue of (G) is false: there are configurations with $|m|\ll|\langle v,\sigma\rangle|/n$. Only the averaged response is
+aligned.</i></li>
+<li><i>Theorem 14 gives recovery with constant probability. Upgrading to high probability needs $|m|$ to concentrate after saturation. That is seen
+numerically but not proved.</i></li>
+<li><i>Past $s_*$, $\operatorname{corr}(Z_0,m_s)$ decays because the sign of $m$ mixes. So statements at much later times must bound $|m|$ directly.</i></li>
+</ul>
+
+<h2 class="entry" data-date="2026-10-30">Escape: from a residual bound to (G)</h2>
+<p>
+<b>Static input (S).</b> $M=-D_e\bar H$, where $D_e$ is a positive diagonal matrix: the mobilities, possibly corrected for memory. $\bar H$ is
+symmetric with exactly one negative eigenvalue. Put $W=D_e^{-1}$. Then $WM=-\bar H$ is symmetric, so $M$ is self-adjoint in
+$\langle x,y\rangle_W=x^\top Wy$ and has:
+</p>
+<ul>
+<li>exactly one positive eigenvalue $\gamma$, with eigenvector $v$ normalized by $v^\top Wv=1$;</li>
+<li>all other eigenvalues $\le-\mu_2\le0$.</li>
+</ul>
+<p>
+Let $\Pi=vv^\top W$ and $Q=I-\Pi$. Decompose
+$$
+r_s=\alpha_sv+p_s,\qquad \alpha_s=\langle v,r_s\rangle_W,\qquad p_s=Qr_s,\qquad u_s=\|p_s\|_W/\alpha_s,
+$$
+and define the <b>residual</b> $\rho_s:=r_s'-Mr_s$: what the true response does, minus what the linear model predicts. The <b>alignment constants</b>
+are
+$$
+\kappa_W=\frac{\langle x^*,v\rangle}{\sqrt n},\qquad s_x=\frac{\|QD_ex^*\|_W}{\sqrt n}\le1 .
+$$
+</p>
+<p>
+<b>Theorem 15 (escape).</b> Fix $z\in(0,1)$ and let $s_*$ be the first time with $\alpha_s\ge z\sqrt n$. Assume:
+</p>
+<ul>
+<li>(E) $\alpha_{s_0}\ge a_0\gt0$ and $u_{s_0}\le u_0$;</li>
+<li>(RB) for $s\in[s_0,s_*]$,
+$$
+\langle v,\rho_s\rangle_W\ \ge\ -\theta_\parallel\,\alpha_s,\qquad \|Q\rho_s\|_W\ \le\ \theta_\perp\,\alpha_s ,\tag{RB}
+$$
+with $g_-:=\gamma-\theta_\parallel\gt0$.</li>
+</ul>
+<p>
+Then:
+</p>
+<ul>
+<li>$s_*\le s_0+\log(z\sqrt n/a_0)/g_-$;</li>
+<li>$u_s\le\bar u:=\max\{u_0,\ \theta_\perp/(g_-+\mu_2)\}$ on $[s_0,s_*]$;</li>
+<li>$\langle x^*,r_{s_*}\rangle/n\ \ge\ z\,(\kappa_W-s_x\bar u)$.</li>
+</ul>
+<p>
+So (G) holds with $c=z(\kappa_W-s_x\bar u)/\|v\|_2$ whenever $\kappa_W\gt s_x\bar u$.
+</p>
+<p>
+<em>Proof.</em> Since $Mv=\gamma v$ and $M$ commutes with $Q$:
+</p>
+<ul>
+<li>$\alpha'=\gamma\alpha+\langle v,\rho\rangle_W\ge g_-\alpha$, which gives the first bullet.</li>
+<li>$p'=Mp+Q\rho$, so $D^+\|p\|_W\le-\mu_2\|p\|_W+\theta_\perp\alpha$.</li>
+<li>Hence $D^+u\le\theta_\perp-(g_-+\mu_2)u$, which gives the second bullet.</li>
+</ul>
+<p>
+For the third, $\langle x^*,r\rangle=\langle D_ex^*,r\rangle_W=\alpha\langle x^*,v\rangle+\langle QD_ex^*,p\rangle_W\ge\alpha\sqrt n(\kappa_W-s_xu)$. At
+$s_*$ we have $\alpha_{s_*}=z\sqrt n$. $\square$
+</p>
+<p>
+<b>Why this form.</b>
+</p>
+<ul>
+<li><b>The $W$-geometry.</b> $M$ is self-adjoint there, so its semigroup is controlled with constant 1. In the Euclidean norm, high-degree stars
+make it non-contractive.</li>
+<li><b>Relative errors.</b> The residual is measured against $\alpha_s$. It is allowed to grow with the signal, and it must: it is itself a linear
+response.</li>
+<li><b>No bulk gap.</b> Claim 11 shows there is none. The argument needs only $g_-+\mu_2\gt0$, and $\mu_2\ge0$ is automatic from the eigenvalue
+count.</li>
+<li><b>The $\log n$.</b> The aligned score has $r_0=v$, so $\alpha_0=1$ and $u_0=0$. The overlap needs $\alpha\sim\sqrt n$: the start's
+$n^{-1/2}$ fluctuation is amplified by $\sqrt n$.</li>
+</ul>
+<p>
+<b>Why the score $\langle v,X_0\rangle$.</b> It starts the response exactly on the unstable mode. The natural alternative $Z_0=n\,m(X_0)$ starts
+it at $x^*$, which is mostly in the stable modes. The data confirm the difference: at $\lambda=1.1$ the old score gives
+$\operatorname{corr}\approx0$, and the aligned score gives $0.10$&ndash;$0.18$.
+</p>
+<p>
+<i>Caveat: (RB) fails during burn-in. The product start is not locally paramagnetic; the measured residual ratio is $+13$ to $+49$ at $s=0$. So
+entry is at $s_0=O(\log\log n)$, not at $0$.</i>
+</p>
+
+<h2 class="entry" data-date="2026-10-30">Where $M$ comes from: the generator on a tree paramagnet</h2>
+<p>
+<b>Theorem 16 (generator projection).</b> Let $\mu$ be the free Ising measure on a finite forest with edge correlation $t$, and let:
+</p>
+<ul>
+<li>$C=\E_\mu[\sigma\sigma^\top]$;</li>
+<li>$H=C^{-1}$;</li>
+<li>$q_i=1-\E_\mu\tanh^2h_i$ and $D_q=\operatorname{diag}(q_i)$;</li>
+<li>$\zeta:=L\sigma+D_qH\sigma$.</li>
+</ul>
+<p>
+Then:
+</p>
+<ol>
+<li>$\E_\mu[\zeta\sigma^\top]=0$.</li>
+<li>$H=H(t)=I+\frac{t^2}{1-t^2}D-\frac{t}{1-t^2}A$.</li>
+<li>$\E_\mu[\zeta\zeta^\top]=\operatorname{diag}\big(q_i(1-q_iH_{ii})\big)$, and $\zeta_i\equiv0$ at vertices of total degree $\le2$.</li>
+</ol>
+<p>
+<em>Proof of 1 and 2.</em> The heat-bath Dirichlet form is $\mathcal E(f,g)=\sum_k\E[\operatorname{Cov}_k(f,g)]$, where $\operatorname{Cov}_k$ is
+the covariance under resampling site $k$. So $\E[\sigma_jL\sigma_i]=-\mathcal E(\sigma_i,\sigma_j)=-q_i\delta_{ij}$, and therefore
+$\E[\zeta_i\sigma_j]=-q_i\delta_{ij}+q_i(HC)_{ij}=0$. This step holds for any reversible measure. On a tree $C_{ij}=t^{\operatorname{dist}(i,j)}$,
+whose inverse is $H(t)$. Item 3 is in the memory note. $\square$
+</p>
+<p>
+So $-D_qH\sigma$ is the $L^2(\mu)$-projection of $L\sigma$ onto linear observables. Taking $\E[Z_0\,\cdot\,]$ gives
+$$
+r_s'=-D_qH\,r_s+\E[Z_0\,\zeta(X_s)] .
+$$
+<b>The linear model is this equation without the last term.</b>
+</p>
+<p>
+<b>Why this is the right linear model.</b> The matrix it produces is the Bethe Hessian of Proposition 10. By Ihara&ndash;Bass, the window
+$\sqrt d\lt1/t\lt d\omega$ is exactly where $H(t)$ has two negative directions, the uniform one and the informative one. On the SBM put
+$$
+\bar H=H(t)+c'(uu^\top-I/n),\qquad c'=-n\beta J_n .
+$$
+By the matrix determinant lemma, $\bar H$ has exactly one negative eigenvalue iff $1+c'u^\top H(t)^{-1}u\lt0$. The measured value is $-0.82$ to
+$-0.85$. So the unstable direction of $M$ is the informative non-backtracking direction, the vector a spectral algorithm would use. Glauber is noisy
+power iteration on $M$.
+</p>
+<p>
+<b>Data.</b>
+</p>
+<ul>
+<li>The formula for $q$ matches measured mobilities within $0.01$ at every degree.</li>
+<li>Theorem 16 holds on the measured $\nu_s$ to about 3 digits.</li>
+<li>Predicted growth rates $0.0135/0.0098/0.0061/0.0027$ against measured $0.0113/0.0107/0.0056/0.0047$.</li>
+<li>The response's ratio to $x^*$ tends to $\kappa$, and its uniform component is about $0.01$.</li>
+</ul>
+
+<h2 class="entry" data-date="2026-10-30">Memory, and what (RB) reduces to</h2>
+<p>
+The residual is uncorrelated with spins at equal times, but not with their past. Let $\mathsf Q$ project off the single spins in $L^2(\mu)$, put
+$L_\perp=\mathsf QL\mathsf Q$, and define the memory kernel $\mathcal C(w)_{ij}=\langle e^{wL_\perp}\zeta_i,\zeta_j\rangle_\mu$.
+</p>
+<p>
+<b>Lemma 17 (exact memory equation, on a forest).</b> For any start,
+$$
+r_s'=-D_qHr_s+\int_0^s\mathcal C(w)Hr_{s-w}\,dw+a(s),\qquad a_i(s)=\E[Z_0\,(e^{sL_\perp}\zeta_i)(X_0)] .
+$$
+$a\equiv0$ for a stationary start, but not for the cold start.
+</p>
+<p>
+<b>Theorem 18 (one unstable mode with memory).</b> Write $\mathcal C(w)=R^*e^{-wB_\perp}R$, and assume passivity:
+$$
+\mathcal K=\begin{pmatrix}D_q&-R^*\\-R&B_\perp\end{pmatrix}\succ0 .
+$$
+On every finite forest, $\mathcal K$ is the Dirichlet form of $-L$ on odd functions, so passivity holds there. If $\bar H$ has exactly one negative
+eigenvalue, then the augmented generator
+$$
+\mathcal G=-\mathcal K\operatorname{diag}(\bar H,I)
+$$
+has exactly one positive eigenvalue $g$ and all its others are $\le0$. After a $C\log\log n$ burn-in, its solutions satisfy (RB), with constants
+controlled by $C_W=\|D_e^{-1/2}D_qD_e^{-1/2}\|^{1/2}$. No small-memory or bulk-gap assumption is needed.
+</p>
+<p>
+<b>Lemma 19 (transfer).</b> Suppose that on $[s_0,s_*]$ the cold response is $r_s=r^{\rm lin}_s+e_s$, where $r^{\rm lin}$ solves the linear model
+and
+$$
+|\langle v,e_s\rangle_W|\le\eta\,\alpha^{\rm lin}_s,\qquad
+|\langle v,e_s'-Me_s\rangle_W|\le d_\parallel\alpha^{\rm lin}_s,\qquad
+\|Q(e_s'-Me_s)\|_W\le d_\perp\alpha^{\rm lin}_s ,\tag{C}
+$$
+with $\eta\lt1$. Then (RB) holds with $\theta_\parallel=(\varepsilon\gamma+d_\parallel)/(1-\eta)$ and
+$\theta_\perp=(\gamma\varepsilon(1+\varepsilon)/\sqrt{1-2\varepsilon}+d_\perp)/(1-\eta)$.
+</p>
+<p>
+<b>Hypothesis C (cold comparison)</b> is the statement that (C) holds with $n$-independent constants. <b>This is the open core of the
+argument.</b>
+</p>
+<p>
+<b>Why it cannot be an exact identity.</b> On the SBM graph, $C_{\mu_\beta}^{-1}\succ0$. In the true equilibrium frame there is no unstable mode
+at all: all of the growth sits in the cold source $a(s)$. Comparing with the paramagnet is therefore a <em>nonstationary local-equilibrium</em>
+statement. It has to hold uniformly up to $s_*\sim\log n$, for a signed, two-time observable.
+</p>
+<p>
+<b>Data (exact tree computations).</b>
+</p>
+<ul>
+<li>Off-diagonal memory is about $10^{-3}$ of the diagonal.</li>
+<li>On stars, $\widehat{\mathcal C}_{kk}/q_k$ saturates near $0.23$ as $k\to\infty$, so the passivity margin is $\ge0.77$ at every degree.</li>
+<li>Depth roughly doubles the memory. On a degree-4 root, $\widehat{\mathcal C}/q$ goes from $0.016$ with leaves to $0.031$ with degree-4
+neighbours.</li>
+<li>Measured on the SBM, memory slows growth by $\theta_\parallel\approx-(0.12$&ndash;$0.31)\gamma$. Star values alone predict $-5$ to $-6\%$.</li>
+</ul>
+<p>
+<i>So the passivity margin uniform in degree on the Galton&ndash;Watson tree is not yet settled. It is measurable through
+$\widehat{\mathcal C}(g)=D_q-(C\widehat G(g)^{-1}-g)C$, where $\widehat G$ is the Laplace transform of the stationary spin autocorrelation.</i>
+</p>
+
+<h2 class="entry" data-date="2026-10-30">Evidence for (G), and what is left</h2>
+<p>
+Here is $\operatorname{corr}(Z_0,m_s)$ with the aligned score, averaged over the escape window ($s\in[40,500]$ at $\lambda=1.3$ and $[40,1000]$ at
+$\lambda=1.1$). There are two graphs per size and 200&ndash;1000 cold starts each. ⚑ marks a graph whose linear operator has no clear unstable mode.
+</p>
+<table>
+<tr><th>$\lambda$</th><th>$n$</th><th>aligned score</th><th>old score $m(X_0)$</th></tr>
+<tr><td>1.3</td><td>5k</td><td>0.20 / 0.14⚑</td><td>0.11 / 0.09</td></tr>
+<tr><td>1.3</td><td>20k</td><td>0.30 / 0.23</td><td>0.16 / 0.07</td></tr>
+<tr><td>1.3</td><td>80k</td><td>0.27 / 0.19</td><td>0.06 / 0.14</td></tr>
+<tr><td>1.1</td><td>50k</td><td>0.15⚑ / 0.07</td><td>0.06 / 0.08</td></tr>
+<tr><td>1.1</td><td>100k</td><td>0.10 / 0.18</td><td>0.00 / 0.02</td></tr>
+</table>
+<p>
+Standard errors are $0.02$&ndash;$0.06$. The correlation does not shrink from $20$k to $80$k, nor from $50$k to $100$k. At $\lambda=1.1$, $n=100$k,
+92% of cold starts reach $|m|\gt0.03$, with rms $m\approx m_{\rm eq}\approx0.06$.
+</p>
+<p>
+<b>What is left</b>, roughly from easiest to hardest:
+</p>
+<ol>
+<li><b>Static inputs (S).</b> Exactly one negative eigenvalue of $\bar H$ on the Poisson graph; $\kappa_W\gt0$; eigenvector stability; Proposition 10
+made rigorous on a trimmed core. These are random-matrix statements that are numerically solid.</li>
+<li><b>A passivity margin uniform in degree</b> on the Galton&ndash;Watson tree. This is a static tree quantity.</li>
+<li><b>Entry (E).</b> Alignment and positivity after burn-in, and the size of the cold source $a(s)$. This is a local computation on the product
+start.</li>
+<li><b>Nonlinear saturation.</b> Errors of order $z^2$ at the stopping level $z$.</li>
+<li><b>Hypothesis C.</b> The signed two-time comparison of the cold response with the passive linear model, up to $s_*$. <b>This is the
+core.</b></li>
+</ol>
+<p>
+<i>Everything else in the chain (Theorems 14, 15, 16, 18 and Lemmas 17, 19) is proved.</i>
+</p>
+
+<h2 class="entry" data-date="2026-10-30">The static input (S)</h2>
+<p>
+<b>Setting.</b> $G\sim\mathrm{SBM}(n,a/n,b/n)$ with two balanced communities, $d=(a+b)/2\gt1$, $\omega=(a-b)/(a+b)$ and $\lambda=d\omega^2\gt1$. $A$ is the
+adjacency matrix, $D$ the degree matrix, $B$ the non-backtracking matrix, and $u=\mathbf 1/\sqrt n$. For $t\in(0,1)$ put $r=1/t$ and
+$$
+H(t)=I+\tfrac{t^2}{1-t^2}D-\tfrac{t}{1-t^2}A=\frac{\tilde H(r)}{r^2-1},\qquad \tilde H(r)=(r^2-1)I-rA+D,
+$$
+$$
+\bar H=H(t)+c'uu^\top,\qquad c'\ge0 .
+$$
+The self-term $-c'I/n$ of the non-edge field is left out of $\bar H$ and kept in the residual. It contributes at most
+$c'(1+\bar u)/n$ to $\theta_\parallel$ and to $\theta_\perp$.
+</p>
+
+<p>
+<b>Proposition S.</b> Fix $\varepsilon\gt0$ and suppose $\sqrt d+\varepsilon\le r\le d\omega-\varepsilon$, which is the window of Proposition 10.
+</p>
+<ol type="a">
+<li><b>Algebra.</b> Let $D_e\succ0$ be diagonal, and suppose $\bar H$ is nonsingular with exactly one negative eigenvalue. Then $M=-D_e\bar H$ is
+self-adjoint in $W=D_e^{-1}$. It has exactly one positive eigenvalue $\gamma$, and all its other eigenvalues are $\le-\mu_2\lt0$. Moreover, for
+every $y$ with $y^\top\bar Hy\lt0$,
+$$
+\gamma\ \ge\ \frac{-y^\top\bar Hy}{y^\top D_e^{-1}y}. \tag{S.1}
+$$</li>
+<li><b>Bethe Hessian.</b> With probability $1-o(1)$, $H(t)$ is nonsingular and has exactly two negative eigenvalues.</li>
+<li><b>Non-edge field.</b> On that event, $\bar H$ has one or two negative eigenvalues, and it has exactly one if and only if
+$$
+1+c'\,u^\top H(t)^{-1}u\ \lt\ 0 .\tag{S.2}
+$$</li>
+</ol>
+<p>
+So (S) holds, with probability $1-o(1)$, as soon as the scalar criterion (S.2) does.
+</p>
+
+<p>
+<em>Proof of (a).</em> $WM=-\bar H$ is symmetric. $M=D_e^{1/2}\big(-D_e^{1/2}\bar HD_e^{1/2}\big)D_e^{-1/2}$ is similar to
+$S:=-D_e^{1/2}\bar HD_e^{1/2}$, and $S$ is congruent to $-\bar H$. By Sylvester's law of inertia, $S$ has exactly one positive eigenvalue and
+$n-1$ negative ones. If $Se_1=\gamma e_1$, then $v=D_e^{1/2}e_1$ satisfies $Mv=\gamma v$ and $v^\top Wv=1$. For (S.1), set $x=D_e^{-1/2}y$:
+then $\gamma\ge x^\top Sx/|x|^2=-y^\top\bar Hy/y^\top D_e^{-1}y$. $\square$
+</p>
+
+<p>
+<em>Proof of (b).</em> Three ingredients.
+</p>
+<ol>
+<li><b>Ihara&ndash;Bass.</b> For $r\gt1$,
+$$
+\det(I-B/r)=(1-r^{-2})^{|E|-n}\,r^{-2n}\det\tilde H(r).
+$$
+So $\tilde H(r)$ is singular exactly when $r$ is an eigenvalue of $B$.</li>
+<li><b>Non-backtracking spectrum</b> (Bordenave&ndash;Lelarge&ndash;Massouli&eacute;, Thm. 4). With probability $1-o(1)$, $B$ has eigenvalues
+$d+o(1)$ and $d\omega+o(1)$, and every other eigenvalue has modulus at most $\sqrt d+o(1)$. So no eigenvalue of $B$ lies in
+$[\sqrt d+\varepsilon,d\omega-\varepsilon]$. By 1, $\tilde H(r)$ is then nonsingular on this whole interval. Since its eigenvalues are continuous
+in $r$ and never cross $0$ there, the number $N(r)$ of negative eigenvalues is constant on the interval.</li>
+<li><b>The count at the left end</b> (Dong&ndash;McKenzie, Thm. 2.1, for every $d\gt1$; Stephan&ndash;Zhu, Thm. 3, for $d\ge2$). With
+probability $1-o(1)$, $N(\sqrt d+\varepsilon)=r_+$. Here $r_+$ is the number of eigenvalues of the signal matrix $Q=P\Pi$ exceeding $\sqrt d$. For
+the symmetric two-block model these eigenvalues are $d$ and $d\omega$, and both exceed $\sqrt d$ because $d\gt1$ and $\lambda\gt1$. So $r_+=2$.</li>
+</ol>
+<p>
+Hence $N(r)=2$ on the whole window, and $H(t)$ has the same inertia as $\tilde H(r)$. $\square$
+</p>
+<p>
+<i>The upper bound $N(r)\le2$ alone needs only 1 and 2. It is Lemma 3.1 of Dong&ndash;McKenzie: $N(r)$ is at most the number of real eigenvalues
+of $B$ above $r$.</i>
+</p>
+
+<p>
+<em>Proof of (c).</em> $c'uu^\top\succeq0$ has rank one, so by interlacing
+$\lambda_k(H)\le\lambda_k(\bar H)\le\lambda_{k+1}(H)$. In particular $\lambda_1(\bar H)\le\lambda_2(H)\lt0$ and
+$\lambda_3(\bar H)\ge\lambda_3(H)\gt0$, so $\bar H$ has one or two negative eigenvalues. The sign of a nonsingular determinant is
+$(-1)^{\#\text{neg}}$, and $\det H\gt0$. By the matrix determinant lemma,
+$$
+\det\bar H=\det H\,(1+c'u^\top H^{-1}u),
+$$
+so there is exactly one negative eigenvalue if and only if (S.2) holds. $\square$
+</p>
+
+<p>
+<b>Why this is the right split.</b> (b) is exactly the window of Proposition 10, now rigorous: inside the window the Bethe Hessian sees the
+uniform direction and the informative one, and nothing else. (c) is the balance condition. The non-edge field can remove at most one negative
+direction, and (S.2) says it removes the uniform one rather than leaving both. On a $d$-regular graph, $Hu=(1-\tfrac{td}{1+t})u$ exactly, so
+$$
+u^\top H^{-1}u=\frac{1+t}{1+t-td},
+$$
+and (S.2) becomes $\tfrac{td}{1+t}-1\lt c'$. This is the "net linear coefficient of the uniform mode is below 1" condition of the
+temperature-window entry.
+</p>
+
+<h3>What is still open in (S)</h3>
+<ol>
+<li><b>The scalar criterion (S.2) on the Poisson graph.</b> Writing $\tilde B=\begin{pmatrix}A&I-D\\ I&0\end{pmatrix}$ for the reduced
+non-backtracking matrix,
+$$
+u^\top\tilde H(r)^{-1}u=\tfrac1r\,\big[(rI-\tilde B)^{-1}\big]_{11}(u,u).
+$$
+I checked this identity numerically to $10^{-15}$. It moves (S.2) onto the non-backtracking resolvent at a point between the bulk radius $\sqrt d$
+and the outliers. The BLM decomposition of $B^\ell$ gives the outlier part explicitly, as a Galton&ndash;Watson quantity. The bulk part needs
+$\sum_k\tilde B^k/r^{k+1}$ on the bulk with $O(1)$ constants, but BLM only bound $\|B^\ell\|$ on the bulk for $\ell\asymp\log n$, with polylog
+losses. This is the missing estimate.</li>
+<li><b>Uniform constants.</b> (a) gives $\mu_2\ge0$ for free, but Theorem 15 also needs $\gamma\ge c$ and $\kappa_W\ge c$, uniformly in $n$. By
+(S.1), $\gamma\ge c$ follows from a test vector $y$ with $-y^\top\bar Hy\ge c|y|^2$ and $\sum_iy_i^2/q_{e,i}\le C|y|^2$, i.e. one not concentrated
+on hubs. A natural candidate is the informative non-backtracking eigenvector pushed to vertices. By Stephan&ndash;Zhu (Lemma 17 there), if
+$\tilde B(x,y)^\top=\lambda(x,y)^\top$ then $\tilde H(\lambda)y=0$, and
+$$
+y^\top\tilde H(r)y=(r-\lambda)\big(r|y|^2-y^\top(D-I)y/\lambda\big),
+$$
+which is negative when $r\lambda\,|y|^2\gt y^\top(D-I)y$. Since $r\lambda\gt\sqrt d\cdot\sqrt d=d$, this reduces to a delocalisation statement:
+the degree-weighted mass of $y$ is at most about $d$. $\kappa_W$ is a similar overlap statement for the same vector.</li>
+<li><b>Finite-$n$ margins near threshold.</b> The window has width $\min(d\omega-r,\ r-\sqrt d)$. At the balanced temperature this is $0.106$ at
+$\lambda=1.3$ and $0.036$ at $\lambda=1.1$. It is comparable to the finite-$n$ fluctuation of the informative outlier of $B$, so (b) can fail on a
+given graph of moderate size. This is what the two flagged graphs show (table below).</li>
+</ol>

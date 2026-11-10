@@ -1,0 +1,402 @@
+---
+layout: post
+title: "Graph Debate"
+---
+<p>
+We work with a <b>binary pairwise factor graph</b>, i.e. a tuple $(G,\varphi,\psi)$ where  $G=(V,E)$ is a finite simple graph, 
+each node $v$ admits a unary factor $\varphi_v:\{\pm 1\}\to\R$, and every edge $u\sim v$ admits a binary factor $\psi_{uv}:\{\pm 1\} \to \R$ s.t. $\psi_{uv}(s,t) = \psi_{vu}(t,s)$. 
+</p>
+
+<p>
+    For a given subset $S\subseteq V$, the <b>judge belief</b> is an induced model: 
+     $$
+        \mu_S(x_S)\propto \exp\left(\sum_{uv\in E(G[S])}\psi_{uv}(x_u,x_v) + \sum_{v\in S}\varphi_v(x_v)\right)
+    $$
+    Then, for $v\in S$, the <b>field</b> of $v$ is given by: 
+    $$
+        h_v:=\frac{1}{2}\log \frac{\mu_S(x_v = 1)}{ \mu_S(x_v = -1)}
+    $$
+    This is because we have that $\mu_S(x_v )\propto \exp(h_v x_v)$. Consequently, $\E _{\mu_S} x_v = \tanh h_v$.
+</p>
+
+
+<h2 class="numbered"> Unstructured Debate</h2>
+<p>
+    Assume we have a <b>target statement</b> $t\in V$ that we want to debate on. The debaters have the knowledge of the full model, however, only a smaller induced subgraph is revealed to the judge.
+    The idea is that the debaters cleverly select which nodes to reveal s.t. the judge belief of the target statement is closer to how they want. 
+</p>
+
+<p>
+    More concretely, given $S\subseteq V$, we define the score as the half log-odds: 
+    $$
+    L_S:= \frac{1}{2}\log \left(\frac{\mu_S(x_t = 1)}{1 - \mu_S(x_t = 1)}\right)
+    $$
+    i.e. $\E_{\mu_S} x_t  =  \tanh L_S$. 
+    
+</p>
+
+<p>
+    Then, the debate is defined inductively:  Let $D_{S,\ell}$ denote the judge decision where the current judge state is $S$ and there are $\ell$ rounds left to the debate. 
+    More formally, for every $S\ni t$, 
+    <ol>
+        <li>$D_{S,0}:=L_S$</li>
+        <li>$D_{S,\ell}:= \min_{v\in V \backslash S} D_{S\cup \{v\}, \ell -1}$ where $\ell $ is odd.</li>
+        <li>$D_{S,\ell}:= \max_{v\in V \backslash S} D_{S\cup \{v\}, \ell -1}$ where $\ell $ is even.</li>
+    </ol>
+    Intuitively, the even rounds want to prove that $t$ is true, and the odd rounds, false. Let further, $D_{k}:= D_{\{t\}, k}$. Then, the goal of debate is to identify, when $D_{2h}\approx L_V$.
+
+</p>
+
+
+<h3 class="numbered">Cores and Oscillations</h3>
+A <b>core</b> is a set $K\ni t$ s.t. $G[K]$ is connected. Then, its <b>oscillation</b> is defined as:
+$$
+\text{osc}(K):=\text{osc}(L|_{\uparrow K}),\qquad \text{where } \uparrow K := \{S\subseteq V : K\subseteq S\}
+$$
+
+
+<div class="box theorem">
+  <div class="box-title">Lemma 1</div>
+  <p class="statement">Let $K$ be a core and $h\ge 0$ s.t. $|K|\le h+1$. Then, $D_{2h}$ is bounded by $L|_{\uparrow K}$, i.e. 
+    $$
+    |D_{2h} - L_V|  \le \osc(K)
+    $$
+  </p>
+</div>
+
+We use this oscillation to bound the gap.
+
+<h3 class="numbered">Upper Bound</h3>
+
+<p>
+    We can rewrite the binary factors uniquely as follows:
+    $$
+    \psi_{uv}(s,t)=J_{uv}\,st+a_{u\to v}\,s+a_{v\to u}\,y+\text{const}.
+    $$
+    Then,
+    <ol>
+        <li>$J_{uv}$ measures how strongly the edge wants $u$ and $v$ to agree or disagree. </li>
+        <li>$a_{u\to v}$  tries to push $u$ towards true regardless of $v$. This bias appears only once $v$ is also revealed. </li>
+    </ol>
+</p>
+
+<p>
+    Now we can view this as a message-passing procedure. Suppose $G$ is a tree, and cut the edge $e=uv$. Let $T_u,T_v$ denote the two subtrees that contain $u$ and $v$, respectively. 
+    Let $h_v$ be the field of $v$ w.r.t. $\mu_{T_v}$, called the <b>cavity field</b> of $v$. 
+</p>
+
+<div class="box theorem">
+  <div class="box-title">Lemma 2 (One-edge message)</div>
+  <p class="statement"> Define the message map of the edge $uv$ towards $u$ as
+    $$
+    \Phi_{uv}(h):=a_{u\to v}+F_{J_{uv}}\big(h+a_{v\to u}\big),\qquad F_J(y)=\arctanh(\tanh J\tanh y).
+    $$
+    On a tree, the field of $u$ is its own unary field plus one message per neighbour:
+    $$
+    H_u=\tfrac12\big(\varphi_u(+)-\varphi_u(-)\big)+\sum_{v\in \partial u}\Phi_{uv}(h_{v\to u}),
+    $$
+    where $h_{v\to u}$ is the cavity field of $v$ with the edge $uv$ removed.
+  </p>
+</div>
+
+
+<details class="proof">
+  <summary></summary>
+  <p>
+    By definiton of the messages, we have that $m_{v\to u}(s) = \mu_{T_v}(x_v = s) \propto \exp(h_{v\to u} s)$. Then, 
+    $$
+    \begin{aligned}
+    \mu_V(x_u) &\propto \sum_{x_{-u}}\exp\left(\varphi_u(x_u) + \sum_{v\in \partial u}[\psi_{uv}(x_u,x_v)+E_v(x_{T_v})]\right)
+    \\&\propto \exp\left(\varphi_u(x_u)\right)\prod_{v\in \partial u}\sum_{x_{T_v}}\exp\left(  \psi_{uv}(x_u,x_v)+E_v(x_{T_v})\right)
+    \\&\propto \exp\left(\varphi_u(x_u)\right)\prod_{v\in \partial u}\sum_{s}\exp\left(\psi_{uv}(x_u,s)\right)\sum_{x_{T_v}: x_v = s} \exp\left(E_v(x_{T_v})\right)
+    \\&\propto \exp\left(\varphi_u(x_u)\right)\prod_{v\in \partial u}\sum_{s}\lambda_v \exp\left(\psi_{uv}(x_u,s) + h_{v\to u} s\right)
+    \\&\propto \exp\left(\varphi_u(x_u)\right)\prod_{v\in \partial u}\lambda_v \sum_{s}\exp\left(J_{uv}x_u s + a_{u\to v} x_u + [a_{v\to u}+ h_{v\to u}] s\right)
+    \\&\propto \exp\left(\varphi_u(x_u)\right)\prod_{v\in \partial u}\lambda_v \exp( a_{u\to v} x_u )\sum_{s}\exp\left(J_{uv}x_u s+ [a_{v\to u}+ h_{v\to u}] s\right)
+    \\&\propto \exp\left(\varphi_u(x_u)\right)\prod_{v\in \partial u}\lambda_v \exp( a_{u\to v} x_u )\cosh\left(J_{uv}x_u + a_{v\to u}+ h_{v\to u}\right)
+    \end{aligned}
+    $$
+    Therefore, 
+    $$
+    H_u = \frac{1}{2}\log \frac{\mu_V(x_u=1)}{\mu_V(x_u = -1)} = \frac{1}{2}(\varphi_u(+) - \varphi_u(-))  + \sum_{v\in \partial u}\left[a_{u\to v}+\frac{1}{2}\log \left(\frac{\cosh(J_{uv} + a_{v\to u}+ h_{v\to u})}{\cosh(-J_{uv} + a_{v\to u}+ h_{v\to u})}\right)\right]
+    $$
+  </p>
+</details>
+
+<p>
+    Now, notice that we have: 
+    $$
+        \tanh |F_J(y)| = |\tanh F_J(y)| = |\tanh J| |\tanh y| < |\tanh J|=\tanh |J|
+    $$
+    As $\tanh$ is increasing, $|F_J(y)|< |J|$. 
+</p>
+
+
+Let $K$ be a core and $\text{gate}(K)$ be the set of all pairs $(P,e)$ s.t.
+<ol>
+    <li> $P$ is a directed path in $K$ from $t$ to some $u\in K$. </li>
+    <li> $e$ is a directed edge from $u$ to some $v\notin K$.</li>
+</ol>
+
+
+<div class="box theorem">
+  <div class="box-title">Theorem 2</div>
+  <p class="statement">For arbitrary finite factors, possibly on graphs with cycles, every core $K$ satisfies
+    $$
+    \text{osc}(K)\;\le\;\sum_{(P,e)\in\text{gate}(K)} I_e\prod_{e'\in P}\tanh\!\big(|J_{e'}|/2\big).
+    $$
+    In particular, by Lemma 1, if $|K|\le h+1$ then $|D_{2h}-L_V|$ is bounded by the same sum.
+  </p>
+</div>
+
+<h2 class="numbered"> Recursive Debate</h2>
+<p>
+    My question is about finding the threshold for debate, similar to that of uniqueness threshold. Given a graph class, 
+does there exist a threshold under which debate works well, but above which debate provably fails? 
+</p>
+
+<p>
+    In a <b>recursive debate</b> game, we are given a tuple $(G,\varphi,\psi)$. 
+
+    Let $t\in V$ be the target statement. We have Alice and Bob, who have access to the full model. Alice's job is to convince the Judge that the field $h_t$ is some value $a_0$. 
+    Then, Bob will recursively have to question this choice, similarly to debate in the classical sense. 
+</p>
+
+<p>
+Before we discuss the soundness and correctness of the protocol, we introduce the Weisz recursion. 
+
+AAAA What's the best way to formalize this? 
+</p>
+
+<p>
+A <b>debate state</b> can be formalized using a tuple $I:=(W,\mathcal E, u)$ where: 
+<ol>
+    <li> $W\subseteq V(G)$ is the set of nodes that are still in the debate. Ironically, its complement are the nodes that were considered already. </li>
+    <li> $\mathcal E=\{\mathcal E_w \}_{w\in W}$ is the <b>frozen information</b>, where $\mathcal E_w$ is a set of functions $f:\{\pm 1\} \to \R$</li>
+    <li> $u\in W$ is the new node that is currently under debate.</li>
+</ol>
+Then, we are tilting the distribution on $W$ with the frozen information:
+$$
+\nu_I(x_W)\propto \mu_W(x_W)\cdot \exp\left(\sum_{ w\in W}\sum_{f\in \mathcal E_w} f(x_w)\right)
+$$
+We can call this the <b>distribution tilted by $I$</b>. Similarly we define: 
+<ol>
+    <li>
+        <b>titled field</b> at $w$: $h_I(w):= h_{\nu_I}(w)$ for $w\in W$.  </li>
+    <li> <b>tilted local field</b> at $w$: given by: 
+    $$
+        \theta_I(w):= \frac{1}{2}\left[\varphi_w(+1) - \varphi_w(-1)+\sum_{f\in \mathcal E_w}f (+1) - f(-1)\right]
+    $$
+    </li>
+</ol>
+</p>
+
+<p>
+    Now we look at how a state moves to the next state. Let $I=(W,\mathcal E,u)$ be a state and let $w_1,...,w_m$ be the neighbors of $u$ in $W$. 
+    We call them the <b>children</b> of $u$. Then, for each "child" $v$, we can define the new state as: $$
+    I^{(v)}:=(W':= W \backslash\{u\}, (\mathcal E^{(v)}_w)_{w\in W'}, v)
+    $$ where 
+    $$
+     \mathcal E^{(v)}_w:= \begin{cases}\mathcal E_w\cup\{\psi_{uw}(+1,\cdot)\}&w \text{ is a child and }w < v\\
+    \mathcal E_w\cup\{\psi_{uw}(-1,\cdot)\}&w \text{ is a child and } v < w\\\mathcal E_w&\text{otherwise}\end{cases}
+    $$
+</p>
+
+
+<div class="box theorem">
+  <div class="box-title">Lemma (Weisz) </div>
+  <p class="statement">Let $I=(W,\mathcal E, u)$ be a debate state.
+    
+    $$
+        h_{I}(u)=\theta_I(u) + \sum_{v\text{ child}}\Phi_{uv}(h_{I^{(v)}}(v))
+    $$
+    
+  </p>
+</div>
+
+
+
+<details class="proof">
+  <summary></summary>
+  
+<p>
+    Let $w_1\lt\dots\lt w_m$ be the children of $u$ w.r.t. $W$. To compute $h_I(u)$, we first have to find the marginal of $\nu_I$. We have that: 
+    $$
+    \begin{aligned}
+    \nu_I(x_u=s)
+    &\propto\exp\Big(\varphi_u(s)+\sum_{f\in\mathcal E_u}f(s)\Big)\sum_{y}\Omega(y)\exp\Big(\sum_{i=1}^m\psi_{uw_i}(s,y_{w_i})\Big)\\
+    &=\exp\Big(\varphi_u(s)+\sum_{f\in\mathcal E_u}f(s)\Big)\pi(s,...,s)
+    \end{aligned}
+    $$
+    where
+    $$
+    \Omega(y):=\exp\Big(\sum_{vw\in E(G[W'])}\psi_{vw}(y_v,y_w)+\sum_{v\in W'}\varphi_v(y_v)+\sum_{w\in W'}\sum_{f\in\mathcal E_w}f(y_w)\Big)
+    $$
+    collects every factor not involving $x_u$, and
+    $$
+    \pi: \{\pm 1\}^m \to \R,\quad \sigma\mapsto \sum_{y}\Omega(y)\exp\Big(\sum_{i=1}^m\psi_{uw_i}(\sigma_i,y_{w_i})\Big).
+    $$
+  </p>
+
+  <p>
+    Hence, we get that: 
+    $$
+    h_I(u) = \theta_{I}(u) + \frac{1}{2}\log \frac{\pi(1,...,1)}{\pi(-1,...,-1)}
+    $$
+  </p>
+  
+  <p>
+    Now, let $\sigma^{(k)}:=1^k(-1)^{m-k}$.  Then, we notice that: 
+    $$
+    \frac{\pi(1,...,1)}{\pi(-1,...,-1)} = \frac{\pi(\sigma^{(m)})}{\pi(\sigma^{(0)})} = \prod_{k=1}^m \frac{\pi(\sigma^{(k)})}{\pi(\sigma^{(k-1)})}
+    $$
+    Then, 
+    $$
+    \frac{\pi(\sigma^{(k)})}{\pi(\sigma^{(k-1)})} = \frac{\sum_{t}\nu_{I^{(w_k)}}(x_{w_k}=t)\exp\Big(\psi_{uw_k}(+1,t)\Big)}{\sum_{t}\nu_{I^{(w_k)}}(x_{w_k}=t)\exp\Big(\psi_{uw_k}(-1,t)\Big)}
+    =\frac{\sum _t \exp( h_{I^{(w_k)}}(w_k)t + \psi_{uw_k}(+1,t))}{\sum_t\exp( h_{I^{(w_k)}}(w_k)t + \psi_{uw_k}(-1,t))}
+    $$
+    By using that: 
+    $
+    \sum_t e^{ h_{I^{(w_k)}}(w_k)t + \psi_{uw_k}(s,t)}\propto e^{a_{u\to w_k}s}\cdot\cosh(J_{uw_k}s+h_{I^{(w_k)}}(w_k)+a_{w_k\to u})$ over $s$, we get that:
+    $$
+    \frac{\pi(\sigma^{(k)})}{\pi(\sigma^{(k-1)})} = e^{2a_{u\to w_k}}\frac{\cosh(J_{uw_k}+h_{I^{(w_k)}}(w_k)+a_{w_k\to u})}{\cosh(-J_{uw_k}+h_{I^{(w_k)}}(w_k)+a_{w_k\to u})} =2 \Phi_{uw_k}(h_{I^{(w_k)}}(w_k))
+    $$
+    This proves the statement. 
+  </p>
+</details>
+
+<h3 class="numbered">Recursive Debate on Loopy Graphs</h3>
+Now, we introduce the following debate protocol. 
+<div class="box theorem">
+  <div class="box-title">Definition </div>
+  <p class="statement">Given a setting $(G,\varphi,\psi)$, a target statement $t\in V(G)$, and a error margin $\eps$,
+    <ol>
+        <li> Alice announces $a_0\in \R$. The initial state of the debate is $I_0:= (V,\varnothing, t)$.</li>
+        <li> For rounds $r = 0,...,R-1$, with the current state $I_r =(W_r, \mathcal E_r, u_r)$ and the announcement $a_r$:</li>
+    <ol>
+        <li>The Judge calls an oracle that returns $\varphi_{u_r}$ and $(v,\psi_{u_rv})_{v\in \partial u_r}$.</li>
+        <li> The Judge computes the <b>tilted local field</b> $\theta_{I_r}(u_r)$.
+        <li> If $u_r$ has no children, Alice wins if and only if $|a_r - \theta_{I_r}(u_r)|\le \eps$.</li>
+        <li> Otherwise, for each <i>child</i> $w$ of $u_r$, Alice announces the tilted field $h_w$ of $w$. Alice loses, if: 
+        $$ 
+            \left|a_r - \theta_r (u_r)-\sum_{w \in \partial u_r \backslash U_r}\Phi_{u_r w}(h_w)\right|> \eps
+        $$
+        </li>
+        <li> Bob selects a child $w$ and $I_{r+1}:= I^{(w)}_r$ and $a_{r+1}:= h_w$.</li>
+        
+        </li>
+    </ol>
+        <li> For round $R$, Alice wins if and only if $|a_R - \theta_{I_R}(u_R)| \le \eps$.
+    </ol>
+  </p>
+</div>
+
+
+<p>
+ For the given debate setting, let $\mathcal A(R,\eps)\subseteq \R$ be the set of $a_0$ for which Alice has a strategy to win against every strategy of Bob. 
+
+It is not difficult to see that the debate protocol is complete. But for completeness sake (haha)
+</p>
+
+
+<p>
+    Let $I:=(W,\mathcal E, u)$ be a debate state. Then, we set $h^{(k)}_I(u)$ to be the tilted field after $k$ steps, i.e. inductively,
+    $$
+    h^{(0)}_I(u) := \theta_I(u),\qquad h^{(k)}_I(u) := \theta_I(u) + \sum_{v\text{ child}}\Phi_{uv}(h^{(k-1)}_{I^{(v)}}(v))
+    $$
+</p>
+<p>
+    Let $I_0:= (V,\varnothing, t)$. Then, we claim that $h^{(R)}_{I_0}(t) \in \mathcal A(R,\eps)$. This is given by Alice announcing $h_v= h^{(R - r - 1)}_{I^{(v)}_{r}}(v)$ at every step. 
+</p>
+
+<p>
+    For soundness, we introduce the following class of debate settings: Let $\mathcal G_\text{RD}(d,a_{\max}, J_{\max})$ be the set of binary factor graphs s.t. for all $(G,\varphi,\psi)\in \mathcal G_\text{RD}(d,a_{\max}, J_{\max})$:
+    <ol>
+        <li>$d$ is the max degree,</li>
+        <li>$|a_{u\to v}|\le a_{\max}$ for all $u,v$,</li>
+        <li>$|J_{uv}|\le J_{\max}$ for all $u,v$.</li>
+    </ol>
+    Then, we can show the soundness of the protocol on this family as follows. 
+</p>
+
+<div class="box theorem">
+  <div class="box-title">Theorem (Soundness)</div>
+  <p class="statement"> Let $(G,\varphi,\psi)\in\mathcal G_\text{RD}(d,a_{\max}, J_{\max})$. For any $R\ge 1$, $\eps \ge 0$, and $a_0\in \mathcal A(R,\eps)$: 
+    $$
+    |a_0 - h^{(R)}_{I_0}(t)|\le \eps \left(1 + d\tanh J_{\max}\cdot \sum_{j=0}^{R-1}\lambda^j\right)
+    $$
+    where $\lambda := (d-1)\tanh J_{\max}$.
+  </p>
+</div>
+
+<p>
+The proof follows an induction. Let $I_r$ and $a_r$ be given from a debate protocol where Alice wins. 
+We show via induction on $R-r$ that if $|a_r - h^{(R-r)}_{I_r}(u_r)|> \eps\sum_{j=0}^{R-r}\lambda^j$, then Bob has a winning strategy from $I_r$. 
+</p>
+
+<p>
+    At round $r=R$ or if $u_r$ has no child, we have that $h_{I_r}^{R-r}(u_r) = \theta_{I_r}(u_r)$ and as $\sum_{j=0}^{R-r}\lambda^j\ge 1$, Alice loses. 
+    Otherwise, assume that the check in (25) passes. We have that: 
+    $$
+    \left|\sum_{v\text{ child}}\Phi_{u_r v}(h_v) -\sum_{v\text{ child}}\Phi_{u_r v}(h^{(R-(r+1))}_{I_r^{(v)}}(v)) \right|\ge |a_r - h^{(R-r)}_{I_r}(u_r)| - \eps > \eps\sum_{j=1}^{R-r}\lambda ^j
+    $$
+    Then, by triangle inequality, there exists a child $v$ s.t. 
+    $$
+    \varepsilon\cdot \tanh J_{\max} \cdot \sum_{j = 0}^{R-(r+1)} \lambda^j  < \left|\Phi_{u_rv} (h_v) - \Phi_{u_rv}(h^{(R-(r+1))}_{I_r^{(v)}}(v))\right|
+    $$
+    Using that $\Phi_{u_r v}$ is $\tanh J_{\max}$-Lipschitz, Bob can choose this child and by induction hypothesis Bob has a winning strategy. 
+</p>
+
+<p>
+    For the theorem statement, it is analogous except that instead of $d-1$ children $t$ has at most $d$ children. 
+</p>
+
+
+<div class="box theorem">
+  <div class="box-title">Corollary</div>
+  <p class="statement"> Let $\rho:= (d-1)\tanh J_{\max} < 1$. For every instance of $\mathcal G_\text{RD}(d,a_{\max}, J_{\max})$, every target $t$, any $R\ge 1$, $\eps \ge 0$, and $a_0\in \mathcal A(R,\eps)$: 
+    $$
+    |a_0 - h_{\mu_V}(t) | \le d (a_{\max} + J_{\max})\rho^R+ \eps\left( 1+ \frac{d}{d-1}\frac{\rho}{1-\rho}\right)
+    $$
+  </p>
+</div>
+
+<p>
+    It suffices to show that $|h^{(R)}_{I_0}(t) - h_{\mu_V}(t)|\le d(a_\max + J_\max) \rho^R$. Let $\Delta_r$ be the supremum of $|h^{(R-r)}_{I_r}(u_r) - h_{I_r}(u_r)|$ over all possible $I_r$. 
+</p>
+
+<p>
+    At $r=R$, for any $I_R$, we have that: 
+    $$
+        |h^{(0)}_{I_0}(t) - h_{\mu_V}(t)| = \left|\sum_{v\text{ child}}\Phi_{_{u_R v}}(h_{I_r^{(v)}}(v))\right|\le (d-1) (a_{\max}+J_\max)
+    $$
+    For $r< R$, we have that: 
+    $$
+    \begin{aligned}
+        |h^{(R-r)}_{I_r}(u_r) - h_{I_r}(u_r)|  
+        &\le \sum_{v\text{ child}}\left|\Phi_{u_rv}(h^{(R-(r+1))}_{I_r^{(v)}}(v)) -\Phi_{u_r v}(h_{I_r^{(v)}}(v))\right|\\
+        &\le \rho\Delta_{r+1}
+    \end{aligned}
+    $$
+    As we have $d$ instead of $d-1$ at only at the root, we have that $\Delta_0 \le d(a_\max + J_\max)\rho^R$. 
+</p>
+
+<h3 class="numbered">Comparison with the tree uniqueness threshold</h3>
+<p>
+    Here we will relate to our findings on debate to a well-known identity in statistical physics. The <b>tree uniqueness threshold</b> is a condition for 
+    the strength of the interaction and degree of a tree s.t. the spins on the nodes far away from the root cannot influence the field on the root. More formally,
+</p>
+<div class="box theorem">
+  <div class="box-title">Definition (Tree uniqueness)</div>
+  <p class="statement">
+    Let $T_d$ be the infinite rooted tree with root $t$ in which every vertex has $d$ children, $T_d^L$ its truncation at depth $L$, and $\partial_L$ the vertices at depth $L$.
+    For $J\in\R$ and pinning $\tau\in\{\pm1\}^{\partial_L}$, let
+    $$
+    \mu^\tau_L(x)\propto\exp\left(\sum_{v\sim w}Jx_vx_w\right)\mathbf 1\{x_{\partial_L}=\tau\}
+    $$ on $T_d^L$.
+    The model has <b>uniqueness on $T_d$</b> if
+    $$
+    \lim_{L\to\infty}\sup_{\tau,\tau'}\big|\mu^\tau_L(x_t=+1)-\mu^{\tau'}_L(x_t=+1)\big|=0 .
+    $$
+    This holds if and only if $d\tanh|J|\le1$.
+  </p>
+</div>

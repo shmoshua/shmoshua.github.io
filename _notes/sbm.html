@@ -56,8 +56,182 @@ where $\Phi:=\frac{n}{k}P$. We have the following two eigenvalues:
 </ol>
 Therefore, 
 $$
-\E_P[\#\text{ loops of size }\ell]  = \frac{1}{2\ell}\left[d^\ell + (k-1) \left(\frac{a-b}{k}\right)^\ell\right]
+\E_P[\#\text{ loops of size }\ell]  \approx \frac{1}{2\ell}\left[d^\ell + (k-1) \left(\frac{a-b}{k}\right)^\ell\right]
 $$
+</p>
+
+
+<p>
+  However, we have that in Erdös-Renyi graph, $\#\ell \sim \text{Poisson}(\frac{d^\ell}{2\ell})$. Hence, 
+  $$
+  \E_Q[\#\text{ loops of size }\ell]  = \frac{d^\ell}{2\ell} 
+  $$
+</p>
+
+<p>
+<figure>
+  <div class="demo">
+    <div style="position:relative;width:100%;height:260px">
+      <canvas id="sc-chart" role="img" aria-label="Poisson distributions of the number of length-ℓ cycles under the null model and under the SBM"></canvas>
+    </div>
+    <div class="legend" style="color:var(--ink)">
+      <span><i style="height:0;border-top:2px dashed var(--accent-2);border-radius:0"></i>Null \(Q\): \(\mathrm{Poisson}\big(\tfrac{d^\ell}{2\ell}\big)\)</span>
+      <span><i style="background:var(--accent)"></i>SBM \(P\): \(\mathrm{Poisson}\big(\tfrac{d^\ell + (k-1)\lambda_2^\ell}{2\ell}\big)\)</span>
+    </div>
+    <div class="controls"><label for="sc-a" style="color:var(--ink)">\(a\)</label><input type="range" id="sc-a" min="0" max="12" step="0.5" value="7"><output id="sc-ao"></output></div>
+    <div class="controls"><label for="sc-b" style="color:var(--ink)">\(b\)</label><input type="range" id="sc-b" min="0" max="12" step="0.5" value="1"><output id="sc-bo"></output></div>
+    <div class="controls"><label for="sc-k" style="color:var(--ink)">\(k\)</label><input type="range" id="sc-k" min="2" max="6" step="1" value="2"><output id="sc-ko"></output></div>
+    <div class="controls"><label for="sc-l" style="color:var(--ink)">\(\ell\)</label><input type="range" id="sc-l" min="3" max="16" step="1" value="6"><output id="sc-lo"></output></div>
+  </div>
+</figure>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+  // Hex colour -> rgba string, for the translucent fills under the curves
+  function rgba(hex, alpha){
+    const h = hex.replace('#','');
+    const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+  }
+
+  function lfact(n){
+    if(n < 20){ let s = 0; for(let i = 2; i <= n; i++) s += Math.log(i); return s; }
+    return n*Math.log(n) - n + 0.5*Math.log(2*Math.PI*n) + 1/(12*n);   // Stirling
+  }
+  function lpmf(x, m){ return m <= 0 ? (x === 0 ? 0 : -Infinity) : x*Math.log(m) - m - lfact(x); }
+
+  const chart = new Chart($('sc-chart'), {
+    type: 'line',
+    data: {datasets: [
+      {data:[], fill:true, borderWidth:2,    pointRadius:0, borderDash:[5,4]},   // Q (null)
+      {data:[], fill:true, borderWidth:1.75, pointRadius:0}                      // P (SBM)
+    ]},
+    options: {
+      responsive:true, maintainAspectRatio:false, animation:false, parsing:false,
+      plugins:{legend:{display:false}, tooltip:{enabled:false}},
+      scales:{ x:{type:'linear', title:{display:true, text:'number of ℓ-cycles'}},
+               y:{title:{display:true, text:'probability'}} }
+    }
+  });
+
+  // Pull colours and fonts from the page's design tokens (re-run if the theme flips)
+  function applyTheme(){
+    const ink = css('--ink') || '#111a14', rule = css('--rule') || '#d9e4da';
+    const acc = css('--accent') || '#0d6e5a', acc2 = css('--accent-2') || '#8fada0';
+    const font = {family: css('--sans') || 'system-ui, sans-serif', size: 12};
+    const [q, p] = chart.data.datasets;
+    q.borderColor = acc2; q.backgroundColor = rgba(acc2, 0.10);
+    p.borderColor = acc;  p.backgroundColor = rgba(acc, 0.10);
+    for(const s of Object.values(chart.options.scales)){
+      s.grid = {color: rule}; s.border = {color: rule};
+      s.ticks = {color: ink, font};
+      s.title.color = ink; s.title.font = font;
+    }
+    chart.update();
+  }
+
+  function update(){
+    const a = +$('sc-a').value, b = +$('sc-b').value, k = +$('sc-k').value, l = +$('sc-l').value;
+    $('sc-ao').textContent = a; $('sc-bo').textContent = b; $('sc-ko').textContent = k; $('sc-lo').textContent = l;
+
+    const d = (a + (k-1)*b)/k, l2 = (a - b)/k;
+    const lam = Math.pow(d, l)/(2*l);              // E_Q[# ℓ-cycles]
+    const mu  = (k-1)*Math.pow(l2, l)/(2*l);       // extra mean under P
+    const sig = Math.sqrt(Math.max(lam, 1e-12));
+    const mP = Math.max(lam + mu, 0), sP = Math.sqrt(Math.max(mP, 1e-12));
+
+    const lo = Math.max(0, Math.floor(Math.min(lam - 5*sig, mP - 5*sP)));
+    const hi = Math.ceil(Math.max(lam + 5*sig, mP + 5*sP)) + 2;
+    const step = Math.max(1, Math.floor((hi - lo)/300)), q = [], p = [];
+    for(let x = lo; x <= hi; x += step){
+      q.push({x, y:Math.exp(lpmf(x, lam))});
+      p.push({x, y:Math.exp(lpmf(x, mP))});
+    }
+    chart.data.datasets[0].data = q;
+    chart.data.datasets[1].data = p;
+    chart.options.scales.x.min = lo;
+    chart.options.scales.x.max = hi;
+    chart.update();
+  }
+
+  ['sc-a','sc-b','sc-k','sc-l'].forEach(id => $(id).addEventListener('input', update));
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+  applyTheme();
+  update();
+})();
+</script>
+</p>
+
+<p>
+  So we can tell $P$ from $Q$ from one sample, only when the SBM's extra mean $(k-1)((a-b)/k)^\ell$ is large compared with that spread. In other words, 
+  $$
+    \frac{k-1}{2\ell}\left(\frac{a-b}{k}\right)^\ell \ge \sqrt{\frac{d^\ell}{2\ell}}
+  $$
+</p>
+and by taking $\ell$ to infinity, we get that $a-b \ge k \sqrt{d}$: the <b>Kesten-Stigum threshold</b>.
+
+<h3 class="numbered">Belief Propagation POV</h3>
+<p>
+Assume we now have $M:= \frac{1}{kd}[(a-b)I + b11^\top]$. Then, $M$ is a stochastic matrix and we can write it as:
+$$
+  M= \lambda I + (1-\lambda)\frac{1}{k}11^\top
+$$
+where $\lambda = (a-b) / kd$, as $1- \lambda = \frac{kd - a+b}{kd} = \frac{a+(k-1)b - a+ b}{kd} = \frac{b}{d}$.
+Then, from <a href="{% link _notes/statphys.html %}#1.2">belief propagation</a> recall that the messages are given as:
+$$
+\begin{aligned}
+m_{i\to j}(s)
+&\propto \prod_{\ell\in\partial i \backslash j} \sum_t m_{\ell\to i}(t)\exp(-\beta h(s,t))\\
+&\propto \prod_{\ell\in\partial i \backslash j} \sum_t m_{\ell\to i}(t)M_{st}
+\end{aligned}
+$$
+
+Now, consider the case where $m_{\ell \to i}(t) = 1/k$ for all $\ell$. Then, 
+$$
+m_{i\to j}(s) = \frac{k^{1- d(i)}}{k ^{2 - d(i)}} = \frac{1}{k}
+$$
+Therefore, $m\equiv 1/k$ is a fixed point. Let $P_{i\to j}(s) := \prod_{\ell\in\partial i \backslash j} \sum_t m_{\ell\to i}(t)M_{st}$.
+Here we have that the derivatives are given by: 
+$$
+\begin{aligned}
+\frac{\partial m_{i\to j}(s)}{\partial m_{\ell\to i}(t)}
+&=\frac{1}{Z_{i\to j}}\frac{\partial P_{i\to j}(s)}{\partial m_{\ell \to i}(t)} - \frac{P_{i\to j}(s)}{Z_{i\to j}^2}\frac{\partial Z_{i\to j}}{\partial m_{\ell\to i}(t)}\\
+&=\frac{1}{k ^{2 - d(i)}}M_{st} \cdot k ^{2 - d(i)}-\frac{1}{k^{3-d(i)}}k ^{2 - d(i)}\\
+&= M_{st} - \frac{1}{k}
+\end{aligned}
+$$
+Therefore, we get that the Jacobian of all messages is given by: 
+$$
+\left(M-\frac{1}{k}11^\top\right)\otimes  B,\qquad B_{(k\to i)(\ell \to j)}=\begin{cases}1 & i = \ell \land k \ne j\\0 & \text{else}\end{cases}
+$$
+where $B$ is called the <b>non-backtracking matrix</b>. We then have the result that the spectrum of $B$ is given as follows: 
+<figure>
+  <img src="{{ '/assets/img/nb_spectrum.svg' | relative_url }}"
+       alt="Non-backtracking spectrum of a sparse SBM: bulk inside the circle of radius √c, outliers at μ and c"
+       style="width:100%; height:auto;">
+  <figcaption>
+    <b>Spectrum of $B$.</b> Sampled SBM with $n=3000$, $k=2$, $a=7$, $b=1$, so $d=4$.
+    The bulk lies inside $|\lambda|\le\sqrt d$; the outliers sit at $d$ and $\mu=\frac{a-b}{k}$.
+  </figcaption>
+</figure>
+So using a spectral algorithm, we can differentiate the two distributions if:
+$$
+\mu = \frac{a-b}{k} > \sqrt{d}
+$$
+Now, given the uniform fixed point, it would be quite useless if the fixed point is stable and stayed there the whole time. Hence, we are interested when BP fixed point is unstable. 
+This is exactly when the spectral radius $$\rho((M-\frac{1}{k}11^\top )\otimes B) > 1.$$
+Notice that $\text{Spec}(M-\frac{1}{k}11^\top ) =\{\lambda, \cdots\}$ and $\text{Spec}(B) = \{d, \mu, ...\}$. However, $\lambda d$ is from the uniform vector and is uninformative. 
+
+Hence, the desired conclusion comes from:
+$$
+\lambda \mu = \frac{(a-b)^2}{k^2d} > 1
+$$
+which is exactly the KS-threshold.
+
 </p>
 
 <h2>Results</h2>
