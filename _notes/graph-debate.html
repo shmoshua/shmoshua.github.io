@@ -276,12 +276,12 @@ Now, we introduce the following debate protocol.
         <li>The Judge calls an oracle that returns $\varphi_{u_r}$ and $(v,\psi_{u_rv})_{v\in \partial u_r}$.</li>
         <li> The Judge computes the <b>tilted local field</b> $\theta_{I_r}(u_r)$.
         <li> If $u_r$ has no children, Alice wins if and only if $|a_r - \theta_{I_r}(u_r)|\le \eps$.</li>
-        <li> Otherwise, for each <i>child</i> $w$ of $u_r$, Alice announces the tilted field $h_w$ of $w$. Alice loses, if: 
+        <li> Otherwise, for each <i>child</i> $v$ of $u_r$, Alice announces the tilted field $h_v$ of $w$. Alice loses, if: 
         $$ 
-            \left|a_r - \theta_r (u_r)-\sum_{w \in \partial u_r \backslash U_r}\Phi_{u_r w}(h_w)\right|> \eps
+            \left|a_r - \theta_{I_r} (u_r)-\sum_{v\text{ child}}\Phi_{u_r v}(h_v)\right|> \eps
         $$
         </li>
-        <li> Bob selects a child $w$ and $I_{r+1}:= I^{(w)}_r$ and $a_{r+1}:= h_w$.</li>
+        <li> Bob selects a child $v$ and $I_{r+1}:= I^{(v)}_r$ and $a_{r+1}:= h_v$.</li>
         
         </li>
     </ol>

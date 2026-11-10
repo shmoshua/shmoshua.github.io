@@ -1,4 +1,4 @@
-# Master Thesis Reading Log
+# Reading Log
 
 Live at https://shmoshua.github.io
 
@@ -20,11 +20,12 @@ never needs editing.
 The site has three sections, shown as tabs at the top of every page. Their names and
 order live in `_data/sections.yml` (rename "Attempts" to "Ansätze" there, for example).
 
-| Tab          | Folder        | Address                 | What goes in it                         |
-|--------------|---------------|-------------------------|-----------------------------------------|
-| Reading List | `_posts/`     | `/` (the homepage)      | One post per paper (see above)          |
-| Attempts     | `_attempts/`  | `/attempts/<file-name>/` | One page per idea, with a dated log    |
-| Notes        | `_notes/`     | `/notes/<file-name>/`   | Concepts, models and summaries          |
+
+| Tab          | Folder       | Address                  | What goes in it                     |
+| -------------- | -------------- | -------------------------- | ------------------------------------- |
+| Reading List | `_posts/`    | `/` (the homepage)       | One post per paper (see above)      |
+| Attempts     | `_attempts/` | `/attempts/<file-name>/` | One page per idea, with a dated log |
+| Notes        | `_notes/`    | `/notes/<file-name>/`    | Concepts, models and summaries      |
 
 ## Attempts
 
