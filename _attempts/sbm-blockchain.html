@@ -1,0 +1,129 @@
+---
+title: "Blockchain Measure Decomposition for SBM"
+status: open
+summary: "Blockchain as a better auxiliary chain to analyze for SBM"
+---
+<h2 class="entry" data-date="2026-11-15">SBM Setting</h2>
+
+<p>
+    Let $\Omega:=\{\pm 1\}^N$ be the hypercube. We consider the following 2-community SBM: Let $d$ be a fixed average degree and $\eps \in(0,1)$. Let further $x\sim \text{Unif}(\Omega)$.
+    Then, $G\sim \text{SBM}(N,d,\eps)$ is a random graph where for all $i< j$:
+    $$
+        \P(ij\in E)=\frac{d}{N}(1+\eps x_ix_j)
+    $$
+    Let $A$ be its adjacency matrix. Let $\lambda:= \eps^2d$ be the SNR.
+</p>
+
+<p>
+    We run Glauber dynamics with the following stationary distribution: 
+
+    $$
+        \pi(x|G)\propto \exp\left(\frac{\beta}{\sqrt{d}} x^\top \left(A-\frac{d}{n}11^\top\right)x\right)
+    $$
+    for some inverse temp $\beta$. 
+</p>
+
+
+<h2 class="numbered"> Blockchain Glauber Transfer</h3>
+
+<p>
+    So the framework is as follows:  
+    <ol>
+        <li>Glauber reaches a locally stationary distribution in poly(n) steps.</li>
+        <li>A locally stationary distribution w.r.t. Glauber is also locally stationary w.r.t the measure decomposition chain.</li>
+        <li>A locally stationary distribution w.r.t. the measure decomposition chain meets our desired quality.</li>
+    </ol>
+    Fix a radius $R\ge 1$. Then, for $i\in[n]$, let $B_i:= B_{\le {R-1}}(i)$ the ball of radius $R$. We consider the following measure decomposition. 
+    $$
+        \pi = \E_{(i,\xi)\sim \rho}[\pi_{i,\xi}],\qquad \rho(i,\xi):= \frac{1}{n}\pi(x_{\overline{B_i}} = \xi),\qquad \pi_{i,\xi} = \pi(\cdot |x_{\overline{B_i}} = \xi).
+    $$
+</p>
+
+<h3 class="numbered">The Transfer Lemma</h3>
+Let $K_i$ be the kernel for the $i$-th blockchain. Then, we have that for any distribution $\nu$:
+$$
+\begin{aligned}
+\KL(\nu\| K_i\nu)
+&=\sum_{\eta,\xi} \nu (\eta,\xi)\log \frac{\nu(\eta,\xi)}{K_i\nu(\eta,\xi)}\\
+&=\sum_{\eta,\xi} \nu (\eta,\xi)\log \frac{\nu(\eta,\xi)}{\nu_{\overline{B_i}}(\xi)\pi_{i,\xi}(\eta)}\\
+&=\sum_{\xi}\nu_{\overline{B_i}}(\xi)\sum_\eta \nu(\eta |x_{\overline{B_i}}=\xi) \log \frac{\nu(\eta |x_{\overline{B_i}}=\xi)}{\pi(\eta |x_{\overline{B_i}}=\xi)}\\
+&=\sum_{\xi}\nu_{\overline{B_i}}(\xi)\KL(\nu(\cdot |\xi)\|\pi(\cdot |\xi))
+\end{aligned}
+$$
+
+<p>
+Let $p:=\nu(\cdot |\xi)$ and $q:=\pi(\cdot |\xi)$. Let $f:= p/q$. We want to relate $\KL(p\|q)$ with $\KL(\nu \| P \nu)$ somehow where $P$ is the Glauber kernel. 
+Because we want to split into each node, we want to shift to the uniform distribution. 
+</p>
+
+<p>
+Let $h,\ell$ s.t. $\ell \le q/u\le h$ where $u$ is a uniform distribution on block $\{\pm 1\}^{B_i}$. 
+Recall that for any $\mu$, $\Ent_\mu(f)=\inf_{a>0}\E_\mu[\Phi(f,a)]$ for $\Phi(t,a):=t\log(t/a) -t+a$.
+Therefore, for the optimizer $a_u$ for $u$,
+$$
+\KL(p\|q) = \Ent_q(f)\le \E_q[\Phi(f,a_u)] \le h \E_u[\Phi(f,a_u)] = h\cdot \Ent_u(f)
+$$
+Then, by tensorization of entropy:
+$$
+\Ent_u(f)\le \sum_{j\in B_i}\Ent_{u,j}(f)
+$$
+where $\Ent_{\mu,j}(f):= \E_\mu[f\log f] - \E_\mu[\E_\mu[f|x_{-j}]\log \E_\mu[f|x_{-j}]]$ for some $j\in B_i$. Finally, similarly to above we have that: 
+$\Ent_{\mu,j}(f)=\inf_{a>0} \E_\mu[\Phi(f,a(x_{-j}))]$
+
+$$
+\Ent_{u,j}(f) \le \E_u[\Phi(f,a_q(x_{-j}))] \le \frac{1}{\ell}\Ent_{q,j}(f)
+$$
+Combining this together, we have: 
+$$
+\KL(p\|q)\le \frac{h}{\ell} \sum_{j\in B_i}\Ent_{q,j}(f) = \frac{\max q}{\min q}\sum_{j\in B_i}\Ent_{q,j}(f)= \frac{\max q}{\min q}\sum_{j\in B_i} \E_{x_{-j}\sim p}\KL(p(\cdot |x_{-j})\|q(\cdot |x_{-j}))
+$$
+Now, let's average that over $\nu_{\overline{B_i}}$. We get that: 
+$$
+\KL(\nu \|K_i\nu) \le \left(\max_\xi \frac{\max q}{\min q}\right)\cdot \sum_{j\in B_i}\KL(\nu\| P_j\nu)
+$$
+For a fixed $i$, let $k_i:= |B_i|$ and $e_i$ the number of edges with at least one endpoint in $B_i$. 
+Then, we can take $\kappa_i:= \exp\left(\frac{2\beta}{\sqrt{d}} e_i + 2\sqrt{d} \beta k_i\right)$ and we get 
+$$
+    \KL(\nu \|K_i\nu) \le \kappa_i \cdot \sum_{j\in B_i}\KL(\nu\| P_j\nu)
+$$
+Bringing this together we get:
+$$
+\frac{1}{n}\sum_i \KL(\nu \|K_i\nu)  \le \frac{C_R}{n}\sum_{j}\KL(\nu\| P_j\nu)
+$$
+where $C_R:= \max_j \sum_{i: B_i\ni j}\kappa_i$. So this is not bounded if the degree is not bounded??
+</p>
+
+<p>
+    Problem is that $j$ might be contained in too many $B_{i}'s$. So we introduce a cutoff bound $L$ for the size of the ball.
+    Let $B_i:= \varnothing$ if $|B_{\le 2R}(i)|> L$. Then, we get that $k_i \le L$ and $e_i \le L^2$. Therefore, 
+    $$
+    \kappa_i \le \exp(\frac{2\beta}{\sqrt{d}}L^2+ 2\sqrt{d}\beta L). 
+    $$
+    Further $j$ can be in at most $L$ of $B_i$'s. Hence, $C_{R,L}:=L\exp\left(\frac{2\beta}{\sqrt{d}}L(L+d)\right)$
+</p>
+
+<h3 class="numbered">Applying it to random time Glauber</h3>
+<p>
+    Now for Glauber, let $\nu_t$ be the random time Glauber distribution. Then, 
+    $$
+        \E_t\left[\frac{1}{n}\sum_i \KL(\nu_t \|K_i\nu_t) \right] \le C_{R,L} \E_t\left[\frac{1}{n}\sum_{j}\KL(\nu_t\| P_j\nu_t)\right]
+    $$
+    Notice that $\KL(\nu_t \| P_j\nu_t) = \KL(\nu_t \|\pi) - \KL(P_j\nu_t \|\pi)$ and we get that:
+    $$
+    \begin{aligned}
+        \KL(P_j\nu_t \|\pi) - \KL(\nu_t \|\pi) - \sum_x ((P_j \nu_t )(x) - \nu_t(x))\log \frac{\nu_t(x)}{\pi(x)}\\
+        = \KL(P_j\nu_t \|\nu_t) \ge 0
+    \end{aligned}
+    $$
+    Hence, 
+    $$
+        \KL(\nu_t \| P_j\nu_t) = \KL(\nu_t \|\pi) - \KL(P_j\nu_t \|\pi) \le \langle \nu_t - P_j \nu_t,\log f_t\rangle
+    $$Summing over $j$, 
+    $$
+        \frac{1}{n}\sum_j\KL(\nu_t \| P_j\nu_t)  \le \langle (I-P)f_t ,\log f_t\rangle_\pi = \mathcal E_P(f_t,\log f_t)
+    $$
+    Therefore, 
+    $$
+        \E_t\left[\frac{1}{n}\sum_i \KL(\nu_t \|K_i\nu_t) \right] \le C_{R,L} \E_t\left[\mathcal E_P(f_t,\log f_t)\right]\le C_{R,L}\frac{\KL(\nu_0\|\pi)}{T}
+    $$
+</p>
