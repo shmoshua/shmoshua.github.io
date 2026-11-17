@@ -6,10 +6,11 @@ summary: "Blockchain as a better auxiliary chain to analyze for SBM"
 <h2 class="entry" data-date="2026-11-14">SBM Setting</h2>
 
 <p>
-    Let $\Omega:=\{\pm 1\}^N$ be the hypercube. We consider the following 2-community SBM: Let $d$ be a fixed average degree and $\eps \in(0,1)$. Let further $x\sim \text{Unif}(\Omega)$.
+    Let $\Omega:=\{\pm 1\}^N$ be the hypercube. We consider the following 2-community SBM: Let $d$ be a fixed average degree and $\eps \in(0,1)$. 
+    Let further $\sigma\sim \text{Unif}(\Omega)$.
     Then, $G\sim \text{SBM}(N,d,\eps)$ is a random graph where for all $i< j$:
     $$
-        \P(ij\in E)=\frac{d}{N}(1+\eps x_ix_j)
+        \P(ij\in E)=\frac{d}{N}(1+\eps \sigma_i\sigma_j)
     $$
     Let $A$ be its adjacency matrix. Let $\lambda:= \eps^2d$ be the SNR.
 </p>
@@ -18,13 +19,13 @@ summary: "Blockchain as a better auxiliary chain to analyze for SBM"
     We run Glauber dynamics with the following stationary distribution: 
 
     $$
-        \pi(x|G)\propto \exp\left(\frac{\beta}{\sqrt{d}} x^\top \left(A-\frac{d}{n}11^\top\right)x\right)
+        \pi(x|G)\propto \exp\left(\frac{\beta}{2\sqrt{d}} x^\top \left(A-\frac{d}{n}11^\top\right)x\right)
     $$
     for some inverse temp $\beta$. 
 </p>
 
 
-<h2 class="numbered"> Blockchain Glauber Transfer</h3>
+<h2 class="numbered"> Block Pinning and Glauber Transfer</h3>
 
 <p>
     So the framework is as follows:  
@@ -126,4 +127,40 @@ where $C_R:= \max_j \sum_{i: B_i\ni j}\kappa_i$. So this is not bounded if the d
     $$
         \E_t\left[\frac{1}{n}\sum_i \KL(\nu_t \|K_i\nu_t) \right] \le C_{R,L} \E_t\left[\mathcal E_P(f_t,\log f_t)\right]\le C_{R,L}\frac{\KL(\nu_0\|\pi)}{T}
     $$
+</p>
+
+<h2 class="numbered">Finding the Potential</h2>
+<p>
+For a law $\nu$, we define the potential function to be: 
+$$
+\Phi(\nu):= \log Z_G - \KL(\nu\|\pi)
+$$
+Then, the LHS of (17) is given by: 
+$$
+\frac{1}{n}\sum_i \E_{t\sim [0,T]}\left[ \Phi(K_i \nu_t) - \Phi(\nu_t)\right]
+$$
+Fix $\xi$ and have $p:=\nu(\cdot |\xi)$ and $q:=\pi(\cdot |\xi)$.
+Then, 
+$$
+\begin{aligned}
+\sum_i \KL(\nu \|K_i\nu)  
+&= \sum_i\sum_\xi\nu_{\overline{B_i}}(\xi)\KL(\nu(\cdot |\xi) \|\pi(\cdot |\xi)) \\
+&\ge 2\sum_i\sum_\xi \nu_{\overline{B_i}}(\xi)d_{\text{TV}}(\nu(\cdot |\xi) ,\pi(\cdot |\xi))^2 \\
+&\ge 2\sum_i\sum_\xi \nu_{\overline{B_i}}(\xi)|\nu(\{x_i = +1\} |\xi)  - \pi(\{x_i = +1\} |\xi)|^2 \\
+&\ge \frac{1}{2}\sum_i\sum_\xi\nu_{\overline{B_i}}(\xi)(a_i(\xi) - b_i(\xi))^2 \\
+&= \frac{1}{2}\sum_i \E_\nu(a_i- b_i)^2 \\
+\end{aligned}
+$$
+where $a_i := \E_\nu[x_i|x_{\overline{B_i}}]$ and $b_i := \E_\pi[x_i|x_{\overline{B_i}}$. 
+</p>
+<p>
+    So we have that one step of the block chain boosts the potential by at least $\sum_i \E_\nu(a_i- b_i)^2/2n$.
+    Let us put $U$ and $V$ be the random variable that denotes the prediction error in each distribution, i.e. 
+    $$
+    U:= \sum_{i}\sigma_i (x_i - a_i),\qquad V:= \sum_{i}\sigma_i (x_i - b_i)
+    $$Then,
+    $$
+        \sum_i \KL(\nu \|K_i\nu)  \ge \frac{1}{2n}\E_\nu[(U-V)^2] = \frac{1}{2n}\E_\nu[(U+V)^2] - \frac{2}{n}\E_\nu[UV]\ge - \frac{2}{n}\E_\nu[UV]
+    $$
+    We just have to show then that $-\E_\nu[UV]= - \Cov(U,V)\ge \Omega(1/\poly(n))$.
 </p>
